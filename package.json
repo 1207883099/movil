@@ -7,7 +7,8 @@
     "ios": "react-native run-ios",
     "start": "react-native start",
     "test": "jest",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "open": "rndebugger://set-debugger-loc?host=localhost&port=8081"
   },
   "dependencies": {
     "@react-native-community/async-storage": "^1.9.0",
@@ -25,7 +26,12 @@
     "react-native-reanimated": "^1.7.0",
     "react-native-safe-area-context": "^0.7.3",
     "react-native-screens": "^2.0.0-beta.8",
-    "react-native-vector-icons": "^6.6.0"
+    "react-native-vector-icons": "^6.6.0",
+    "react-redux": "^7.2.1",
+    "redux": "^4.0.5",
+    "redux-devtools-extension": "^2.13.8",
+    "redux-thunk": "^2.3.0",
+    "remote-redux-devtools": "^0.5.16"
   },
   "devDependencies": {
     "@babel/core": "^7.6.2",
@@ -35,6 +41,7 @@
     "eslint": "^6.5.1",
     "jest": "^24.9.0",
     "metro-react-native-babel-preset": "^0.56.0",
+    "react-devtools": "^4.8.2",
     "react-test-renderer": "16.9.0"
   },
   "jest": {

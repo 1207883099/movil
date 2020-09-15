@@ -20,6 +20,8 @@ import {
   DefaultTheme as PaperDefaultTheme,
   DarkTheme as PaperDarkTheme 
 } from 'react-native-paper';
+import { Provider } from 'react-redux';
+import Store from './redux/index';
 
 import { DrawerContent } from './screens/DrawerContent';
 
@@ -162,24 +164,27 @@ const App = () => {
       </View>
     );
   }
+
   return (
-    <PaperProvider theme={theme}>
-    <AuthContext.Provider value={authContext}>
-    <NavigationContainer theme={theme}>
-      { loginState.userToken !== null ? (
-        <Drawer.Navigator drawerContent={props => <DrawerContent {...props} />}>
-          <Drawer.Screen name="HomeDrawer" component={MainTabScreen} />
-          <Drawer.Screen name="SupportScreen" component={SupportScreen} />
-          <Drawer.Screen name="SettingsScreen" component={SettingsScreen} />
-          <Drawer.Screen name="BookmarkScreen" component={BookmarkScreen} />
-        </Drawer.Navigator>
-      )
-    :
-      <RootStackScreen/>
-    }
-    </NavigationContainer>
-    </AuthContext.Provider>
-    </PaperProvider>
+    <Provider store={Store()}>
+      <PaperProvider theme={theme}>
+        <AuthContext.Provider value={authContext}>
+          <NavigationContainer theme={theme}>
+            { loginState.userToken !== null ? (
+              <Drawer.Navigator drawerContent={props => <DrawerContent {...props} />}>
+                <Drawer.Screen name="HomeDrawer" component={MainTabScreen} />
+                <Drawer.Screen name="SupportScreen" component={SupportScreen} />
+                <Drawer.Screen name="SettingsScreen" component={SettingsScreen} />
+                <Drawer.Screen name="BookmarkScreen" component={BookmarkScreen} />
+              </Drawer.Navigator>
+            )
+          :
+            <RootStackScreen/>
+          }
+          </NavigationContainer>
+        </AuthContext.Provider>
+      </PaperProvider>
+    </Provider>
   );
 }
 

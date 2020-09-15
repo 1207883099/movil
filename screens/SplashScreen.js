@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { connect } from 'react-redux';
 import { 
     View, 
     Text, 
@@ -13,8 +14,12 @@ import LinearGradient from 'react-native-linear-gradient';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { useTheme } from '@react-navigation/native';
 
-const SplashScreen = ({navigation}) => {
+const SplashScreen = ({navigation, UsuarioReducer}) => {
     const { colors } = useTheme();
+
+    useEffect( () => {
+        console.log(UsuarioReducer);
+    },[UsuarioReducer]);
 
     return (
       <View style={styles.container}>
@@ -58,7 +63,11 @@ const SplashScreen = ({navigation}) => {
     );
 };
 
-export default SplashScreen;
+const mapStateToProps = ({ UsuarioReducer }) => {
+    return { UsuarioReducer };
+}
+
+export default connect(mapStateToProps, null)(SplashScreen);
 
 const {height} = Dimensions.get("screen");
 const height_logo = height * 0.28;
