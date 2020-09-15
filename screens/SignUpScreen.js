@@ -75,7 +75,7 @@ const SignInScreen = ({navigation}) => {
       <View style={styles.container}>
           <StatusBar backgroundColor='#009387' barStyle="light-content"/>
         <View style={styles.header}>
-            <Text style={styles.text_header}>Register Now!</Text>
+            <Text style={styles.text_header}>Registrare ahora!</Text>
         </View>
         <Animatable.View 
             animation="fadeInUpBig"
@@ -90,7 +90,7 @@ const SignInScreen = ({navigation}) => {
                     size={20}
                 />
                 <TextInput 
-                    placeholder="Your Username"
+                    placeholder="Tu Username"
                     style={styles.textInput}
                     autoCapitalize="none"
                     onChangeText={(val) => textInputChange(val)}
@@ -118,7 +118,7 @@ const SignInScreen = ({navigation}) => {
                     size={20}
                 />
                 <TextInput 
-                    placeholder="Your Password"
+                    placeholder="Tu Password"
                     secureTextEntry={data.secureTextEntry ? true : false}
                     style={styles.textInput}
                     autoCapitalize="none"
@@ -145,7 +145,7 @@ const SignInScreen = ({navigation}) => {
 
             <Text style={[styles.text_footer, {
                 marginTop: 35
-            }]}>Confirm Password</Text>
+            }]}>Confirmar Password</Text>
             <View style={styles.action}>
                 <Feather 
                     name="lock"
@@ -153,7 +153,7 @@ const SignInScreen = ({navigation}) => {
                     size={20}
                 />
                 <TextInput 
-                    placeholder="Confirm Your Password"
+                    placeholder="Confirmar Tu Password"
                     secureTextEntry={data.confirm_secureTextEntry ? true : false}
                     style={styles.textInput}
                     autoCapitalize="none"
@@ -176,7 +176,7 @@ const SignInScreen = ({navigation}) => {
                     />
                     }
                 </TouchableOpacity>
-            </View>
+            </View>{/*
             <View style={styles.textPrivate}>
                 <Text style={styles.color_textPrivate}>
                     By signing up you agree to our
@@ -184,7 +184,7 @@ const SignInScreen = ({navigation}) => {
                 <Text style={[styles.color_textPrivate, {fontWeight: 'bold'}]}>{" "}Terms of service</Text>
                 <Text style={styles.color_textPrivate}>{" "}and</Text>
                 <Text style={[styles.color_textPrivate, {fontWeight: 'bold'}]}>{" "}Privacy policy</Text>
-            </View>
+            </View>*/}
             <View style={styles.button}>
                 <TouchableOpacity
                     style={styles.signIn}
@@ -196,7 +196,7 @@ const SignInScreen = ({navigation}) => {
                 >
                     <Text style={[styles.textSign, {
                         color:'#fff'
-                    }]}>Sign Up</Text>
+                    }]}>Registrarme</Text>
                 </LinearGradient>
                 </TouchableOpacity>
 
@@ -210,7 +210,7 @@ const SignInScreen = ({navigation}) => {
                 >
                     <Text style={[styles.textSign, {
                         color: '#009387'
-                    }]}>Sign In</Text>
+                    }]}>Iniciar Session</Text>
                 </TouchableOpacity>
             </View>
             </ScrollView>

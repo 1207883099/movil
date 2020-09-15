@@ -23,7 +23,7 @@ const SplashScreen = ({navigation}) => {
             <Animatable.Image 
                 animation="bounceIn"
                 duraton="1500"
-            source={require('../assets/logo.png')}
+            source={require('../assets/logo-clementina.jpeg')}
             style={styles.logo}
             resizeMode="stretch"
             />
@@ -36,15 +36,15 @@ const SplashScreen = ({navigation}) => {
         >
             <Text style={[styles.title, {
                 color: colors.text
-            }]}>Stay connected with everyone!</Text>
-            <Text style={styles.text}>Sign in with account</Text>
+            }]}>Cooperativa de produccion y comercializacion "La clementina"</Text>
+            <Text style={styles.text}>Procede a iniciar session</Text>
             <View style={styles.button}>
             <TouchableOpacity onPress={()=>navigation.navigate('SignInScreen')}>
                 <LinearGradient
                     colors={['#08d4c4', '#01ab9d']}
                     style={styles.signIn}
                 >
-                    <Text style={styles.textSign}>Get Started</Text>
+                    <Text style={styles.textSign}>Empezar</Text>
                     <MaterialIcons 
                         name="navigate-next"
                         color="#fff"
@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
   },
   title: {
       color: '#05375a',
-      fontSize: 30,
+      fontSize: 27,
       fontWeight: 'bold'
   },
   text: {

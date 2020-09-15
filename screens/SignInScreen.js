@@ -97,10 +97,10 @@ const SignInScreen = ({navigation}) => {
         } );
 
         if ( data.username.length == 0 || data.password.length == 0 ) {
-            Alert.alert('Wrong Input!', 'Username or password field cannot be empty.', [
-                {text: 'Okay'}
+            Alert.alert('Datos vacios!', 'No se encontro datos especificos en los campos Username y Password.', [
+                {text: 'Ok'}
             ]);
-            return;
+            return false;
         }
 
         if ( foundUser.length == 0 ) {
@@ -116,7 +116,7 @@ const SignInScreen = ({navigation}) => {
       <View style={styles.container}>
           <StatusBar backgroundColor='#009387' barStyle="light-content"/>
         <View style={styles.header}>
-            <Text style={styles.text_header}>Welcome!</Text>
+            <Text style={styles.text_header}>Bienvenido!</Text>
         </View>
         <Animatable.View 
             animation="fadeInUpBig"
@@ -134,7 +134,7 @@ const SignInScreen = ({navigation}) => {
                     size={20}
                 />
                 <TextInput 
-                    placeholder="Your Username"
+                    placeholder="Tu Username"
                     placeholderTextColor="#666666"
                     style={[styles.textInput, {
                         color: colors.text
@@ -157,7 +157,7 @@ const SignInScreen = ({navigation}) => {
             </View>
             { data.isValidUser ? null : 
             <Animatable.View animation="fadeInLeft" duration={500}>
-            <Text style={styles.errorMsg}>Username must be 4 characters long.</Text>
+            <Text style={styles.errorMsg}>El username debe tener mas de 6 caracteres.</Text>
             </Animatable.View>
             }
             
@@ -173,7 +173,7 @@ const SignInScreen = ({navigation}) => {
                     size={20}
                 />
                 <TextInput 
-                    placeholder="Your Password"
+                    placeholder="Tu Password"
                     placeholderTextColor="#666666"
                     secureTextEntry={data.secureTextEntry ? true : false}
                     style={[styles.textInput, {
@@ -202,14 +202,10 @@ const SignInScreen = ({navigation}) => {
             </View>
             { data.isValidPassword ? null : 
             <Animatable.View animation="fadeInLeft" duration={500}>
-            <Text style={styles.errorMsg}>Password must be 8 characters long.</Text>
+            <Text style={styles.errorMsg}>Se requiere 8 o mas caracteres en password.</Text>
             </Animatable.View>
             }
             
-
-            <TouchableOpacity>
-                <Text style={{color: '#009387', marginTop:15}}>Forgot password?</Text>
-            </TouchableOpacity>
             <View style={styles.button}>
                 <TouchableOpacity
                     style={styles.signIn}
@@ -221,7 +217,7 @@ const SignInScreen = ({navigation}) => {
                 >
                     <Text style={[styles.textSign, {
                         color:'#fff'
-                    }]}>Sign In</Text>
+                    }]}>Entrar</Text>
                 </LinearGradient>
                 </TouchableOpacity>
 
@@ -235,7 +231,7 @@ const SignInScreen = ({navigation}) => {
                 >
                     <Text style={[styles.textSign, {
                         color: '#009387'
-                    }]}>Sign Up</Text>
+                    }]}>Registrarme</Text>
                 </TouchableOpacity>
             </View>
         </Animatable.View>
