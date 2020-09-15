@@ -1,10 +1,7 @@
-# React Navigation v5 mix
+# Cooperativa de productos ( La clementina )
+Desarrollo de una app mobil escrita en [React Native](https://reactnative.dev/) para el control de areas y tareas en la hacienda La clementina.
 
-This project is part of YouTube tutorial series on React Navigation 5. Here I have used every navigator option available and combine them in a single project to create a seemless user navigation experience for the app user.
-
-Then I have created some extra things such as login, signup & splash screen and provided an authentication flow using AsycStorage. Also I have created form validation for the login screen.
-
-Here you can find complete tutorial series and each video link.
+Interfaz y codigo de introduccion gracias a: [Pradip Debnath - itzpradip](https://github.com/itzpradip/react-navigation-v5-mix)
 
 # YouTube Video List
 - [Complete React Navigation v5 Playlist](https://www.youtube.com/playlist?list=PLQWFhX-gwJbmmqcP-9zMXBaxQbGKfIJY2)
@@ -22,4 +19,75 @@ Here you can find complete tutorial series and each video link.
 ### iPhone Demo
 
 ![React Navigation v5 Mix App Android Demo](https://raw.githubusercontent.com/itzpradip/react-navigation-v5-mix/master/app-interaction-demo-android.gif)
-### Android Demo
+
+### Pre-requisitos 📋
+
+_Que cosas necesitas para instalar el software y como instalarlas_
+
+_Tener instalado Node Js en tu ordenador, puedes obtener desde el sitio oficial para diferentes SOS._
+* [Node js](https://nodejs.org/es/) - Entorno de ejecucion javascript
+* [React navigation](https://reactnative.dev/) - Se ejecuta instrucciones de **React Native** mediante la consola o terminal.
+* [Android Studio][https://developer.android.com/studio] - Entorno para crear app mobil en Android.
+
+### Instalación 🔧
+
+Abrir una terminal o linea de comandos apuntando a la raiz de la carpeta y ejecutar.
+
+```
+npm install
+```
+o
+```
+yarn install
+```
+_Despues que termine la instacion proceda a ejecutar el siguiente comando para correr la app._
+
+```
+npm run android
+```
+
+Esto creara un Build en **Android Studio** para poder arrancar su app, tambien se ejecuta el emulador que tiene configurado por defecto en su **Android Studio**.
+
+Luego ejecutar....
+
+```
+npm run start
+```
+
+Para que react native realize la compilacion de Javascript a codigo nativo y asi poder mostrarse la app.
+
+## Ejecutando las pruebas ⚙️
+
+_Para hacer debuguin del codido, puedes hacer uso del siguiente comando para android._
+
+```
+control + m
+```
+Te mostrara un menu donde podras ver el fetch de datos, inspeccionar los componentes y elementos.
+
+## Construido con 🛠️
+
+_Para el desarrollo de esta app se utilizo las siguientes herramientas._
+
+* [React navigation](https://reactnative.dev/)
+* [Redux](https://es.redux.js.org/)
+* [Jwt](https://jwt.io/)
+* [React Navigation](https://reactnavigation.org/)
+
+## Autores ✒️
+
+* **Andrés Coello** - *Developer full stack* - [Andres Coello](https://www.instagram.com/coellogoyes/)
+
+## Licencia 📄
+
+Este proyecto está bajo la Licencia (MIT)
+
+## Expresiones de Gratitud 🎁
+
+* Pasate por mi perfil para ver algun otro proyecto 📢
+* Desarrollemos alguna app juntos, puedes escribirme en mis redes. 
+* Muchas gracias por pasarte por este proyecto 🤓.
+
+
+---
+⌨️ con ❤️ por [Andres Coello](https://www.instagram.com/coellogoyes/) 😊
