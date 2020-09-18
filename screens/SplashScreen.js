@@ -9,6 +9,7 @@ import {
     StatusBar,
     Image
 } from 'react-native';
+import { insertar } from '../db-local/config-db-local';
 import * as Animatable from 'react-native-animatable';
 import LinearGradient from 'react-native-linear-gradient';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
@@ -18,6 +19,7 @@ const SplashScreen = ({navigation, UsuarioReducer}) => {
     const { colors } = useTheme();
 
     useEffect( () => {
+        insertar();
         console.log(UsuarioReducer);
     },[UsuarioReducer]);
 

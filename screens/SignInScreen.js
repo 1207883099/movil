@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { 
     View, 
     Text, 
@@ -9,6 +9,7 @@ import {
     StatusBar,
     Alert
 } from 'react-native';
+import { consultar } from '../db-local/config-db-local';
 import * as Animatable from 'react-native-animatable';
 import LinearGradient from 'react-native-linear-gradient';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -34,6 +35,10 @@ const SignInScreen = ({navigation}) => {
     const { colors } = useTheme();
 
     const { signIn } = React.useContext(AuthContext);
+
+    useEffect( () => {
+        console.log(consultar());
+    },[]);
 
     const textInputChange = (val) => {
         if( val.trim().length >= 4 ) {
