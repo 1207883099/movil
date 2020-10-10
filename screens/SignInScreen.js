@@ -1,20 +1,21 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { 
     View, 
     Text, 
     TouchableOpacity, 
     TextInput,
     Platform,
+    AsyncStorage,
     StyleSheet ,
     StatusBar,
     Alert
 } from 'react-native';
-import { consultar } from '../db-local/config-db-local';
+import { consultar, insertar, db } from '../db-local/config-db-local';
 import * as Animatable from 'react-native-animatable';
 import LinearGradient from 'react-native-linear-gradient';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Feather from 'react-native-vector-icons/Feather';
-
+import axios from 'axios';
 import { useTheme } from 'react-native-paper';
 
 import { AuthContext } from '../components/context';
@@ -23,6 +24,7 @@ import Users from '../model/users';
 
 const SignInScreen = ({navigation}) => {
 
+    const [fetch, setFetch] = useState([]);
     const [data, setData] = React.useState({
         username: '',
         password: '',
@@ -37,7 +39,33 @@ const SignInScreen = ({navigation}) => {
     const { signIn } = React.useContext(AuthContext);
 
     useEffect( () => {
-        console.log(consultar());
+        try {
+            const fetchTest = async () => {
+                if(AsyncStorage.getItem('isFetch')){
+                    db.find({}, function (err, docs) {
+                        if(err){
+                            console.log(err);
+                        }
+                        setFetch(docs);
+                    });
+                    Alert.alert('Reutilizando los datos almacenados');
+                }else{
+                    const res = await axios({
+                        url: 'https://jsonplaceholder.typicode.com/users',
+                        method: 'GET'
+                    });
+
+                    setFetch(res.data);
+                    insertar(res.data);
+                    AsyncStorage.setItem('isFetch', 'true');
+                    Alert.alert('Se realizo un fetch al servidor');
+                }
+            }
+
+            fetchTest();
+        } catch (error) {
+            Alert.alert(error.message);
+        }
     },[]);
 
     const textInputChange = (val) => {
@@ -118,7 +146,7 @@ const SignInScreen = ({navigation}) => {
     }
 
     return (
-      <View style={styles.container}>
+      {/*<View style={styles.container}>
           <StatusBar backgroundColor='#009387' barStyle="light-content"/>
         <View style={styles.header}>
             <Text style={styles.text_header}>Bienvenido!</Text>
@@ -240,8 +268,17 @@ const SignInScreen = ({navigation}) => {
                 </TouchableOpacity>
             </View>
         </Animatable.View>
-      </View>
-    );
+                </View>*/},
+        <>
+            {fetch.map(item => (
+                <View key={item.id} style={{ margin: 5, backgroundColor: 'royalblue', padding: 5, border: 2, borderStyle: 'solid', borderColor: '#cdcdcd' }}>
+                    <Text style={{ padding: 5, color: '#fff' }}>{item.name}</Text>
+                    <Text style={{ padding: 5, color: '#fff' }}>{item.username}</Text>
+                    <Text style={{ padding: 5, color: '#fff' }}>{item.email}</Text>
+                </View>
+            ))}
+        </>
+    )
 };
 
 export default SignInScreen;

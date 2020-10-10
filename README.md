@@ -69,10 +69,11 @@ Te mostrara un menu donde podras ver el fetch de datos, inspeccionar los compone
 
 _Para el desarrollo de esta app se utilizo las siguientes herramientas._
 
-* [React navigation](https://reactnative.dev/)
+* [React native](https://reactnative.dev/)
 * [Redux](https://es.redux.js.org/)
 * [Jwt](https://jwt.io/)
 * [React Navigation](https://reactnavigation.org/)
+* [React Native Mongo db local](https://www.npmjs.com/package/react-native-local-mongodb#inserting-documents)
 
 ## Autores ✒️
 

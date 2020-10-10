@@ -19,7 +19,7 @@ const SplashScreen = ({navigation, UsuarioReducer}) => {
     const { colors } = useTheme();
 
     useEffect( () => {
-        insertar();
+        //insertar();
         console.log(UsuarioReducer);
     },[UsuarioReducer]);
 
