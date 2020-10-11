@@ -41,25 +41,25 @@ const SignInScreen = ({navigation}) => {
     useEffect( () => {
         try {
             const fetchTest = async () => {
-                if(AsyncStorage.getItem('isFetch')){
-                    db.find({}, function (err, docs) {
-                        if(err){
-                            console.log(err);
-                        }
+                db.find({}, async function (err, docs) {
+                    if(err){
+                        console.log(err);
+                    }
+                    Alert.alert(`${docs.length}`);
+                    if(docs.length > 0){
                         setFetch(docs);
-                    });
-                    Alert.alert('Reutilizando los datos almacenados');
-                }else{
-                    const res = await axios({
-                        url: 'https://jsonplaceholder.typicode.com/users',
-                        method: 'GET'
-                    });
+                        Alert.alert('Reutilizando los datos almacenados');
+                    }else{
+                        const res = await axios({
+                            url: 'https://jsonplaceholder.typicode.com/users',
+                            method: 'GET'
+                        });
 
-                    setFetch(res.data);
-                    insertar(res.data);
-                    AsyncStorage.setItem('isFetch', 'true');
-                    Alert.alert('Se realizo un fetch al servidor');
-                }
+                        setFetch(res.data);
+                        insertar(res.data);
+                        Alert.alert('Se realizo un fetch al servidor');
+                    }
+                });
             }
 
             fetchTest();
