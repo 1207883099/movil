@@ -10,6 +10,7 @@ import {
     StatusBar,
     Alert
 } from 'react-native';
+import { connect } from 'react-redux';
 import { consultar, insertar, db } from '../db-local/config-db-local';
 import * as Animatable from 'react-native-animatable';
 import LinearGradient from 'react-native-linear-gradient';
@@ -18,11 +19,7 @@ import Feather from 'react-native-vector-icons/Feather';
 import axios from 'axios';
 import { useTheme } from 'react-native-paper';
 
-import { AuthContext } from '../components/context';
-
-import Users from '../model/users';
-
-const SignInScreen = ({navigation}) => {
+const SignInScreen = ({navigation, UsuarioReducer}) => {
 
     const [fetch, setFetch] = useState([]);
     const [data, setData] = React.useState({
@@ -34,11 +31,10 @@ const SignInScreen = ({navigation}) => {
         isValidPassword: true,
     });
 
-    const { colors } = useTheme();
-
-    const { signIn } = React.useContext(AuthContext);
+    const { colors } = useTheme()
 
     useEffect( () => {
+        console.log(UsuarioReducer);
         try {
             const fetchTest = async () => {
                 db.find({}, async function (err, docs) {
@@ -67,83 +63,6 @@ const SignInScreen = ({navigation}) => {
             Alert.alert(error.message);
         }
     },[]);
-
-    const textInputChange = (val) => {
-        if( val.trim().length >= 4 ) {
-            setData({
-                ...data,
-                username: val,
-                check_textInputChange: true,
-                isValidUser: true
-            });
-        } else {
-            setData({
-                ...data,
-                username: val,
-                check_textInputChange: false,
-                isValidUser: false
-            });
-        }
-    }
-
-    const handlePasswordChange = (val) => {
-        if( val.trim().length >= 8 ) {
-            setData({
-                ...data,
-                password: val,
-                isValidPassword: true
-            });
-        } else {
-            setData({
-                ...data,
-                password: val,
-                isValidPassword: false
-            });
-        }
-    }
-
-    const updateSecureTextEntry = () => {
-        setData({
-            ...data,
-            secureTextEntry: !data.secureTextEntry
-        });
-    }
-
-    const handleValidUser = (val) => {
-        if( val.trim().length >= 4 ) {
-            setData({
-                ...data,
-                isValidUser: true
-            });
-        } else {
-            setData({
-                ...data,
-                isValidUser: false
-            });
-        }
-    }
-
-    const loginHandle = (userName, password) => {
-
-        const foundUser = Users.filter( item => {
-            return userName == item.username && password == item.password;
-        } );
-
-        if ( data.username.length == 0 || data.password.length == 0 ) {
-            Alert.alert('Datos vacios!', 'No se encontro datos especificos en los campos Username y Password.', [
-                {text: 'Ok'}
-            ]);
-            return false;
-        }
-
-        if ( foundUser.length == 0 ) {
-            Alert.alert('Invalid User!', 'Username or password is incorrect.', [
-                {text: 'Okay'}
-            ]);
-            return;
-        }
-        signIn(foundUser);
-    }
 
     return (
       {/*<View style={styles.container}>
@@ -281,7 +200,11 @@ const SignInScreen = ({navigation}) => {
     )
 };
 
-export default SignInScreen;
+const mapStateToProps = ({ UsuarioReducer }) => {
+    return { UsuarioReducer };
+}
+
+export default connect(mapStateToProps, null)(SignInScreen);
 
 const styles = StyleSheet.create({
     container: {

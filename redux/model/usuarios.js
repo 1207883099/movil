@@ -1,20 +1,26 @@
 
 /// CONSTANTES
 
-const initialData = {
-    myUser:[],
+export const initialData = {
+    MyUser: [{
+        token: undefined,
+        id_Empleado: undefined,
+        id_login_movil: undefined,
+        fecha_ingreso: undefined,
+        ip_public: undefined,
+    }],
     error: '',
-    loading: true,
+    loading: false,
 }
 
-const GET_USUSARIOS = "GET_USUARIOS";
+const SET_MY_USER = "SET_MY_USER";
 
 //// REDUCER
 
 export default function reducer(state = initialData, action){
     switch(action.type){
-        case GET_USUSARIOS:
-            return { ...state, myUser: action.payload, loading: false }
+        case SET_MY_USER:
+            return { ...state, MyUser: action.payload, loading: false }
         default:
             return state;
     }
@@ -22,9 +28,9 @@ export default function reducer(state = initialData, action){
 
 ///// ACTIONS
 
-export const getUsuario = () => (dispatch) => {
+export const SetUsuario = (myUser) => (dispatch) => {
     dispatch({
-        type: GET_USUSARIOS,
-        payload: [{ name: "andres", lasname: "coello" }]
+        type: SET_MY_USER,
+        payload: myUser
     });
 }

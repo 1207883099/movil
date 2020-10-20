@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import { 
     View, 
@@ -7,33 +7,63 @@ import {
     Dimensions,
     StyleSheet,
     StatusBar,
-    Image
+    TextInput,
+    Alert
 } from 'react-native';
-import { insertar } from '../db-local/config-db-local';
 import * as Animatable from 'react-native-animatable';
 import LinearGradient from 'react-native-linear-gradient';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { useTheme } from '@react-navigation/native';
+import {useNetInfo} from "@react-native-community/netinfo";
+import {NetworkInfo} from 'react-native-network-info';
+import { getDomain, setDomain } from '../api/config';
+import { LoaderSpinner } from '../components/loader/spiner-loader';
+import { SetUsuario } from '../redux/model/usuarios';
+import { Auth } from '../api/usuario';
 
-const SplashScreen = ({navigation, UsuarioReducer}) => {
+const SplashScreen = ({navigation, UsuarioReducer, SetUsuario}) => {
     const { colors } = useTheme();
+    const netInfo = useNetInfo();
+    const [isLogind, setIsLogind] = useState(false);
 
     useEffect( () => {
-        //insertar();
-        console.log(UsuarioReducer);
-    },[UsuarioReducer]);
+        if(!netInfo.isConnected){
+            Alert.alert('Necesitas conneccion a internet para bajar o subir datos.');
+        }
+    },[UsuarioReducer, netInfo]);
+
+    const btn_empezar = async () => {
+        setIsLogind(true);
+        if(getDomain()){
+            if(getDomain().indexOf('https') !== -1){
+                try {
+                    NetworkInfo.getIPAddress().then( async ip => {
+                        const auth = await Auth(ip);
+                        if(auth.data.feedback){
+                            Alert.alert(auth.data.feedback);
+                        }else{
+                            SetUsuario(auth.data);
+                            navigation.navigate('SignInScreen');
+                        }
+                    }).catch( err => Alert.alert(err.message));
+                } catch (error) {
+                    Alert.alert(error.message);
+                }
+            }else{
+                Alert.alert('Inserta una URL valida.');
+            }
+        }else{
+            Alert.alert('Inserta la URL de autorizacion.');
+        }
+        setIsLogind(false);
+    }
 
     return (
       <View style={styles.container}>
           <StatusBar backgroundColor='#009387' barStyle="light-content"/>
         <View style={styles.header}>
-            <Animatable.Image 
-                animation="bounceIn"
-                duraton="1500"
-            source={require('../assets/logo-clementina.jpeg')}
-            style={styles.logo}
-            resizeMode="stretch"
-            />
+            <Text style={{ color: '#fff', fontSize: 17, fontWeight: 'bold' }}>Inserta la direccion autorizada</Text>
+            <TextInput onChangeText={(value) => setDomain(value)} style={styles.input} type='url' placeholder='Inserta la URL autorizada'  />
         </View>
         <Animatable.View 
             style={[styles.footer, {
@@ -46,21 +76,22 @@ const SplashScreen = ({navigation, UsuarioReducer}) => {
             }]}>Cooperativa de produccion y comercializacion "La clementina"</Text>
             <Text style={styles.text}>Procede a iniciar session</Text>
             <View style={styles.button}>
-            <TouchableOpacity onPress={()=>navigation.navigate('SignInScreen')}>
-                <LinearGradient
-                    colors={['#08d4c4', '#01ab9d']}
-                    style={styles.signIn}
-                >
-                    <Text style={styles.textSign}>Empezar</Text>
-                    <MaterialIcons 
-                        name="navigate-next"
-                        color="#fff"
-                        size={20}
-                    />
-                </LinearGradient>
-            </TouchableOpacity>
+                <TouchableOpacity onPress={btn_empezar}>
+                    <LinearGradient
+                        colors={['#08d4c4', '#01ab9d']}
+                        style={styles.signIn}
+                    >
+                        <Text style={styles.textSign}>Empezar</Text>
+                        <MaterialIcons 
+                            name="navigate-next"
+                            color="#fff"
+                            size={20}
+                        />
+                    </LinearGradient>
+                </TouchableOpacity>
             </View>
         </Animatable.View>
+        {isLogind && <LoaderSpinner />}
       </View>
     );
 };
@@ -69,7 +100,15 @@ const mapStateToProps = ({ UsuarioReducer }) => {
     return { UsuarioReducer };
 }
 
-export default connect(mapStateToProps, null)(SplashScreen);
+const mapDispatchToProp = {
+    SetUsuario,
+}
+
+export default connect(mapStateToProps, mapDispatchToProp)(SplashScreen);
+
+
+///// Styles ....
+
 
 const {height} = Dimensions.get("screen");
 const height_logo = height * 0.28;
@@ -83,6 +122,16 @@ const styles = StyleSheet.create({
       flex: 2,
       justifyContent: 'center',
       alignItems: 'center'
+  },
+  input: {
+    borderColor: '#fff',
+    borderStyle: 'solid',
+    borderWidth: 2,
+    borderRadius: 10,
+    paddingHorizontal: 5,
+    width: '80%',
+    color: '#fff',
+    marginTop: 15,
   },
   footer: {
       flex: 1,
