@@ -7,7 +7,7 @@ export const initialData = {
         id_Empleado: undefined,
         id_login_movil: undefined,
         fecha_ingreso: undefined,
-        ip_public: undefined,
+        movil_ip: undefined,
     }],
     error: '',
     loading: false,
