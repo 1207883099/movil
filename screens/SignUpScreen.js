@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { LoaderSpinner } from '../components/loader/spiner-loader';
 import { db } from '../db-local/config-db-local';
-import { MessageAlert } from '../components/message';
+import { MessageAlert } from '../components/pequenos/message';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import * as Animatable from 'react-native-animatable';
 
@@ -27,7 +27,7 @@ const SignInScreen = ({navigation}) => {
                     if(err){
                         Alert.alert(err.message);
                     }
-                    setDataLocal(docs);
+                    setDataLocal(docs[0].My_Cuadrilla.Empleados);
                     setIsLoading(false);
                 });
             }
@@ -62,8 +62,11 @@ const SignInScreen = ({navigation}) => {
         >
             <ScrollView>
                 {dataLocal.map(data => (
-                    <View style={{ backgroundColor: '#25AEF0' }} key={data.id}>
-                        <Text style={{ color:'#000' }}>Email: {data.email}</Text>
+                    <View style={{ padding: 10, borderBottom: 2, borderBottomStyle: 'solid', borderBottomColor: '#cddcdcd', borderBottomWidth: 2 }} key={data.Codigo}>
+                        <Text style={{ color:'#000' }}>Cedula: {data.Cedula}</Text>
+                        <Text style={{ color:'#000' }}>Nombre: {data.Nombre}</Text>
+                        <Text style={{ color:'#000' }}>Apellido: {data.Apellido}</Text>
+                        <Text style={{ color:'#000' }}>Codigo: {data.Codigo}</Text>
                     </View>
                 ))}
 

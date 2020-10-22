@@ -16,6 +16,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { useTheme } from '@react-navigation/native';
 import {useNetInfo} from "@react-native-community/netinfo";
 import {NetworkInfo} from 'react-native-network-info';
+import { db } from '../db-local/config-db-local';
 import { getDomain, setDomain } from '../api/config';
 import { LoaderSpinner } from '../components/loader/spiner-loader';
 import { SetUsuario } from '../redux/model/usuarios';
@@ -30,7 +31,17 @@ const SplashScreen = ({navigation, UsuarioReducer, SetUsuario}) => {
         if(!netInfo.isConnected){
             Alert.alert('Necesitas conneccion a internet para bajar o subir datos.');
         }
-    },[UsuarioReducer, netInfo]);
+
+        db.find({}, async function (err, docs) {
+            if(err){
+                Alert.alert(err.message);
+            }
+
+            if(docs.length > 0){
+                navigation.navigate('SignInScreen');
+            }
+        });
+    },[netInfo, db]);
 
     const btn_empezar = async () => {
         setIsLogind(true);
@@ -42,7 +53,8 @@ const SplashScreen = ({navigation, UsuarioReducer, SetUsuario}) => {
                         if(auth.data.feedback){
                             Alert.alert(auth.data.feedback);
                         }else{
-                            SetUsuario(auth.data);
+                            console.log(auth.data);
+                            SetUsuario(auth.data.MyUser);
                             navigation.navigate('SignInScreen');
                         }
                     }).catch( err => Alert.alert(err.message));
@@ -76,7 +88,7 @@ const SplashScreen = ({navigation, UsuarioReducer, SetUsuario}) => {
             }]}>Cooperativa de produccion y comercializacion "La clementina"</Text>
             <Text style={styles.text}>Procede a iniciar session</Text>
             <View style={styles.button}>
-                <TouchableOpacity onPress={btn_empezar}>
+                {isLogind ? <LoaderSpinner /> : <TouchableOpacity onPress={btn_empezar}>
                     <LinearGradient
                         colors={['#08d4c4', '#01ab9d']}
                         style={styles.signIn}
@@ -88,10 +100,9 @@ const SplashScreen = ({navigation, UsuarioReducer, SetUsuario}) => {
                             size={20}
                         />
                     </LinearGradient>
-                </TouchableOpacity>
+                </TouchableOpacity>}
             </View>
         </Animatable.View>
-        {isLogind && <LoaderSpinner />}
       </View>
     );
 };
