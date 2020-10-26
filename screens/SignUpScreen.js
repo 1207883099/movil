@@ -27,7 +27,7 @@ const SignInScreen = ({navigation}) => {
                     if(err){
                         Alert.alert(err.message);
                     }
-                    setDataLocal(docs[0].My_Cuadrilla.Empleados);
+                    setDataLocal(docs[0].My_Cuadrilla);
                     setIsLoading(false);
                 });
             }
@@ -44,7 +44,7 @@ const SignInScreen = ({navigation}) => {
       <View style={styles.container}>
           <StatusBar backgroundColor='#009387' barStyle="light-content"/>
         <View style={styles.header}>
-            <Text style={styles.text_header}>Tu Cuadrilla</Text>
+            <Text style={styles.text_header}>Tus Cuadrilla</Text>
             <View style={styles.button}>
                 <TouchableOpacity style={{ backgroundColor: '#fff', padding: 7, borderRadius: 15 }} onPress={() => navigation.navigate('SignInScreen')}>
                     <MaterialIcons 
@@ -61,13 +61,21 @@ const SignInScreen = ({navigation}) => {
             style={styles.footer}
         >
             <ScrollView>
-                {dataLocal.map(data => (
-                    <View style={{ padding: 10, borderBottom: 2, borderBottomStyle: 'solid', borderBottomColor: '#cddcdcd', borderBottomWidth: 2 }} key={data.Codigo}>
-                        <Text style={{ color:'#000' }}>Cedula: {data.Cedula}</Text>
-                        <Text style={{ color:'#000' }}>Nombre: {data.Nombre}</Text>
-                        <Text style={{ color:'#000' }}>Apellido: {data.Apellido}</Text>
-                        <Text style={{ color:'#000' }}>Codigo: {data.Codigo}</Text>
-                    </View>
+                {dataLocal.map((cuadrilla, index) => (
+                    <>
+                        <View key={index}>
+                            <Text style={{ fontSize: 18, fontWeight: 'bold' }}>Nombre:  "{cuadrilla.Nombre}"</Text>
+                            <Text style={{ fontSize: 18, fontWeight: 'bold' }}>Estado:  "{cuadrilla.Estado}"</Text>
+                        </View>
+                        {cuadrilla.Empleados.map((empleado, index) => (
+                            <View style={{ padding: 10, borderBottom: 2, borderBottomStyle: 'solid', borderBottomColor: '#cddcdcd', borderBottomWidth: 2 }} key={index}>
+                                <Text style={{ color:'#000' }}>Cedula: {empleado.Cedula}</Text>
+                                <Text style={{ color:'#000' }}>Nombre: {empleado.Nombre}</Text>
+                                <Text style={{ color:'#000' }}>Apellido: {empleado.Apellido}</Text>
+                                <Text style={{ color:'#000' }}>Codigo: {empleado.Codigo}</Text>
+                            </View>
+                        ))}
+                    </>
                 ))}
 
                 {isLoading && <LoaderSpinner />}

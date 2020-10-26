@@ -25,6 +25,7 @@ import UserReducer, { initialData } from './redux/model/usuarios';
 import SplashScreen from './screens/SplashScreen';
 import SignInScreen from './screens/SignInScreen';
 import SignUpScreen from './screens/SignUpScreen';
+import ParteDiario from './screens/parteDiario';
 // import AsyncStorage from '@react-native-community/async-storage';
 
 const RootStack = createStackNavigator();
@@ -70,6 +71,7 @@ const App = () => {
               <RootStack.Screen name="SplashScreen" component={SplashScreen}/>
               <RootStack.Screen name="SignInScreen" component={SignInScreen}/>
               <RootStack.Screen name="SignUpScreen" component={SignUpScreen}/>
+              <RootStack.Screen name="ParteDiario" component={ParteDiario}/>
             </RootStack.Navigator>
         </NavigationContainer>
       </PaperProvider>

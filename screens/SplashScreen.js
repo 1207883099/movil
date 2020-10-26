@@ -22,7 +22,7 @@ import { LoaderSpinner } from '../components/loader/spiner-loader';
 import { SetUsuario } from '../redux/model/usuarios';
 import { Auth } from '../api/usuario';
 
-const SplashScreen = ({navigation, UsuarioReducer, SetUsuario}) => {
+const SplashScreen = ({navigation, route, SetUsuario}) => {
     const { colors } = useTheme();
     const netInfo = useNetInfo();
     const [isLogind, setIsLogind] = useState(false);
@@ -32,16 +32,19 @@ const SplashScreen = ({navigation, UsuarioReducer, SetUsuario}) => {
             Alert.alert('Necesitas conneccion a internet para bajar o subir datos.');
         }
 
-        db.find({}, async function (err, docs) {
-            if(err){
-                Alert.alert(err.message);
-            }
+        if(route.params == undefined){
+            db.find({}, async function (err, docs) {
+                if(err){
+                    Alert.alert(err.message);
+                }
+    
+                if(docs.length > 0){
+                    navigation.navigate('SignInScreen');
+                }
+            });
+        }
 
-            if(docs.length > 0){
-                navigation.navigate('SignInScreen');
-            }
-        });
-    },[netInfo, db]);
+    },[netInfo, db, route, navigation]);
 
     const btn_empezar = async () => {
         setIsLogind(true);
@@ -53,7 +56,6 @@ const SplashScreen = ({navigation, UsuarioReducer, SetUsuario}) => {
                         if(auth.data.feedback){
                             Alert.alert(auth.data.feedback);
                         }else{
-                            console.log(auth.data);
                             SetUsuario(auth.data.MyUser);
                             navigation.navigate('SignInScreen');
                         }

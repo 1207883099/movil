@@ -100,15 +100,29 @@ const SignInScreen = ({navigation, UsuarioReducer}) => {
 
                             <TouchableOpacity
                                 style={styles.delete}
-                                onPress={() => navigation.navigate('SignUpScreen')}
+                                onPress={() => navigation.navigate('SignUpScreen', {test: 'probando'})}
                             >
                                 <LinearGradient
-                                    colors={['#5982EB', '#6491EB']}
+                                    colors={['#5982EB', '#A69649']}
                                     style={styles.signIn}
                                 >
                                     <Text style={[styles.textSign, {
                                         color:'#fff'
-                                    }]}>Ver Mi Cuadrilla</Text>
+                                    }]}>Ver Mis Cuadrilla</Text>
+                                </LinearGradient>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity
+                                style={styles.delete}
+                                onPress={() => navigation.navigate('ParteDiario')}
+                            >
+                                <LinearGradient
+                                    colors={['#69ABC9', '#69D6C9']}
+                                    style={styles.signIn}
+                                >
+                                    <Text style={[styles.textSign, {
+                                        color:'#fff'
+                                    }]}>Gestionar Parte Diario</Text>
                                 </LinearGradient>
                             </TouchableOpacity>
 
@@ -136,18 +150,33 @@ const SignInScreen = ({navigation, UsuarioReducer}) => {
                         </>
                     )}
 
-                    {dataLocal.length > 0 && UsuarioReducer.MyUser[0].movil_ip !== undefined && <TouchableOpacity
-                        onPress={() => navigation.navigate('SignUpScreen')}
-                        style={[styles.signIn, {
-                            borderColor: '#009387',
-                            borderWidth: 1,
-                            marginTop: 15
-                        }]}
-                    >
-                        <Text style={[styles.textSign, {
-                            color: '#009387'
-                        }]}>Subir datos</Text>
-                    </TouchableOpacity>}
+                    {dataLocal.length > 0 && UsuarioReducer.MyUser[0].movil_ip !== undefined ? (
+                        <TouchableOpacity
+                            onPress={() => navigation.navigate('SignUpScreen')}
+                            style={[styles.signIn, {
+                                borderColor: '#009387',
+                                borderWidth: 1,
+                                marginTop: 15
+                            }]}
+                        >
+                            <Text style={[styles.textSign, {
+                                color: '#009387'
+                            }]}>Subir datos</Text>
+                        </TouchableOpacity>
+                    ) : (
+                        <TouchableOpacity
+                            onPress={() => navigation.navigate('SplashScreen', {login: true})}
+                            style={[styles.signIn, {
+                                borderColor: '#009387',
+                                borderWidth: 1,
+                                marginTop: 15
+                            }]}
+                        >
+                            <Text style={[styles.textSign, {
+                                color: '#009387'
+                            }]}>Volver ah iniciar session</Text>
+                        </TouchableOpacity>
+                    )}
                 </ScrollView>
             </View>
         </>
