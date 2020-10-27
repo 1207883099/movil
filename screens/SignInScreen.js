@@ -163,7 +163,7 @@ const SignInScreen = ({navigation, UsuarioReducer}) => {
                                 color: '#009387'
                             }]}>Subir datos</Text>
                         </TouchableOpacity>
-                    ) : (
+                    ) : ( dataLocal.length > 0 &&
                         <TouchableOpacity
                             onPress={() => navigation.navigate('SplashScreen', {login: true})}
                             style={[styles.signIn, {
