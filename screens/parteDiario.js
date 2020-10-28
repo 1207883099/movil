@@ -26,6 +26,8 @@ const ParteDiarioScreen = ({navigation}) => {
             Alert.alert(err.message);
           }
 
+          console.log(docs[0]);
+
           if (IndexDb > 0) {
             if (docs[IndexDb]) {
               setIsParteDiario(false);
@@ -102,10 +104,46 @@ const ParteDiarioScreen = ({navigation}) => {
       const Result_Sector = Sectores.find(
         (sector) => sector.IdSector === IdSector,
       );
-      return (
-        Result_Sector.Nombre.trim() + ' - ' + Result_Sector.Nombre_Hacienda
-      );
+      return Result_Sector.Nombre + ' - ' + Result_Sector.Nombre_Hacienda;
     }
+  };
+
+  const finalizar_plantilla = () => {
+    console.log('final');
+    db.find({}, async function (err, docs) {
+      if (err) {
+        Alert.alert(err.message);
+      }
+      const dataBd = docs;
+
+      db.remove({}, {multi: true}, function (err, numRemoved) {
+        if (err) {
+          Alert.alert(err.message);
+        }
+
+        Alert.alert(`Se eliminaron ${numRemoved} registros guardados.`);
+
+        dataBd.splice(IndexDb, 1);
+        dataBd.map((data, index) => {
+          if (index === IndexDb) {
+            console.log('final');
+            const ParteDiario = {
+              tipo: MisPartesDiarios[0].tipo,
+              sector: MisPartesDiarios[0].sector,
+              labores: LaboresAsignado,
+            };
+
+            const Mis_Parte_Diario = [];
+            Mis_Parte_Diario.push(ParteDiario);
+
+            return insertar([{Mis_Parte_Diario}]);
+          } else {
+            return insertar(data);
+          }
+        });
+        setIsReload(true);
+      });
+    });
   };
 
   return (
@@ -151,48 +189,96 @@ const ParteDiarioScreen = ({navigation}) => {
                         </Text>
                       </View>
                     </View>
-                  </>
-                ))}
 
-                <Button
-                  color="green"
-                  title="Agregar Labores"
-                  onPress={() => {
-                    setIsModal(true);
-                    setIsRender('Agregar-labores');
-                  }}
-                />
-
-                {LaboresAsignado.map((labores, index) => (
-                  <>
-                    <Text>{'\n'}</Text>
-                    <Text>
-                      <Text style={styles.label}>Labor: </Text>
-                      {obtener_labor(labores.labor)}
-                    </Text>
-                    <View style={{padding: 10}} key={index}>
-                      <Text
-                        style={{
-                          textAlign: 'center',
-                          fontWeight: 'bold',
-                          padding: 10,
-                        }}>
-                        Empleados Asignados
-                      </Text>
-                      {labores.Asignado.map((asig, index) => (
-                        <Text
-                          style={{
-                            color: '#000',
-                            borderBottom: 2,
-                            borderBottomStyle: 'solid',
-                            borderBottomColor: '#cddcdcd',
-                            borderBottomWidth: 2,
+                    {parte_diario.labores[0].labor === 'ninguno' ? (
+                      <>
+                        <Button
+                          color="green"
+                          title="Agregar Labores"
+                          onPress={() => {
+                            setIsModal(true);
+                            setIsRender('Agregar-labores');
                           }}
-                          key={index}>
-                          {obtener_empleado(asig.Empleado)}
-                        </Text>
-                      ))}
-                    </View>
+                        />
+
+                        {LaboresAsignado.length > 0 && (
+                          <Button
+                            title="Finalizar plantilla"
+                            onPress={finalizar_plantilla}
+                            color="#009387"
+                          />
+                        )}
+
+                        {LaboresAsignado.map((labores, index) => (
+                          <>
+                            <Text>{'\n'}</Text>
+                            <Text>
+                              <Text style={styles.label}>Labor: </Text>
+                              {obtener_labor(labores.labor)}
+                            </Text>
+                            <View style={{padding: 10}} key={index}>
+                              <Text
+                                style={{
+                                  textAlign: 'center',
+                                  fontWeight: 'bold',
+                                  padding: 10,
+                                }}>
+                                Empleados Asignados
+                              </Text>
+                              {labores.Asignado.map((asig, index) => (
+                                <Text
+                                  style={{
+                                    color: '#000',
+                                    borderBottom: 2,
+                                    borderBottomStyle: 'solid',
+                                    borderBottomColor: '#cddcdcd',
+                                    borderBottomWidth: 2,
+                                  }}
+                                  key={index}>
+                                  {obtener_empleado(asig.Empleado)}
+                                </Text>
+                              ))}
+                            </View>
+                          </>
+                        ))}
+                      </>
+                    ) : (
+                      <>
+                        {parte_diario.labores.map((labores, index) => (
+                          <>
+                            <Text>{'\n'}</Text>
+                            <Text>Desde la db</Text>
+                            <Text>
+                              <Text style={styles.label}>Labor: </Text>
+                              {obtener_labor(labores.labor)}
+                            </Text>
+                            <View style={{padding: 10}} key={index}>
+                              <Text
+                                style={{
+                                  textAlign: 'center',
+                                  fontWeight: 'bold',
+                                  padding: 10,
+                                }}>
+                                Empleados Asignados
+                              </Text>
+                              {labores.Asignado.map((asig, index) => (
+                                <Text
+                                  style={{
+                                    color: '#000',
+                                    borderBottom: 2,
+                                    borderBottomStyle: 'solid',
+                                    borderBottomColor: '#cddcdcd',
+                                    borderBottomWidth: 2,
+                                  }}
+                                  key={index}>
+                                  {obtener_empleado(asig.Empleado)}
+                                </Text>
+                              ))}
+                            </View>
+                          </>
+                        ))}
+                      </>
+                    )}
                   </>
                 ))}
               </>
@@ -232,6 +318,7 @@ const ParteDiarioScreen = ({navigation}) => {
         </View>
         <Button
           title="Crear Plantilla"
+          disabled={LaboresAsignado.length > 0}
           onPress={() => {
             setIsModal(true);
             setIsRender('Create-plantilla');
