@@ -15,7 +15,10 @@ export function CrearPlantilla({setIsModal, setIsReload}) {
           if (err) {
             Alert.alert(err.message);
           }
-          setSelectSector(docs[0].Sectores);
+          docs.map(
+            (dataBase, index) =>
+              docs[index].Sectores && setSelectSector(docs[index].Sectores),
+          );
         });
       };
 
@@ -36,9 +39,10 @@ export function CrearPlantilla({setIsModal, setIsReload}) {
             Asignado: [
               {
                 Empleado: 'ninguno',
+                observacion: 'ninguno',
                 Tareas: [
                   {
-                    Actividad: 'ningino',
+                    Actividad: 'ninguno',
                     Hectarea: 'ninguno',
                     Lote: 'ninguno',
                   },

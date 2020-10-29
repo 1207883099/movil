@@ -1,6 +1,7 @@
 import React from 'react';
 import {CrearPlantilla} from '../parte-diario/crear-plantilla';
 import {AgregarLabores} from '../parte-diario/agregar-labores';
+import {TareasAsginados} from '../parte-diario/tareas-asignados';
 import {
   Alert,
   Modal,
@@ -17,6 +18,7 @@ export function ModalScreen({
   render,
   setLaboresAsignado,
   LaboresAsignado,
+  thisEmpleado,
 }) {
   return (
     <>
@@ -42,6 +44,9 @@ export function ModalScreen({
                   LaboresAsignado={LaboresAsignado}
                   setIsModal={setIsModal}
                 />
+              )}
+              {render === 'Actividades-asignados' && (
+                <TareasAsginados thisEmpleado={thisEmpleado} />
               )}
 
               <View

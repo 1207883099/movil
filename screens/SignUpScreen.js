@@ -1,120 +1,135 @@
-import React, { useState, useEffect } from 'react';
-import { 
-    View,
-    Text,
-    Platform,
-    TouchableOpacity,
-    StyleSheet,
-    ScrollView,
-    StatusBar
+import React, {useState, useEffect} from 'react';
+import {
+  View,
+  Text,
+  Platform,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+  StatusBar,
 } from 'react-native';
-import { LoaderSpinner } from '../components/loader/spiner-loader';
-import { db } from '../db-local/config-db-local';
-import { MessageAlert } from '../components/pequenos/message';
+import {LoaderSpinner} from '../components/loader/spiner-loader';
+import {db} from '../db-local/config-db-local';
+import {MessageAlert} from '../components/pequenos/message';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import * as Animatable from 'react-native-animatable';
 
 const SignInScreen = ({navigation}) => {
+  const [dataLocal, setDataLocal] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-    const [dataLocal, setDataLocal] = useState([]);
-    const [isLoading, setIsLoading] = useState(false);
+  useEffect(() => {
+    setIsLoading(true);
+    try {
+      const fetchTest = () => {
+        db.find({}, async function (err, docs) {
+          if (err) {
+            Alert.alert(err.message);
+          }
+          docs.map(
+            (dataBase, index) =>
+              docs[index].My_Cuadrilla &&
+              setDataLocal(docs[index].My_Cuadrilla),
+          );
+          setIsLoading(false);
+        });
+      };
 
-    useEffect( () => {
-        setIsLoading(true);
-        try {
-            const fetchTest = () => {
-                db.find({}, async function (err, docs) {
-                    if(err){
-                        Alert.alert(err.message);
-                    }
-                    setDataLocal(docs[0].My_Cuadrilla);
-                    setIsLoading(false);
-                });
-            }
+      fetchTest();
+    } catch (error) {
+      Alert.alert(error.message);
+    }
 
-            fetchTest();
-        } catch (error) {
-            Alert.alert(error.message);
-        }
+    setIsLoading(false);
+  }, [db]);
 
-        setIsLoading(false);
-    },[db]);
-
-    return (
-      <View style={styles.container}>
-          <StatusBar backgroundColor='#009387' barStyle="light-content"/>
-        <View style={styles.header}>
-            <Text style={styles.text_header}>Tus Cuadrilla</Text>
-            <View style={styles.button}>
-                <TouchableOpacity style={{ backgroundColor: '#fff', padding: 7, borderRadius: 15 }} onPress={() => navigation.navigate('SignInScreen')}>
-                    <MaterialIcons 
-                        name="navigate-before"
-                        color="#009387"
-                        size={25}
-                    />
-                    <Text style={{ color: '#009387' }}>Volver</Text>
-                </TouchableOpacity>
-            </View>
+  return (
+    <View style={styles.container}>
+      <StatusBar backgroundColor="#009387" barStyle="light-content" />
+      <View style={styles.header}>
+        <Text style={styles.text_header}>Tus Cuadrilla</Text>
+        <View style={styles.button}>
+          <TouchableOpacity
+            style={{backgroundColor: '#fff', padding: 7, borderRadius: 15}}
+            onPress={() => navigation.navigate('SignInScreen')}>
+            <MaterialIcons name="navigate-before" color="#009387" size={25} />
+            <Text style={{color: '#009387'}}>Volver</Text>
+          </TouchableOpacity>
         </View>
-        <Animatable.View 
-            animation="fadeInUpBig"
-            style={styles.footer}
-        >
-            <ScrollView>
-                {dataLocal.map((cuadrilla, index) => (
-                    <>
-                        <View key={index}>
-                            <Text style={{ fontSize: 18, fontWeight: 'bold' }}>Nombre:  "{cuadrilla.Nombre}"</Text>
-                            <Text style={{ fontSize: 18, fontWeight: 'bold' }}>Estado:  "{cuadrilla.Estado}"</Text>
-                        </View>
-                        {cuadrilla.Empleados.map((empleado, index) => (
-                            <View style={{ padding: 10, borderBottom: 2, borderBottomStyle: 'solid', borderBottomColor: '#cddcdcd', borderBottomWidth: 2 }} key={index}>
-                                <Text style={{ color:'#000' }}>Cedula: {empleado.Cedula}</Text>
-                                <Text style={{ color:'#000' }}>Nombre: {empleado.Nombre}</Text>
-                                <Text style={{ color:'#000' }}>Apellido: {empleado.Apellido}</Text>
-                                <Text style={{ color:'#000' }}>Codigo: {empleado.Codigo}</Text>
-                            </View>
-                        ))}
-                    </>
-                ))}
-
-                {isLoading && <LoaderSpinner />}
-                {dataLocal.length === 0 && (
-                    <MessageAlert background='#F0615D' content='No se encontraron datos para mostrar.' />
-                )}
-            </ScrollView>
-        </Animatable.View>
       </View>
-    );
+      <Animatable.View animation="fadeInUpBig" style={styles.footer}>
+        <ScrollView>
+          {dataLocal.map((cuadrilla, index) => (
+            <>
+              <View key={index}>
+                <Text style={{fontSize: 18, fontWeight: 'bold'}}>
+                  Nombre: "{cuadrilla.Nombre}"
+                </Text>
+                <Text style={{fontSize: 18, fontWeight: 'bold'}}>
+                  Estado: "{cuadrilla.Estado}"
+                </Text>
+              </View>
+              {cuadrilla.Empleados.map((empleado, index) => (
+                <View
+                  style={{
+                    padding: 10,
+                    borderBottom: 2,
+                    borderBottomStyle: 'solid',
+                    borderBottomColor: '#cddcdcd',
+                    borderBottomWidth: 2,
+                  }}
+                  key={index}>
+                  <Text style={{color: '#000'}}>Cedula: {empleado.Cedula}</Text>
+                  <Text style={{color: '#000'}}>Nombre: {empleado.Nombre}</Text>
+                  <Text style={{color: '#000'}}>
+                    Apellido: {empleado.Apellido}
+                  </Text>
+                  <Text style={{color: '#000'}}>Codigo: {empleado.Codigo}</Text>
+                </View>
+              ))}
+            </>
+          ))}
+
+          {isLoading && <LoaderSpinner />}
+          {dataLocal.length === 0 && (
+            <MessageAlert
+              background="#F0615D"
+              content="No se encontraron datos para mostrar."
+            />
+          )}
+        </ScrollView>
+      </Animatable.View>
+    </View>
+  );
 };
 
 export default SignInScreen;
 
 const styles = StyleSheet.create({
-    container: {
-      flex: 1, 
-      backgroundColor: '#009387'
-    },
-    header: {
-        flex: 1,
-        justifyContent: 'flex-end',
-        paddingHorizontal: 20,
-        paddingBottom: 50
-    },
-    footer: {
-        flex: Platform.OS === 'ios' ? 3 : 5,
-        backgroundColor: '#fff',
-        borderTopLeftRadius: 30,
-        borderTopRightRadius: 30,
-        paddingHorizontal: 20,
-        paddingVertical: 30
-    },
-    text_header: {
-        color: '#fff',
-        fontWeight: 'bold',
-        fontSize: 30
-    },
-    button: {
-        alignItems: 'flex-end',
-    }
+  container: {
+    flex: 1,
+    backgroundColor: '#009387',
+  },
+  header: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    paddingHorizontal: 20,
+    paddingBottom: 50,
+  },
+  footer: {
+    flex: Platform.OS === 'ios' ? 3 : 5,
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    paddingHorizontal: 20,
+    paddingVertical: 30,
+  },
+  text_header: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 30,
+  },
+  button: {
+    alignItems: 'flex-end',
+  },
 });

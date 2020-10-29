@@ -4,13 +4,15 @@ import {MessageAlert} from '../components/pequenos/message';
 import {db, insertar} from '../db-local/config-db-local';
 import {ModalScreen} from '../components/modal/modal';
 import * as Animatable from 'react-native-animatable';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 const ParteDiarioScreen = ({navigation}) => {
   const [isParteDiario, setIsParteDiario] = useState(true);
   const [isModal, setIsModal] = useState(false);
   const [isReload, setIsReload] = useState(false);
   const [isRender, setIsRender] = useState('');
-  const [IndexDb, setIndexDb] = useState(1);
+  const [IndexDb, setIndexDb] = useState(0);
+  const [thisEmpleado, setThisEmpleado] = useState(0);
   const [next_prev, setNext_Prev] = useState({next: true, prev: true});
   const [MisPartesDiarios, setMisPartesDiarios] = useState([]);
   const [Sectores, setSectores] = useState([]);
@@ -26,28 +28,31 @@ const ParteDiarioScreen = ({navigation}) => {
             Alert.alert(err.message);
           }
 
-          console.log(docs[0]);
+          console.log(docs.length);
 
-          if (IndexDb > 0) {
-            if (docs[IndexDb]) {
-              setIsParteDiario(false);
-              setMisPartesDiarios(docs[IndexDb].Mis_Parte_Diario);
-              setSectores(docs[0].Sectores);
-              setCuadrillas(docs[0].My_Cuadrilla);
-              setLabores(docs[0].Labores);
+          if (IndexDb >= 0) {
+            docs.map((dataBase, index) => {
+              if (docs[index].Mis_Parte_Diario) {
+                setIsParteDiario(false);
+                setIndexDb(index);
+                setMisPartesDiarios(docs[index].Mis_Parte_Diario);
+                if (IndexDb === 0 || IndexDb === index) {
+                  setNext_Prev({next: true, prev: true});
+                } else {
+                  if (docs[index - 1].Mis_Parte_Diario) {
+                    setNext_Prev({next: true, prev: false});
+                  }
+                }
 
-              if (IndexDb === 1) {
-                setNext_Prev({next: true, prev: true});
-              } else {
-                if (docs[IndexDb - 1]) {
-                  setNext_Prev({next: true, prev: false});
+                if (docs[index + 1].Mis_Parte_Diario) {
+                  setNext_Prev({next: false, prev: true});
                 }
               }
-
-              if (docs[IndexDb + 1]) {
-                setNext_Prev({next: false, prev: true});
-              }
-            }
+              docs[index].Sectores && setSectores(docs[index].Sectores);
+              docs[index].My_Cuadrilla &&
+                setCuadrillas(docs[index].My_Cuadrilla);
+              docs[index].Labores && setLabores(docs[index].Labores);
+            });
           }
         });
       };
@@ -60,7 +65,7 @@ const ParteDiarioScreen = ({navigation}) => {
     } catch (error) {
       Alert.alert(error.message);
     }
-  }, [db, isReload]);
+  }, [db, isReload, IndexDb]);
 
   const delete_parte_diario = () => {
     db.find({}, async function (err, docs) {
@@ -77,7 +82,7 @@ const ParteDiarioScreen = ({navigation}) => {
         Alert.alert(`Se eliminaron ${numRemoved} registros guardados.`);
 
         dataBd.splice(IndexDb, 1);
-        dataBd.map((data) => insertar(data));
+        dataBd.map((data, index) => insertar(docs[index]));
         navigation.navigate('SignInScreen');
       });
     });
@@ -123,10 +128,8 @@ const ParteDiarioScreen = ({navigation}) => {
 
         Alert.alert(`Se eliminaron ${numRemoved} registros guardados.`);
 
-        dataBd.splice(IndexDb, 1);
         dataBd.map((data, index) => {
           if (index === IndexDb) {
-            console.log('final');
             const ParteDiario = {
               tipo: MisPartesDiarios[0].tipo,
               sector: MisPartesDiarios[0].sector,
@@ -138,10 +141,11 @@ const ParteDiarioScreen = ({navigation}) => {
 
             return insertar([{Mis_Parte_Diario}]);
           } else {
-            return insertar(data);
+            return insertar(dataBd[index]);
           }
         });
         setIsReload(true);
+        setLaboresAsignado([]);
       });
     });
   };
@@ -246,8 +250,6 @@ const ParteDiarioScreen = ({navigation}) => {
                       <>
                         {parte_diario.labores.map((labores, index) => (
                           <>
-                            <Text>{'\n'}</Text>
-                            <Text>Desde la db</Text>
                             <Text>
                               <Text style={styles.label}>Labor: </Text>
                               {obtener_labor(labores.labor)}
@@ -262,17 +264,24 @@ const ParteDiarioScreen = ({navigation}) => {
                                 Empleados Asignados
                               </Text>
                               {labores.Asignado.map((asig, index) => (
-                                <Text
-                                  style={{
-                                    color: '#000',
-                                    borderBottom: 2,
-                                    borderBottomStyle: 'solid',
-                                    borderBottomColor: '#cddcdcd',
-                                    borderBottomWidth: 2,
-                                  }}
+                                <View
+                                  style={styles.row_empleado_asig}
                                   key={index}>
-                                  {obtener_empleado(asig.Empleado)}
-                                </Text>
+                                  <Text>{obtener_empleado(asig.Empleado)}</Text>
+                                  <Text
+                                    style={styles.btn_actividad}
+                                    onPress={() => {
+                                      setIsModal(true);
+                                      setIsRender('Actividades-asignados');
+                                      setThisEmpleado(asig.Empleado);
+                                    }}>
+                                    <MaterialIcons
+                                      name="navigate-next"
+                                      color="#009387"
+                                      size={20}
+                                    />
+                                  </Text>
+                                </View>
                               ))}
                             </View>
                           </>
@@ -333,6 +342,7 @@ const ParteDiarioScreen = ({navigation}) => {
         render={isRender}
         setLaboresAsignado={setLaboresAsignado}
         LaboresAsignado={LaboresAsignado}
+        thisEmpleado={thisEmpleado}
       />
     </>
   );
@@ -342,11 +352,11 @@ export default ParteDiarioScreen;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flex: 5,
     backgroundColor: '#009387',
   },
   footer: {
-    height: 600,
+    height: '100%',
     backgroundColor: '#fff',
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
@@ -379,6 +389,23 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderStyle: 'solid',
     borderColor: 'red',
+    marginBottom: 10,
+  },
+  btn_actividad: {
+    borderWidth: 1,
+    borderStyle: 'solid',
+    borderColor: '#009387',
+    padding: 5,
+  },
+  row_empleado_asig: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    color: '#000',
+    padding: 5,
+    borderWidth: 2,
+    borderStyle: 'solid',
+    borderColor: '#cdcdcd',
     marginBottom: 10,
   },
 });

@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {Picker} from '@react-native-picker/picker';
 import {View, Text, Button, StyleSheet, Alert} from 'react-native';
-import {insertar, db} from '../../db-local/config-db-local';
+import {db} from '../../db-local/config-db-local';
 import {MessageAlert} from '../pequenos/message';
 
 export function AgregarLabores({
@@ -76,7 +76,7 @@ export function AgregarLabores({
             },
           ];
           const asig = [];
-          asig.push({Empleado: SelectEmpleado, tareas});
+          asig.push({Empleado: SelectEmpleado, tareas, observacion: 'ninguno'});
 
           setAsignado([...Asignado, ...asig]);
           Alert.alert(`${obtener_empleado(SelectEmpleado)} fue guardado.`);
