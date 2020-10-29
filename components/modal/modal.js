@@ -28,7 +28,7 @@ export function ModalScreen({
           transparent={true}
           visible={isModal}
           onRequestClose={() => {
-            Alert.alert("Precione 'Cancelar' para salir del modal.");
+            Alert.alert("Presione 'Cancelar' para salir del modal.");
           }}>
           <View style={styles.centeredView}>
             <View style={styles.modalView}>
@@ -46,7 +46,11 @@ export function ModalScreen({
                 />
               )}
               {render === 'Actividades-asignados' && (
-                <TareasAsginados thisEmpleado={thisEmpleado} />
+                <TareasAsginados
+                  thisEmpleado={thisEmpleado}
+                  setIsReload={setIsReload}
+                  setIsModal={setIsModal}
+                />
               )}
 
               <View

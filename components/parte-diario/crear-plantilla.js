@@ -40,7 +40,7 @@ export function CrearPlantilla({setIsModal, setIsReload}) {
               {
                 Empleado: 'ninguno',
                 observacion: 'ninguno',
-                Tareas: [
+                tareas: [
                   {
                     Actividad: 'ninguno',
                     Hectarea: 'ninguno',
@@ -59,6 +59,7 @@ export function CrearPlantilla({setIsModal, setIsReload}) {
       insertar([{Mis_Parte_Diario}]);
       setIsModal(false);
       setIsReload(true);
+      navigation.navigate('SignInScreen');
     } else {
       Alert.alert('Seleccione el sector en la seccion de sectores.');
     }

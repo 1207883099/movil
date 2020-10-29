@@ -13,12 +13,13 @@ const ParteDiarioScreen = ({navigation}) => {
   const [isRender, setIsRender] = useState('');
   const [IndexDb, setIndexDb] = useState(0);
   const [thisEmpleado, setThisEmpleado] = useState(0);
-  const [next_prev, setNext_Prev] = useState({next: false, prev: true});
+  const [next_prev, setNext_Prev] = useState({next: false, prev: false});
   const [MisPartesDiarios, setMisPartesDiarios] = useState([]);
   const [Sectores, setSectores] = useState([]);
   const [Labores, setLabores] = useState([]);
   const [Cuadrillas, setCuadrillas] = useState([]);
   const [LaboresAsignado, setLaboresAsignado] = useState([]);
+  const [DisponiblesParteDiario, setDisponiblesParteDiario] = useState([]);
 
   useEffect(() => {
     try {
@@ -28,35 +29,40 @@ const ParteDiarioScreen = ({navigation}) => {
             Alert.alert(err.message);
           }
 
-          console.log(docs.length + ' parte diario');
-
           if (IndexDb >= 0) {
+            let disponibles = [];
             let toma_parte_diario = true;
+
             docs.map((dataBase, index) => {
               docs[index].Sectores && setSectores(docs[index].Sectores);
               docs[index].My_Cuadrilla &&
                 setCuadrillas(docs[index].My_Cuadrilla);
               docs[index].Labores && setLabores(docs[index].Labores);
 
-              if (docs[index + IndexDb].Mis_Parte_Diario) {
+              if (
+                docs[
+                  DisponiblesParteDiario.length
+                    ? DisponiblesParteDiario[IndexDb]
+                    : index
+                ].Mis_Parte_Diario
+              ) {
+                DisponiblesParteDiario.length === 0 && disponibles.push(index);
+
                 if (toma_parte_diario) {
                   setIsParteDiario(false);
-                  console.log(index + IndexDb);
-                  setMisPartesDiarios(docs[index + IndexDb].Mis_Parte_Diario);
-
-                  /*if (docs[(index + IndexDb)].Mis_Parte_Diario) {
-                    setNext_Prev({next: true, prev: false});
-                  }
-
-                  if (docs[(index - IndexDb)].Mis_Parte_Diario) {
-                    setNext_Prev({next: false, prev: true});
-                  }*/
-
-                  setIndexDb(index + IndexDb);
+                  setMisPartesDiarios(
+                    docs[
+                      DisponiblesParteDiario.length
+                        ? DisponiblesParteDiario[IndexDb]
+                        : index
+                    ].Mis_Parte_Diario,
+                  );
                 }
                 toma_parte_diario = false;
               }
             });
+            DisponiblesParteDiario.length === 0 &&
+              setDisponiblesParteDiario(disponibles);
           }
         });
       };
@@ -85,8 +91,12 @@ const ParteDiarioScreen = ({navigation}) => {
 
         Alert.alert(`Se eliminaron ${numRemoved} registros guardados.`);
 
-        dataBd.splice(IndexDb, 1);
-        dataBd.map((data, index) => insertar(docs[index]));
+        //dataBd.splice(DisponiblesParteDiario[IndexDb], 1);
+        dataBd.map((data, index) => {
+          if (DisponiblesParteDiario[IndexDb] !== index) {
+            return insertar(docs[index]);
+          }
+        });
         navigation.navigate('SignInScreen');
       });
     });
@@ -315,18 +325,25 @@ const ParteDiarioScreen = ({navigation}) => {
           <Button
             title="Anterior"
             color={next_prev.prev ? '#cdcdcd' : '#8FBF1D'}
-            disabled={next_prev.prev}
+            disabled={DisponiblesParteDiario[0] === IndexDb}
             onPress={() => {
-              setIndexDb(IndexDb - 2);
+              setIndexDb(
+                DisponiblesParteDiario.findIndex((item) => item == IndexDb) - 1,
+              );
               setIsReload(true);
             }}
           />
           <Button
             title="Siguiente"
             color={next_prev.next ? '#cdcdcd' : '#8FBF1D'}
-            disabled={next_prev.next}
+            disabled={
+              DisponiblesParteDiario[DisponiblesParteDiario.length - 1] ===
+              IndexDb
+            }
             onPress={() => {
-              setIndexDb(IndexDb + 1);
+              setIndexDb(
+                DisponiblesParteDiario.findIndex((item) => item == IndexDb) + 1,
+              );
               setIsReload(true);
             }}
           />

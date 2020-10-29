@@ -76,7 +76,7 @@ export function AgregarLabores({
         if (obtener_empleado_asignado(SelectEmpleado) == undefined) {
           const tareas = [
             {
-              Actividad: 'ningino',
+              Actividad: 'ninguno',
               Hectarea: 'ninguno',
               Lote: 'ninguno',
             },
