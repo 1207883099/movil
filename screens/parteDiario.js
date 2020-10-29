@@ -13,7 +13,7 @@ const ParteDiarioScreen = ({navigation}) => {
   const [isRender, setIsRender] = useState('');
   const [IndexDb, setIndexDb] = useState(0);
   const [thisEmpleado, setThisEmpleado] = useState(0);
-  const [next_prev, setNext_Prev] = useState({next: true, prev: true});
+  const [next_prev, setNext_Prev] = useState({next: false, prev: true});
   const [MisPartesDiarios, setMisPartesDiarios] = useState([]);
   const [Sectores, setSectores] = useState([]);
   const [Labores, setLabores] = useState([]);
@@ -28,30 +28,34 @@ const ParteDiarioScreen = ({navigation}) => {
             Alert.alert(err.message);
           }
 
-          console.log(docs.length);
+          console.log(docs.length + ' parte diario');
 
           if (IndexDb >= 0) {
+            let toma_parte_diario = true;
             docs.map((dataBase, index) => {
-              if (docs[index].Mis_Parte_Diario) {
-                setIsParteDiario(false);
-                setIndexDb(index);
-                setMisPartesDiarios(docs[index].Mis_Parte_Diario);
-                if (IndexDb === 0 || IndexDb === index) {
-                  setNext_Prev({next: true, prev: true});
-                } else {
-                  if (docs[index - 1].Mis_Parte_Diario) {
-                    setNext_Prev({next: true, prev: false});
-                  }
-                }
-
-                if (docs[index + 1].Mis_Parte_Diario) {
-                  setNext_Prev({next: false, prev: true});
-                }
-              }
               docs[index].Sectores && setSectores(docs[index].Sectores);
               docs[index].My_Cuadrilla &&
                 setCuadrillas(docs[index].My_Cuadrilla);
               docs[index].Labores && setLabores(docs[index].Labores);
+
+              if (docs[index + IndexDb].Mis_Parte_Diario) {
+                if (toma_parte_diario) {
+                  setIsParteDiario(false);
+                  console.log(index + IndexDb);
+                  setMisPartesDiarios(docs[index + IndexDb].Mis_Parte_Diario);
+
+                  /*if (docs[(index + IndexDb)].Mis_Parte_Diario) {
+                    setNext_Prev({next: true, prev: false});
+                  }
+
+                  if (docs[(index - IndexDb)].Mis_Parte_Diario) {
+                    setNext_Prev({next: false, prev: true});
+                  }*/
+
+                  setIndexDb(index + IndexDb);
+                }
+                toma_parte_diario = false;
+              }
             });
           }
         });
@@ -89,8 +93,10 @@ const ParteDiarioScreen = ({navigation}) => {
   };
 
   const obtener_labor = (IdLabor) => {
-    const resul_labor = Labores.find((labor) => labor.IdLabor === IdLabor);
-    return resul_labor.Nombre;
+    if (Labores.length > 0) {
+      const resul_labor = Labores.find((labor) => labor.IdLabor === IdLabor);
+      return resul_labor.Nombre;
+    }
   };
 
   const obtener_empleado = (IdEmpleado) => {
@@ -311,7 +317,7 @@ const ParteDiarioScreen = ({navigation}) => {
             color={next_prev.prev ? '#cdcdcd' : '#8FBF1D'}
             disabled={next_prev.prev}
             onPress={() => {
-              setIndexDb(IndexDb - 1);
+              setIndexDb(IndexDb - 2);
               setIsReload(true);
             }}
           />

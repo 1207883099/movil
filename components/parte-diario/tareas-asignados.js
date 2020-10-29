@@ -162,13 +162,5 @@ const styles = StyleSheet.create({
   },
   row_tareas: {
     padding: 10,
-    shadowColor: '#cdcdcd',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.43,
-    shadowRadius: 7.51,
-    elevation: 3,
   },
 });

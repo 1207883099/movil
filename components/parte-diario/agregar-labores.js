@@ -25,15 +25,21 @@ export function AgregarLabores({
           if (err) {
             Alert.alert(err.message);
           }
-          setLabores(docs[0].Labores);
-          setCuadrillas(docs[0].My_Cuadrilla);
+          docs.map((dataBase, index) => {
+            docs[index].Labores && setLabores(docs[index].Labores);
 
-          if (docs[0].My_Cuadrilla.length > 1) {
-            setIsCuadrilla('');
-          } else {
-            setIsCuadrilla(docs[0].My_Cuadrilla[0].Nombre);
-            setEmpleados(docs[0].My_Cuadrilla[0].Empleados);
-          }
+            if (docs[index].My_Cuadrilla) {
+              setCuadrillas(docs[index].My_Cuadrilla);
+              if (docs[index].My_Cuadrilla.length > 1) {
+                setIsCuadrilla('');
+              } else {
+                docs[index].My_Cuadrilla &&
+                  setIsCuadrilla(docs[index].My_Cuadrilla[0].Nombre);
+                docs[index].My_Cuadrilla &&
+                  setEmpleados(docs[index].My_Cuadrilla[0].Empleados);
+              }
+            }
+          });
         });
       };
 
