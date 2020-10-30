@@ -19,6 +19,7 @@ export function ModalScreen({
   setLaboresAsignado,
   LaboresAsignado,
   thisEmpleado,
+  navigation,
 }) {
   return (
     <>
@@ -36,6 +37,7 @@ export function ModalScreen({
                 <CrearPlantilla
                   setIsReload={setIsReload}
                   setIsModal={setIsModal}
+                  navigation={navigation}
                 />
               )}
               {render === 'Agregar-labores' && (

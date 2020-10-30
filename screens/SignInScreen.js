@@ -12,6 +12,7 @@ import {connect} from 'react-redux';
 import {insertar, db} from '../db-local/config-db-local';
 import LinearGradient from 'react-native-linear-gradient';
 import {obtenerMaestra} from '../api/maestra';
+import {SubirParteDiario} from '../api/parte-diario';
 import {SemanaDelAno} from '../components/pequenos/semana-del-ano';
 
 const SignInScreen = ({navigation, UsuarioReducer}) => {
@@ -69,188 +70,235 @@ const SignInScreen = ({navigation, UsuarioReducer}) => {
     });
   };
 
+  const subir_datos = async () => {
+    setIsLoading(true);
+    try {
+      db.find({}, async function (err, docs) {
+        if (err) {
+          Alert.alert(err.message);
+        }
+
+        if (docs.some((data, index) => docs[index].Mis_Parte_Diario)) {
+          const partes_diario = docs.filter(
+            (data, index) => docs[index].Mis_Parte_Diario,
+          );
+          const resParteDiario = await SubirParteDiario(partes_diario);
+
+          if (resParteDiario.data.upload) {
+            Alert.alert(
+              `EXITO, se acabo de subir: ${partes_diario.length} partes diarios`,
+            );
+            eliminar_datos();
+          } else {
+            Alert.alert(
+              'ERROR, algo acabo de fallar al momento de subir los parte diarios.',
+            );
+          }
+        } else {
+          Alert.alert(
+            'No tienes datos que subir, crea y gestionar parte diarios y luego vuelve.',
+          );
+        }
+      });
+
+      setIsLoading(false);
+    } catch (error) {
+      Alert.alert(error.message);
+    }
+
+    setIsLoading(false);
+  };
+
   return (
     <>
-      <View style={{padding: 10, backgroundColor: '#cdcdcd'}}>
-        <Text style={{textAlign: 'center', fontSize: 18, fontWeight: 'bold'}}>
-          Mis Datos
-        </Text>
-        <Text>
-          Ip Movil:{' '}
-          <Text style={{fontWeight: 'bold'}}>
-            {UsuarioReducer.MyUser[0].movil_ip === undefined
-              ? 'Indefinido'
-              : UsuarioReducer.MyUser[0].movil_ip}
-          </Text>
-        </Text>
-        <Text>
-          Ingreso el:{' '}
-          <Text style={{fontWeight: 'bold'}}>
-            {UsuarioReducer.MyUser[0].fecha_ingreso === undefined
-              ? 'Indefinido'
-              : UsuarioReducer.MyUser[0].fecha_ingreso}
-          </Text>
-        </Text>
-        <Text>
-          Nombres:{' '}
-          <Text style={{fontWeight: 'bold'}}>
-            {UsuarioReducer.MyUser[0].Nombre === undefined
-              ? 'Indefinido'
-              : UsuarioReducer.MyUser[0].Nombre}
-          </Text>
-        </Text>
-        <Text>
-          Apellidos:{' '}
-          <Text style={{fontWeight: 'bold'}}>
-            {UsuarioReducer.MyUser[0].Apellido === undefined
-              ? 'Indefinido'
-              : UsuarioReducer.MyUser[0].Apellido}
-          </Text>
-        </Text>
-      </View>
-      <SemanaDelAno />
-      <View style={styles.button}>
+      <View style={styles.container}>
         <ScrollView>
-          {dataLocal.length > 0 ? (
-            <>
-              <TouchableOpacity style={styles.delete} onPress={eliminar_datos}>
-                <LinearGradient
-                  colors={['#EB9058', '#EB5443']}
-                  style={styles.signIn}>
-                  <Text
-                    style={[
-                      styles.textSign,
-                      {
-                        color: '#fff',
-                      },
-                    ]}>
-                    Eliminar Datos
-                  </Text>
-                </LinearGradient>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={styles.delete}
-                onPress={() =>
-                  navigation.navigate('SignUpScreen', {test: 'probando'})
-                }>
-                <LinearGradient
-                  colors={['#5982EB', '#A69649']}
-                  style={styles.signIn}>
-                  <Text
-                    style={[
-                      styles.textSign,
-                      {
-                        color: '#fff',
-                      },
-                    ]}>
-                    Ver Mis Cuadrilla
-                  </Text>
-                </LinearGradient>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={styles.delete}
-                onPress={() => navigation.navigate('ParteDiario')}>
-                <LinearGradient
-                  colors={['#69ABC9', '#69D6C9']}
-                  style={styles.signIn}>
-                  <Text
-                    style={[
-                      styles.textSign,
-                      {
-                        color: '#fff',
-                      },
-                    ]}>
-                    Gestionar Parte Diario
-                  </Text>
-                </LinearGradient>
-              </TouchableOpacity>
-
-              <View
-                style={{
-                  padding: 10,
-                  borderBottom: 2,
-                  borderBottomColor: '#cdcdcd',
-                  borderBottomWidth: 2,
-                  marginBottom: 10,
-                }}>
-                <Text style={{fontWeight: 'bold'}}>
-                  Estas opciones son mostradas por que se detectaron datos
-                  guardados.
-                </Text>
-              </View>
-            </>
-          ) : (
-            <>
-              <TouchableOpacity style={styles.signIn} onPress={bajar_maestra}>
-                <LinearGradient
-                  colors={['#08d3c4', '#06ab9d']}
-                  style={styles.signIn}>
-                  <Text
-                    style={[
-                      styles.textSign,
-                      {
-                        color: '#fff',
-                      },
-                    ]}>
-                    Bajar Maestra
-                  </Text>
-                </LinearGradient>
-              </TouchableOpacity>
-
-              {isLoading && <LoaderSpinner />}
-            </>
-          )}
-
-          {dataLocal.length > 0 &&
-          UsuarioReducer.MyUser[0].movil_ip !== undefined ? (
-            <TouchableOpacity
-              onPress={() => navigation.navigate('SignUpScreen')}
-              style={[
-                styles.signIn,
-                {
-                  borderColor: '#009387',
-                  borderWidth: 1,
-                  marginTop: 15,
-                },
-              ]}>
-              <Text
-                style={[
-                  styles.textSign,
-                  {
-                    color: '#009387',
-                  },
-                ]}>
-                Subir datos
+          <View style={{padding: 10, backgroundColor: '#cdcdcd'}}>
+            <Text
+              style={{textAlign: 'center', fontSize: 18, fontWeight: 'bold'}}>
+              Mis Datos
+            </Text>
+            <Text>
+              Ip Movil:{' '}
+              <Text style={{fontWeight: 'bold'}}>
+                {UsuarioReducer.MyUser[0].movil_ip === undefined
+                  ? 'Indefinido'
+                  : UsuarioReducer.MyUser[0].movil_ip}
               </Text>
-            </TouchableOpacity>
-          ) : (
-            dataLocal.length > 0 && (
-              <TouchableOpacity
-                onPress={() =>
-                  navigation.navigate('SplashScreen', {login: true})
-                }
-                style={[
-                  styles.signIn,
-                  {
-                    borderColor: '#009387',
-                    borderWidth: 1,
-                    marginTop: 15,
-                  },
-                ]}>
-                <Text
+            </Text>
+            <Text>
+              Ingreso el:{' '}
+              <Text style={{fontWeight: 'bold'}}>
+                {UsuarioReducer.MyUser[0].fecha_ingreso === undefined
+                  ? 'Indefinido'
+                  : UsuarioReducer.MyUser[0].fecha_ingreso}
+              </Text>
+            </Text>
+            <Text>
+              Nombres:{' '}
+              <Text style={{fontWeight: 'bold'}}>
+                {UsuarioReducer.MyUser[0].Nombre === undefined
+                  ? 'Indefinido'
+                  : UsuarioReducer.MyUser[0].Nombre}
+              </Text>
+            </Text>
+            <Text>
+              Apellidos:{' '}
+              <Text style={{fontWeight: 'bold'}}>
+                {UsuarioReducer.MyUser[0].Apellido === undefined
+                  ? 'Indefinido'
+                  : UsuarioReducer.MyUser[0].Apellido}
+              </Text>
+            </Text>
+          </View>
+          <SemanaDelAno />
+          <View style={styles.button}>
+            {dataLocal.length > 0 ? (
+              <>
+                <TouchableOpacity
+                  style={styles.delete}
+                  onPress={eliminar_datos}>
+                  <LinearGradient
+                    colors={['#EB9058', '#EB5443']}
+                    style={styles.signIn}>
+                    <Text
+                      style={[
+                        styles.textSign,
+                        {
+                          color: '#fff',
+                        },
+                      ]}>
+                      Eliminar Datos
+                    </Text>
+                  </LinearGradient>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.delete}
+                  onPress={() =>
+                    navigation.navigate('SignUpScreen', {test: 'probando'})
+                  }>
+                  <LinearGradient
+                    colors={['#5982EB', '#A69649']}
+                    style={styles.signIn}>
+                    <Text
+                      style={[
+                        styles.textSign,
+                        {
+                          color: '#fff',
+                        },
+                      ]}>
+                      Ver Mis Cuadrilla
+                    </Text>
+                  </LinearGradient>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.delete}
+                  onPress={() => navigation.navigate('ParteDiario')}>
+                  <LinearGradient
+                    colors={['#69ABC9', '#69D6C9']}
+                    style={styles.signIn}>
+                    <Text
+                      style={[
+                        styles.textSign,
+                        {
+                          color: '#fff',
+                        },
+                      ]}>
+                      Gestionar Parte Diario
+                    </Text>
+                  </LinearGradient>
+                </TouchableOpacity>
+
+                <View
+                  style={{
+                    padding: 10,
+                    borderBottom: 2,
+                    borderBottomColor: '#cdcdcd',
+                    borderBottomWidth: 2,
+                    marginBottom: 10,
+                  }}>
+                  <Text style={{fontWeight: 'bold'}}>
+                    Estas opciones son mostradas por que se detectaron datos
+                    guardados.
+                  </Text>
+                </View>
+              </>
+            ) : (
+              <>
+                <TouchableOpacity style={styles.signIn} onPress={bajar_maestra}>
+                  <LinearGradient
+                    colors={['#08d3c4', '#06ab9d']}
+                    style={styles.signIn}>
+                    <Text
+                      style={[
+                        styles.textSign,
+                        {
+                          color: '#fff',
+                        },
+                      ]}>
+                      Bajar Maestra
+                    </Text>
+                  </LinearGradient>
+                </TouchableOpacity>
+
+                {isLoading && <LoaderSpinner />}
+              </>
+            )}
+
+            {dataLocal.length > 0 &&
+            UsuarioReducer.MyUser[0].movil_ip !== undefined ? (
+              <>
+                <TouchableOpacity
+                  onPress={subir_datos}
                   style={[
-                    styles.textSign,
+                    styles.signIn,
                     {
-                      color: '#009387',
+                      borderColor: '#009387',
+                      borderWidth: 1,
+                      marginTop: 15,
                     },
                   ]}>
-                  Volver ah iniciar session
-                </Text>
-              </TouchableOpacity>
-            )
-          )}
+                  <Text
+                    style={[
+                      styles.textSign,
+                      {
+                        color: '#009387',
+                      },
+                    ]}>
+                    Subir datos
+                  </Text>
+                </TouchableOpacity>
+                {isLoading && <LoaderSpinner />}
+              </>
+            ) : (
+              dataLocal.length > 0 && (
+                <TouchableOpacity
+                  onPress={() =>
+                    navigation.navigate('SplashScreen', {login: true})
+                  }
+                  style={[
+                    styles.signIn,
+                    {
+                      borderColor: '#009387',
+                      borderWidth: 1,
+                      marginTop: 15,
+                    },
+                  ]}>
+                  <Text
+                    style={[
+                      styles.textSign,
+                      {
+                        color: '#009387',
+                      },
+                    ]}>
+                    Volver ah iniciar session
+                  </Text>
+                </TouchableOpacity>
+              )
+            )}
+          </View>
         </ScrollView>
       </View>
     </>
@@ -266,7 +314,7 @@ export default connect(mapStateToProps, null)(SignInScreen);
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#009387',
+    backgroundColor: '#fff',
   },
   header: {
     flex: 1,

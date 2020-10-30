@@ -89,80 +89,77 @@ export function TareasAsginados({thisEmpleado, setIsReload, setIsModal}) {
         {MisPartesDiarios.map((mis_parte_diario) =>
           mis_parte_diario.labores.map((labores) =>
             labores.Asignado.filter(
-              (asig) => asig.Empleado === thisEmpleado,
-            ).map((asig) =>
-              asig.tareas.map((tarea, index) => (
-                <>
-                  <View style={styles.box_tareas}>
-                    <View style={styles.row_tareas}>
-                      <Text style={styles.tarea_text}>Actividad:</Text>
+              (asig) => asig.Empleado == thisEmpleado,
+            ).map(
+              (asig) =>
+                asig.tareas.map((tarea, index) => (
+                  <>
+                    <View style={styles.box_tareas}>
+                      <View style={styles.row_tareas}>
+                        <Text style={styles.tarea_text}>Actividad:</Text>
 
-                      <View style={styles.select}>
-                        <Picker
-                          selectedValue={selectActividades}
-                          onValueChange={(itemValue) => {
-                            selectActividades.splice(index, 1);
-                            setSelectActividades(
-                              selectActividades.length
-                                ? [
-                                    ...selectActividades,
-                                    {index, idActividad: itemValue},
-                                  ]
-                                : [{index, idActividad: itemValue}],
-                            );
-                          }}>
-                          {Actividades.map((actividad, index) => (
-                            <Picker.Item
-                              key={index}
-                              label={actividad.Nombre}
-                              value={actividad.IdActividad}
-                            />
-                          ))}
-                        </Picker>
+                        <View style={styles.select}>
+                          <Picker
+                            selectedValue={selectActividades}
+                            onValueChange={(itemValue) => {
+                              selectActividades.splice(index, 1);
+                              setSelectActividades(
+                                selectActividades.length
+                                  ? [
+                                      ...selectActividades,
+                                      {index, idActividad: itemValue},
+                                    ]
+                                  : [{index, idActividad: itemValue}],
+                              );
+                            }}>
+                            {Actividades.map((actividad, index) => (
+                              <Picker.Item
+                                key={index}
+                                label={actividad.Nombre}
+                                value={actividad.IdActividad}
+                              />
+                            ))}
+                          </Picker>
+                        </View>
+                      </View>
+
+                      <View style={styles.row_tareas}>
+                        <Text style={styles.tarea_text}>Hectaria:</Text>
+                        <TextInput
+                          defaultValue={tarea.Actividad}
+                          onChangeText={(value) => setHectarea(value)}
+                          style={styles.text_input}
+                          placeholder="Inserta hectareas"
+                        />
+                      </View>
+
+                      <View style={styles.row_tareas}>
+                        <Text style={styles.tarea_text}>Lote:</Text>
+
+                        <View style={styles.select}>
+                          <Picker
+                            selectedValue={selectLote}
+                            onValueChange={(itemValue) =>
+                              setSelectLote(itemValue)
+                            }>
+                            {Lotes.map((lote, index) => (
+                              <Picker.Item
+                                key={index}
+                                label={lote.Nombre}
+                                value={lote.IdLote}
+                              />
+                            ))}
+                          </Picker>
+                        </View>
                       </View>
                     </View>
-
-                    <View style={styles.row_tareas}>
-                      <Text style={styles.tarea_text}>Hectaria:</Text>
-                      <TextInput
-                        defaultValue={tarea.Actividad}
-                        onChangeText={(value) => setHectarea(value)}
-                        style={styles.text_input}
-                        placeholder="Inserta hectareas"
-                      />
-                    </View>
-
-                    <View style={styles.row_tareas}>
-                      <Text style={styles.tarea_text}>Lote:</Text>
-
-                      <View style={styles.select}>
-                        <Picker
-                          selectedValue={selectLote}
-                          onValueChange={(itemValue) =>
-                            setSelectLote(itemValue)
-                          }>
-                          {Lotes.map((lote, index) => (
-                            <Picker.Item
-                              key={index}
-                              label={lote.Nombre}
-                              value={lote.IdLote}
-                            />
-                          ))}
-                        </Picker>
-                      </View>
-                    </View>
-                  </View>
-
-                  <TextInput
-                    style={[styles.text_input, {height: 60, marginBottom: 20}]}
-                    defaultValue={
-                      asig.observacion !== 'ninguno' && asig.observacion
-                    }
-                    placeholder="Escriba las observaciones: (opcional)"
-                    onChangeText={(value) => setObservaciones(value)}
-                  />
-                </>
-              )),
+                  </>
+                )),
+              <TextInput
+                style={[styles.text_input, {height: 60, marginBottom: 20}]}
+                placeholder="Escriba las observaciones: (opcional)"
+                onChangeText={(value) => setObservaciones(value)}
+              />,
             ),
           ),
         )}

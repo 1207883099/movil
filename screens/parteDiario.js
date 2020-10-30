@@ -11,7 +11,7 @@ const ParteDiarioScreen = ({navigation}) => {
   const [isModal, setIsModal] = useState(false);
   const [isReload, setIsReload] = useState(false);
   const [isRender, setIsRender] = useState('');
-  const [IndexDb, setIndexDb] = useState(0);
+  const [IndexDb, setIndexDb] = useState(10);
   const [thisEmpleado, setThisEmpleado] = useState(0);
   const [next_prev, setNext_Prev] = useState({next: false, prev: false});
   const [MisPartesDiarios, setMisPartesDiarios] = useState([]);
@@ -50,6 +50,7 @@ const ParteDiarioScreen = ({navigation}) => {
 
                 if (toma_parte_diario) {
                   setIsParteDiario(false);
+                  DisponiblesParteDiario.length === 0 && setIndexDb(index);
                   setMisPartesDiarios(
                     docs[
                       DisponiblesParteDiario.length
@@ -93,8 +94,10 @@ const ParteDiarioScreen = ({navigation}) => {
 
         //dataBd.splice(DisponiblesParteDiario[IndexDb], 1);
         dataBd.map((data, index) => {
-          if (DisponiblesParteDiario[IndexDb] !== index) {
-            return insertar(docs[index]);
+          console.log(index + ' index');
+          console.log(DisponiblesParteDiario[IndexDb] + ' DB');
+          if (DisponiblesParteDiario[IndexDb] != index) {
+            return insertar(dataBd[index]);
           }
         });
         navigation.navigate('SignInScreen');
@@ -145,7 +148,7 @@ const ParteDiarioScreen = ({navigation}) => {
         Alert.alert(`Se eliminaron ${numRemoved} registros guardados.`);
 
         dataBd.map((data, index) => {
-          if (index === IndexDb) {
+          if (index === DisponiblesParteDiario[IndexDb]) {
             const ParteDiario = {
               tipo: MisPartesDiarios[0].tipo,
               sector: MisPartesDiarios[0].sector,
@@ -161,13 +164,14 @@ const ParteDiarioScreen = ({navigation}) => {
           }
         });
         setIsReload(true);
-        setLaboresAsignado([]);
+        //setLaboresAsignado([]);
       });
     });
   };
 
   return (
     <>
+      {console.log(DisponiblesParteDiario)}
       <View style={styles.container}>
         <Text
           style={{
@@ -325,11 +329,15 @@ const ParteDiarioScreen = ({navigation}) => {
           <Button
             title="Anterior"
             color={next_prev.prev ? '#cdcdcd' : '#8FBF1D'}
-            disabled={DisponiblesParteDiario[0] === IndexDb}
+            disabled={
+              DisponiblesParteDiario.length == 0
+                ? true
+                : DisponiblesParteDiario.findIndex(
+                    (index) => index == DisponiblesParteDiario[0],
+                  ) === IndexDb
+            }
             onPress={() => {
-              setIndexDb(
-                DisponiblesParteDiario.findIndex((item) => item == IndexDb) - 1,
-              );
+              setIndexDb(IndexDb - 1);
               setIsReload(true);
             }}
           />
@@ -337,13 +345,16 @@ const ParteDiarioScreen = ({navigation}) => {
             title="Siguiente"
             color={next_prev.next ? '#cdcdcd' : '#8FBF1D'}
             disabled={
-              DisponiblesParteDiario[DisponiblesParteDiario.length - 1] ===
-              IndexDb
+              DisponiblesParteDiario.length == 0
+                ? true
+                : DisponiblesParteDiario.findIndex(
+                    (index) =>
+                      index ==
+                      DisponiblesParteDiario[DisponiblesParteDiario.length - 1],
+                  ) === IndexDb
             }
             onPress={() => {
-              setIndexDb(
-                DisponiblesParteDiario.findIndex((item) => item == IndexDb) + 1,
-              );
+              setIndexDb(IndexDb + 1);
               setIsReload(true);
             }}
           />
@@ -366,6 +377,7 @@ const ParteDiarioScreen = ({navigation}) => {
         setLaboresAsignado={setLaboresAsignado}
         LaboresAsignado={LaboresAsignado}
         thisEmpleado={thisEmpleado}
+        navigation={navigation}
       />
     </>
   );

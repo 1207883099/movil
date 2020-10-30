@@ -3,7 +3,7 @@ import {StyleSheet, Text, View, Button, Alert} from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 import {insertar, db} from '../../db-local/config-db-local';
 
-export function CrearPlantilla({setIsModal, setIsReload}) {
+export function CrearPlantilla({setIsModal, setIsReload, navigation}) {
   const [selectTipo, setSelectTipo] = useState('Cultivo');
   const [selectSectorValue, setSectorValue] = useState(0);
   const [selectSector, setSelectSector] = useState([]);
@@ -41,6 +41,16 @@ export function CrearPlantilla({setIsModal, setIsReload}) {
                 Empleado: 'ninguno',
                 observacion: 'ninguno',
                 tareas: [
+                  {
+                    Actividad: 'ninguno',
+                    Hectarea: 'ninguno',
+                    Lote: 'ninguno',
+                  },
+                  {
+                    Actividad: 'ninguno',
+                    Hectarea: 'ninguno',
+                    Lote: 'ninguno',
+                  },
                   {
                     Actividad: 'ninguno',
                     Hectarea: 'ninguno',

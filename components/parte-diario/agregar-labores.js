@@ -80,9 +80,23 @@ export function AgregarLabores({
               Hectarea: 'ninguno',
               Lote: 'ninguno',
             },
+            {
+              Actividad: 'ninguno',
+              Hectarea: 'ninguno',
+              Lote: 'ninguno',
+            },
+            {
+              Actividad: 'ninguno',
+              Hectarea: 'ninguno',
+              Lote: 'ninguno',
+            },
           ];
           const asig = [];
-          asig.push({Empleado: SelectEmpleado, tareas, observacion: 'ninguno'});
+          asig.push({
+            Empleado: SelectEmpleado,
+            tareas: tareas,
+            observacion: 'ninguno',
+          });
 
           setAsignado([...Asignado, ...asig]);
           Alert.alert(`${obtener_empleado(SelectEmpleado)} fue guardado.`);
