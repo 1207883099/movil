@@ -1,24 +1,21 @@
 import React, {useState, useEffect} from 'react';
 import {StyleSheet, Text, View, Button, Alert} from 'react-native';
 import {Picker} from '@react-native-picker/picker';
-import {insertar, db} from '../../db-local/config-db-local';
+import {insertar, dbMaestra} from '../../db-local/db-maestra';
 
 export function CrearPlantilla({setIsModal, setIsReload, navigation}) {
   const [selectTipo, setSelectTipo] = useState('Cultivo');
   const [selectSectorValue, setSectorValue] = useState(0);
-  const [selectSector, setSelectSector] = useState([]);
+  const [sectores, setSectores] = useState([]);
 
   useEffect(() => {
     try {
       const fetchDB = () => {
-        db.find({}, async function (err, docs) {
+        dbMaestra.find({}, async function (err, docs) {
           if (err) {
             Alert.alert(err.message);
           }
-          docs.map(
-            (dataBase, index) =>
-              docs[index].Sectores && setSelectSector(docs[index].Sectores),
-          );
+          setSectores(docs[0].Sectores);
         });
       };
 
@@ -26,7 +23,7 @@ export function CrearPlantilla({setIsModal, setIsReload, navigation}) {
     } catch (error) {
       Alert.alert(error.message);
     }
-  }, [db]);
+  }, []);
 
   const create_Template_Parte_Diario = () => {
     if (selectSectorValue !== 0) {
@@ -92,9 +89,9 @@ export function CrearPlantilla({setIsModal, setIsReload, navigation}) {
       <Text style={styles.label}>Sectores:</Text>
       <View style={styles.select}>
         <Picker
-          selectedValue={selectSector}
+          selectedValue={sectores}
           onValueChange={(itemValue) => setSectorValue(itemValue)}>
-          {selectSector.map((sector, index) => (
+          {sectores.map((sector, index) => (
             <Picker.Item
               key={index}
               label={sector.Nombre + ' - ' + sector.Nombre_Hacienda}

@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {insertar, db} from '../../db-local/config-db-local';
+import {dbMaestra} from '../../db-local/db-maestra';
 import {Picker} from '@react-native-picker/picker';
 import {
   View,
@@ -24,26 +24,26 @@ export function TareasAsginados({thisEmpleado, setIsReload, setIsModal}) {
 
   useEffect(() => {
     try {
-      const fetchDB = () => {
-        db.find({}, async function (err, docs) {
+      const fetchDbMaestra = () => {
+        dbMaestra.find({}, async function (err, docs) {
           if (err) {
             Alert.alert(err.message);
           }
           docs.map((dataBase, index) => {
-            docs[index].Actividades && setActividades(docs[index].Actividades);
-            docs[index].Lotes && setLotes(docs[index].Lotes);
-            docs[index].My_Cuadrilla && setCuadrillas(docs[index].My_Cuadrilla);
+            setActividades(docs[0].Actividades);
+            setLotes(docs[0].Lotes);
+            setCuadrillas(docs[0].My_Cuadrilla);
             docs[index].Mis_Parte_Diario &&
               setMisPartesDiarios(docs[index].Mis_Parte_Diario);
           });
         });
       };
 
-      fetchDB();
+      fetchDbMaestra();
     } catch (error) {
       Alert.alert(error.message);
     }
-  }, [db]);
+  }, []);
 
   const obtener_empleado = (IdEmpleado) => {
     return Cuadrillas.map((cuadrilla, index) => {

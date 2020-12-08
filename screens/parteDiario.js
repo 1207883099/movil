@@ -1,7 +1,8 @@
 import React, {useState, useEffect} from 'react';
 import {Alert, StyleSheet, Text, Button, ScrollView, View} from 'react-native';
-import {MessageAlert} from '../components/pequenos/message';
-import {db, insertar} from '../db-local/config-db-local';
+import {MessageAlert} from '../components/elementos/message';
+import {dbMaestra} from '../db-local/db-maestra';
+import {InsertarParteDiario} from '../db-local/db-parte-diario';
 import {ModalScreen} from '../components/modal/modal';
 import * as Animatable from 'react-native-animatable';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
@@ -24,7 +25,7 @@ const ParteDiarioScreen = ({navigation}) => {
   useEffect(() => {
     try {
       const fetchDb = () => {
-        db.find({}, async function (err, docs) {
+        dbMaestra.find({}, async function (err, docs) {
           if (err) {
             Alert.alert(err.message);
           }
@@ -76,16 +77,16 @@ const ParteDiarioScreen = ({navigation}) => {
     } catch (error) {
       Alert.alert(error.message);
     }
-  }, [db, isReload, IndexDb]);
+  }, [isReload, IndexDb, DisponiblesParteDiario]);
 
   const delete_parte_diario = () => {
-    db.find({}, async function (err, docs) {
+    dbMaestra.find({}, async function (err, docs) {
       if (err) {
         Alert.alert(err.message);
       }
       const dataBd = docs;
 
-      db.remove({}, {multi: true}, function (err, numRemoved) {
+      dbMaestra.remove({}, {multi: true}, function (err, numRemoved) {
         if (err) {
           Alert.alert(err.message);
         }
@@ -97,7 +98,7 @@ const ParteDiarioScreen = ({navigation}) => {
           console.log(index + ' index');
           console.log(DisponiblesParteDiario[IndexDb] + ' DB');
           if (DisponiblesParteDiario[IndexDb] != index) {
-            return insertar(dataBd[index]);
+            return InsertarParteDiario(dataBd[index]);
           }
         });
         navigation.navigate('SignInScreen');
@@ -134,13 +135,13 @@ const ParteDiarioScreen = ({navigation}) => {
 
   const finalizar_plantilla = () => {
     console.log('final');
-    db.find({}, async function (err, docs) {
+    dbMaestra.find({}, async function (err, docs) {
       if (err) {
         Alert.alert(err.message);
       }
       const dataBd = docs;
 
-      db.remove({}, {multi: true}, function (err, numRemoved) {
+      dbMaestra.remove({}, {multi: true}, function (err, numRemoved) {
         if (err) {
           Alert.alert(err.message);
         }
@@ -158,9 +159,9 @@ const ParteDiarioScreen = ({navigation}) => {
             const Mis_Parte_Diario = [];
             Mis_Parte_Diario.push(ParteDiario);
 
-            return insertar([{Mis_Parte_Diario}]);
+            return InsertarParteDiario([{Mis_Parte_Diario}]);
           } else {
-            return insertar(dataBd[index]);
+            return InsertarParteDiario(dataBd[index]);
           }
         });
         setIsReload(true);

@@ -2,6 +2,7 @@ import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
+  Alert,
   Platform,
   TouchableOpacity,
   StyleSheet,
@@ -9,28 +10,24 @@ import {
   StatusBar,
 } from 'react-native';
 import {LoaderSpinner} from '../components/loader/spiner-loader';
-import {db} from '../db-local/config-db-local';
-import {MessageAlert} from '../components/pequenos/message';
+import {dbMaestra} from '../db-local/db-maestra';
+import {MessageAlert} from '../components/elementos/message';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import * as Animatable from 'react-native-animatable';
 
 const SignInScreen = ({navigation}) => {
-  const [dataLocal, setDataLocal] = useState([]);
+  const [misCuadrillas, setMisCuadrillas] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     setIsLoading(true);
     try {
       const fetchTest = () => {
-        db.find({}, async function (err, docs) {
+        dbMaestra.find({}, async function (err, docs) {
           if (err) {
             Alert.alert(err.message);
           }
-          docs.map(
-            (dataBase, index) =>
-              docs[index].My_Cuadrilla &&
-              setDataLocal(docs[index].My_Cuadrilla),
-          );
+          setMisCuadrillas(docs[0].My_Cuadrilla);
           setIsLoading(false);
         });
       };
@@ -41,7 +38,7 @@ const SignInScreen = ({navigation}) => {
     }
 
     setIsLoading(false);
-  }, [db]);
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -59,7 +56,7 @@ const SignInScreen = ({navigation}) => {
       </View>
       <Animatable.View animation="fadeInUpBig" style={styles.footer}>
         <ScrollView>
-          {dataLocal.map((cuadrilla, index) => (
+          {misCuadrillas.map((cuadrilla, index) => (
             <>
               <View key={index}>
                 <Text style={{fontSize: 18, fontWeight: 'bold'}}>
@@ -91,7 +88,7 @@ const SignInScreen = ({navigation}) => {
           ))}
 
           {isLoading && <LoaderSpinner />}
-          {dataLocal.length === 0 && (
+          {misCuadrillas.length === 0 && (
             <MessageAlert
               background="#F0615D"
               content="No se encontraron datos para mostrar."

@@ -1,8 +1,8 @@
 import React, {useEffect, useState} from 'react';
 import {Picker} from '@react-native-picker/picker';
 import {View, Text, Button, StyleSheet, Alert} from 'react-native';
-import {db} from '../../db-local/config-db-local';
-import {MessageAlert} from '../pequenos/message';
+import {dbMaestra} from '../../db-local/db-maestra';
+import {MessageAlert} from '../elementos/message';
 
 export function AgregarLabores({
   setLaboresAsignado,
@@ -20,34 +20,30 @@ export function AgregarLabores({
 
   useEffect(() => {
     try {
-      const fetchDB = () => {
-        db.find({}, async function (err, docs) {
+      const fetchDbMaestra = () => {
+        dbMaestra.find({}, async function (err, docs) {
           if (err) {
             Alert.alert(err.message);
           }
-          docs.map((dataBase, index) => {
-            docs[index].Labores && setLabores(docs[index].Labores);
+          setLabores(docs[0].Labores);
 
-            if (docs[index].My_Cuadrilla) {
-              setCuadrillas(docs[index].My_Cuadrilla);
-              if (docs[index].My_Cuadrilla.length > 1) {
-                setIsCuadrilla('');
-              } else {
-                docs[index].My_Cuadrilla &&
-                  setIsCuadrilla(docs[index].My_Cuadrilla[0].Nombre);
-                docs[index].My_Cuadrilla &&
-                  setEmpleados(docs[index].My_Cuadrilla[0].Empleados);
-              }
+          if (docs[0].My_Cuadrilla) {
+            setCuadrillas(docs[0].My_Cuadrilla);
+            if (docs[0].My_Cuadrilla.length > 1) {
+              setIsCuadrilla('');
+            } else {
+              setIsCuadrilla(docs[0].My_Cuadrilla[0].Nombre);
+              setEmpleados(docs[0].My_Cuadrilla[0].Empleados);
             }
-          });
+          }
         });
       };
 
-      fetchDB();
+      fetchDbMaestra();
     } catch (error) {
       Alert.alert(error.message);
     }
-  }, [db]);
+  }, []);
 
   const obtener_labor = (IdLabor) => {
     const resul_labor = Labores.find((labor) => labor.IdLabor === IdLabor);
@@ -62,7 +58,7 @@ export function AgregarLabores({
   };
 
   const obtener_empleado_asignado = (IdEmpleado) => {
-    const result = Asignado.find((asig) => asig.Empleado == IdEmpleado);
+    const result = Asignado.find((asig) => asig.Empleado === IdEmpleado);
     return result;
   };
 
@@ -72,8 +68,8 @@ export function AgregarLabores({
 
   const guardar_integrantes = () => {
     if (SelectEmpleado && Labor) {
-      if (obtener_labores_asignados(Labor) == undefined) {
-        if (obtener_empleado_asignado(SelectEmpleado) == undefined) {
+      if (obtener_labores_asignados(Labor) === undefined) {
+        if (obtener_empleado_asignado(SelectEmpleado) === undefined) {
           const tareas = [
             {
               Actividad: 'ninguno',
@@ -142,7 +138,7 @@ export function AgregarLabores({
             <Picker
               selectedValue={Labor}
               onValueChange={(itemValue) => {
-                if (obtener_labores_asignados(itemValue) == undefined) {
+                if (obtener_labores_asignados(itemValue) === undefined) {
                   setLabor(itemValue);
                 } else {
                   Alert.alert(
@@ -226,7 +222,7 @@ export function AgregarLabores({
         <Button
           style={{marginTop: 20}}
           color="green"
-          title={`Finalizar asignaciones`}
+          title={'Finalizar asignaciones'}
           onPress={finalizar_asignaciones}
         />
       )}

@@ -61,7 +61,8 @@ export function ModalScreen({
                   borderBottomColor: '#cdcdcd',
                   borderBottomWidth: 2,
                   padding: 10,
-                }}></View>
+                }}
+              />
 
               <TouchableHighlight
                 style={{...styles.openButton, backgroundColor: '#EB5443'}}

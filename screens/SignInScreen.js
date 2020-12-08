@@ -9,11 +9,12 @@ import {
 } from 'react-native';
 import {LoaderSpinner} from '../components/loader/spiner-loader';
 import {connect} from 'react-redux';
-import {insertar, db} from '../db-local/config-db-local';
+import {InsertarMaestra, dbMaestra} from '../db-local/db-maestra';
 import LinearGradient from 'react-native-linear-gradient';
+import {MisDatos} from '../components/elementos/mis-datos';
 import {obtenerMaestra} from '../api/maestra';
 import {SubirParteDiario} from '../api/parte-diario';
-import {SemanaDelAno} from '../components/pequenos/semana-del-ano';
+import {FechaTrabajo} from '../components/elementos/semana-del-ano';
 
 const SignInScreen = ({navigation, UsuarioReducer}) => {
   const [dataLocal, setDataLocal] = useState([]);
@@ -23,7 +24,7 @@ const SignInScreen = ({navigation, UsuarioReducer}) => {
   useEffect(() => {
     try {
       const fetchDB = () => {
-        db.find({}, async function (err, docs) {
+        dbMaestra.find({}, async function (err, docs) {
           if (err) {
             Alert.alert(err.message);
           }
@@ -39,14 +40,14 @@ const SignInScreen = ({navigation, UsuarioReducer}) => {
     } catch (error) {
       Alert.alert(error.message);
     }
-  }, [db, isReload]);
+  }, [isReload]);
 
   const bajar_maestra = async () => {
     setIsLoading(true);
     try {
       const maestra = await obtenerMaestra(UsuarioReducer.MyUser[0].token);
-      if (maestra.data.My_Cuadrilla != undefined) {
-        insertar([maestra.data]);
+      if (maestra.data.My_Cuadrilla !== undefined) {
+        InsertarMaestra([maestra.data]);
         Alert.alert('Se Obtuvo datos Maestra :)');
         setIsLoading(false);
         setIsReload(true);
@@ -60,7 +61,7 @@ const SignInScreen = ({navigation, UsuarioReducer}) => {
   };
 
   const eliminar_datos = () => {
-    db.remove({}, {multi: true}, function (err, numRemoved) {
+    dbMaestra.remove({}, {multi: true}, function (err, numRemoved) {
       if (err) {
         Alert.alert(err.message);
       }
@@ -73,7 +74,7 @@ const SignInScreen = ({navigation, UsuarioReducer}) => {
   const subir_datos = async () => {
     setIsLoading(true);
     try {
-      db.find({}, async function (err, docs) {
+      dbMaestra.find({}, async function (err, docs) {
         if (err) {
           Alert.alert(err.message);
         }
@@ -113,45 +114,8 @@ const SignInScreen = ({navigation, UsuarioReducer}) => {
     <>
       <View style={styles.container}>
         <ScrollView>
-          <View style={{padding: 10, backgroundColor: '#cdcdcd'}}>
-            <Text
-              style={{textAlign: 'center', fontSize: 18, fontWeight: 'bold'}}>
-              Mis Datos
-            </Text>
-            <Text>
-              Ip Movil:{' '}
-              <Text style={{fontWeight: 'bold'}}>
-                {UsuarioReducer.MyUser[0].movil_ip === undefined
-                  ? 'Indefinido'
-                  : UsuarioReducer.MyUser[0].movil_ip}
-              </Text>
-            </Text>
-            <Text>
-              Ingreso el:{' '}
-              <Text style={{fontWeight: 'bold'}}>
-                {UsuarioReducer.MyUser[0].fecha_ingreso === undefined
-                  ? 'Indefinido'
-                  : UsuarioReducer.MyUser[0].fecha_ingreso}
-              </Text>
-            </Text>
-            <Text>
-              Nombres:{' '}
-              <Text style={{fontWeight: 'bold'}}>
-                {UsuarioReducer.MyUser[0].Nombre === undefined
-                  ? 'Indefinido'
-                  : UsuarioReducer.MyUser[0].Nombre}
-              </Text>
-            </Text>
-            <Text>
-              Apellidos:{' '}
-              <Text style={{fontWeight: 'bold'}}>
-                {UsuarioReducer.MyUser[0].Apellido === undefined
-                  ? 'Indefinido'
-                  : UsuarioReducer.MyUser[0].Apellido}
-              </Text>
-            </Text>
-          </View>
-          <SemanaDelAno />
+          <MisDatos UsuarioReducer={UsuarioReducer} />
+          <FechaTrabajo />
           <View style={styles.button}>
             {dataLocal.length > 0 ? (
               <>
