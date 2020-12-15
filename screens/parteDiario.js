@@ -2,20 +2,26 @@ import React, {useState, useEffect} from 'react';
 import {Alert, StyleSheet, Text, Button, ScrollView, View} from 'react-native';
 import {MessageAlert} from '../components/elementos/message';
 import {dbMaestra} from '../db-local/db-maestra';
+import {dbParteDiario} from '../db-local/db-parte-diario';
+import {PaginationParteDiario} from '../components/parte-diario/pagination';
 import {InsertarParteDiario} from '../db-local/db-parte-diario';
 import {ModalScreen} from '../components/modal/modal';
 import * as Animatable from 'react-native-animatable';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import {fecha_actual, getDia, get_Semana_Del_Ano} from '../hooks/fechas';
 
 const ParteDiarioScreen = ({navigation}) => {
   const [isParteDiario, setIsParteDiario] = useState(true);
   const [isModal, setIsModal] = useState(false);
   const [isReload, setIsReload] = useState(false);
   const [isRender, setIsRender] = useState('');
-  const [IndexDb, setIndexDb] = useState(10);
+  const [IndexDb, setIndexDb] = useState(0);
   const [thisEmpleado, setThisEmpleado] = useState(0);
   const [next_prev, setNext_Prev] = useState({next: false, prev: false});
-  const [MisPartesDiarios, setMisPartesDiarios] = useState([]);
+  const [MisPartesDiarios, setMisPartesDiarios] = useState({
+    _id: '',
+    data: [],
+  });
   const [Sectores, setSectores] = useState([]);
   const [Labores, setLabores] = useState([]);
   const [Cuadrillas, setCuadrillas] = useState([]);
@@ -31,15 +37,21 @@ const ParteDiarioScreen = ({navigation}) => {
           }
 
           if (IndexDb >= 0) {
+            setSectores(docs[0].Sectores);
+            setCuadrillas(docs[0].My_Cuadrilla);
+            setLabores(docs[0].Labores);
+          }
+        });
+
+        dbParteDiario.find({fecha: fecha_actual()}, async function (err, docs) {
+          if (err) {
+            Alert.alert(err.message);
+          }
+
+          if (IndexDb >= 0) {
             let disponibles = [];
             let toma_parte_diario = true;
-
-            docs.map((dataBase, index) => {
-              docs[index].Sectores && setSectores(docs[index].Sectores);
-              docs[index].My_Cuadrilla &&
-                setCuadrillas(docs[index].My_Cuadrilla);
-              docs[index].Labores && setLabores(docs[index].Labores);
-
+            docs.map((database, index) => {
               if (
                 docs[
                   DisponiblesParteDiario.length
@@ -52,13 +64,16 @@ const ParteDiarioScreen = ({navigation}) => {
                 if (toma_parte_diario) {
                   setIsParteDiario(false);
                   DisponiblesParteDiario.length === 0 && setIndexDb(index);
-                  setMisPartesDiarios(
+                  const selectPD =
                     docs[
                       DisponiblesParteDiario.length
                         ? DisponiblesParteDiario[IndexDb]
                         : index
-                    ].Mis_Parte_Diario,
-                  );
+                    ];
+                  setMisPartesDiarios({
+                    _id: selectPD._id,
+                    data: selectPD.Mis_Parte_Diario,
+                  });
                 }
                 toma_parte_diario = false;
               }
@@ -77,32 +92,19 @@ const ParteDiarioScreen = ({navigation}) => {
     } catch (error) {
       Alert.alert(error.message);
     }
-  }, [isReload, IndexDb, DisponiblesParteDiario]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isReload, IndexDb, dbMaestra]);
 
-  const delete_parte_diario = () => {
-    dbMaestra.find({}, async function (err, docs) {
+  const delete_parte_diario = (_id) => {
+    dbParteDiario.remove({_id}, {multi: true}, function (err, numRemoved) {
       if (err) {
         Alert.alert(err.message);
       }
-      const dataBd = docs;
 
-      dbMaestra.remove({}, {multi: true}, function (err, numRemoved) {
-        if (err) {
-          Alert.alert(err.message);
-        }
-
-        Alert.alert(`Se eliminaron ${numRemoved} registros guardados.`);
-
-        //dataBd.splice(DisponiblesParteDiario[IndexDb], 1);
-        dataBd.map((data, index) => {
-          console.log(index + ' index');
-          console.log(DisponiblesParteDiario[IndexDb] + ' DB');
-          if (DisponiblesParteDiario[IndexDb] != index) {
-            return InsertarParteDiario(dataBd[index]);
-          }
-        });
-        navigation.navigate('SignInScreen');
-      });
+      Alert.alert(
+        `Se elimino el registro con el _id ${_id + ' cantidad:' + numRemoved}.`,
+      );
+      navigation.navigate('SignInScreen');
     });
   };
 
@@ -135,44 +137,20 @@ const ParteDiarioScreen = ({navigation}) => {
 
   const finalizar_plantilla = () => {
     console.log('final');
-    dbMaestra.find({}, async function (err, docs) {
-      if (err) {
-        Alert.alert(err.message);
-      }
-      const dataBd = docs;
+    const ParteDiario = {
+      tipo: MisPartesDiarios.data[0].tipo,
+      sector: MisPartesDiarios.data[0].sector,
+      labores: LaboresAsignado,
+    };
 
-      dbMaestra.remove({}, {multi: true}, function (err, numRemoved) {
-        if (err) {
-          Alert.alert(err.message);
-        }
-
-        Alert.alert(`Se eliminaron ${numRemoved} registros guardados.`);
-
-        dataBd.map((data, index) => {
-          if (index === DisponiblesParteDiario[IndexDb]) {
-            const ParteDiario = {
-              tipo: MisPartesDiarios[0].tipo,
-              sector: MisPartesDiarios[0].sector,
-              labores: LaboresAsignado,
-            };
-
-            const Mis_Parte_Diario = [];
-            Mis_Parte_Diario.push(ParteDiario);
-
-            return InsertarParteDiario([{Mis_Parte_Diario}]);
-          } else {
-            return InsertarParteDiario(dataBd[index]);
-          }
-        });
-        setIsReload(true);
-        //setLaboresAsignado([]);
-      });
-    });
+    const Mis_Parte_Diario = [];
+    Mis_Parte_Diario.push(ParteDiario);
+    InsertarParteDiario([{Mis_Parte_Diario}]);
+    setIsReload(true);
   };
 
   return (
     <>
-      {console.log(DisponiblesParteDiario)}
       <View style={styles.container}>
         <Text
           style={{
@@ -181,7 +159,8 @@ const ParteDiarioScreen = ({navigation}) => {
             color: '#fff',
             fontSize: 20,
           }}>
-          Parte diario
+          Parte diario (
+          {'dia ' + getDia(new Date()) + ' - semana ' + get_Semana_Del_Ano()})
         </Text>
 
         <Animatable.View animation="fadeInUpBig" style={styles.footer}>
@@ -193,11 +172,11 @@ const ParteDiarioScreen = ({navigation}) => {
               />
             ) : (
               <>
-                {MisPartesDiarios.map((parte_diario) => (
+                {MisPartesDiarios.data.map((parte_diario) => (
                   <>
                     <Text
                       style={styles.eliminar_parte_diario}
-                      onPress={delete_parte_diario}>
+                      onPress={() => delete_parte_diario(MisPartesDiarios._id)}>
                       Eliminar parte diario
                     </Text>
                     <View style={styles.header}>
@@ -320,46 +299,20 @@ const ParteDiarioScreen = ({navigation}) => {
                 borderBottomColor: '#cdcdcd',
                 borderBottomWidth: 2,
                 padding: 10,
-              }}></View>
+              }}
+            />
           </ScrollView>
         </Animatable.View>
       </View>
 
       <View style={styles.btn_create_plantilla}>
-        <View style={[styles.header, {marginBottom: 10}]}>
-          <Button
-            title="Anterior"
-            color={next_prev.prev ? '#cdcdcd' : '#8FBF1D'}
-            disabled={
-              DisponiblesParteDiario.length == 0
-                ? true
-                : DisponiblesParteDiario.findIndex(
-                    (index) => index == DisponiblesParteDiario[0],
-                  ) === IndexDb
-            }
-            onPress={() => {
-              setIndexDb(IndexDb - 1);
-              setIsReload(true);
-            }}
-          />
-          <Button
-            title="Siguiente"
-            color={next_prev.next ? '#cdcdcd' : '#8FBF1D'}
-            disabled={
-              DisponiblesParteDiario.length == 0
-                ? true
-                : DisponiblesParteDiario.findIndex(
-                    (index) =>
-                      index ==
-                      DisponiblesParteDiario[DisponiblesParteDiario.length - 1],
-                  ) === IndexDb
-            }
-            onPress={() => {
-              setIndexDb(IndexDb + 1);
-              setIsReload(true);
-            }}
-          />
-        </View>
+        <PaginationParteDiario
+          next_prev={next_prev}
+          DisponiblesParteDiario={DisponiblesParteDiario}
+          IndexDb={IndexDb}
+          setIndexDb={setIndexDb}
+          setIsReload={setIsReload}
+        />
         <Button
           title="Crear Plantilla"
           disabled={LaboresAsignado.length > 0}

@@ -10,6 +10,7 @@ import {
 import {LoaderSpinner} from '../components/loader/spiner-loader';
 import {connect} from 'react-redux';
 import {InsertarMaestra, dbMaestra} from '../db-local/db-maestra';
+import {dbParteDiario} from '../db-local/db-parte-diario';
 import LinearGradient from 'react-native-linear-gradient';
 import {MisDatos} from '../components/elementos/mis-datos';
 import {obtenerMaestra} from '../api/maestra';
@@ -61,14 +62,25 @@ const SignInScreen = ({navigation, UsuarioReducer}) => {
   };
 
   const eliminar_datos = () => {
-    dbMaestra.remove({}, {multi: true}, function (err, numRemoved) {
+    dbMaestra.remove({}, {multi: true}, function (err) {
       if (err) {
         Alert.alert(err.message);
+        return;
       }
       setIsReload(true);
-      Alert.alert(`Se eliminaron ${numRemoved} registros guardados.`);
-      navigation.navigate('SplashScreen');
     });
+
+    dbParteDiario.remove({}, {multi: true}, function (err) {
+      if (err) {
+        Alert.alert(err.message);
+        return;
+      }
+      setIsReload(true);
+    });
+
+    Alert.alert('Se limpiaron todo los datos de maestra y partes diarios.');
+
+    navigation.navigate('SplashScreen');
   };
 
   const subir_datos = async () => {

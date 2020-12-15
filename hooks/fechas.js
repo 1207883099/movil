@@ -25,7 +25,15 @@ export function get_Semana_Del_Ano() {
   return NumberOfWeek;
 }
 
-export function getDia() {
+function takeYear(theDate) {
+  let x;
+  x = theDate.getYear();
+  let y = x % 100;
+  y += y < 38 ? 2000 : 1900;
+  return y;
+}
+
+export function getDia(date) {
   const dias = [
     'Domingo',
     'Lunes',
@@ -35,14 +43,32 @@ export function getDia() {
     'Viernes',
     'Sabado',
   ];
-  const numerDay = new Date().getDay();
+  const numerDay = date.getDay();
   return dias[numerDay];
 }
 
-function takeYear(theDate) {
-  let x;
-  x = theDate.getYear();
-  let y = x % 100;
-  y += y < 38 ? 2000 : 1900;
-  return y;
+export function fecha_actual() {
+  let ano = new Date().getFullYear();
+  let mes = new Date().getMonth() + 1;
+  let dia = new Date().getDate();
+
+  if (mes < 10) {
+    mes = `${0}${mes}`;
+  }
+  if (dia < 10) {
+    dia = `${0}${dia}`;
+  }
+
+  return ano + '-' + mes + '-' + dia;
+}
+
+export function suma_resta_fecha(fecha, dias) {
+  fecha.setDate(fecha.getDate() + dias);
+  return fecha;
+}
+
+export function primerDiaSemana() {
+  const curr = new Date();
+  const first = curr.getDate() - curr.getDay();
+  return new Date(curr.setDate(first)).toUTCString();
 }

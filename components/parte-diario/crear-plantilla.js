@@ -1,7 +1,9 @@
 import React, {useState, useEffect} from 'react';
 import {StyleSheet, Text, View, Button, Alert} from 'react-native';
 import {Picker} from '@react-native-picker/picker';
-import {insertar, dbMaestra} from '../../db-local/db-maestra';
+import {dbMaestra} from '../../db-local/db-maestra';
+import {fecha_actual} from '../../hooks/fechas';
+import {InsertarParteDiario} from '../../db-local/db-parte-diario';
 
 export function CrearPlantilla({setIsModal, setIsReload, navigation}) {
   const [selectTipo, setSelectTipo] = useState('Cultivo');
@@ -63,7 +65,10 @@ export function CrearPlantilla({setIsModal, setIsReload, navigation}) {
       const Mis_Parte_Diario = [];
       Mis_Parte_Diario.push(ParteDiario);
 
-      insertar([{Mis_Parte_Diario}]);
+      InsertarParteDiario({
+        Mis_Parte_Diario,
+        fecha: fecha_actual(),
+      });
       setIsModal(false);
       setIsReload(true);
       navigation.navigate('SignInScreen');
