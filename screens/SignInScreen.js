@@ -69,7 +69,6 @@ const SignInScreen = ({navigation, UsuarioReducer}) => {
         Alert.alert(err.message);
         return;
       }
-      setIsReload(true);
     });
 
     dbParteDiario.remove({}, {multi: true}, function (err) {
@@ -77,10 +76,10 @@ const SignInScreen = ({navigation, UsuarioReducer}) => {
         Alert.alert(err.message);
         return;
       }
-      setIsReload(true);
     });
 
     Alert.alert('Se limpiaron todo los datos de maestra y partes diarios.');
+    setIsReload(true);
 
     navigation.navigate('SplashScreen');
   };
@@ -139,13 +138,7 @@ const SignInScreen = ({navigation, UsuarioReducer}) => {
                   <LinearGradient
                     colors={['#EB9058', '#EB5443']}
                     style={styles.signIn}>
-                    <Text
-                      style={[
-                        styles.textSign,
-                        {
-                          color: '#fff',
-                        },
-                      ]}>
+                    <Text style={[styles.textSign, {color: '#fff'}]}>
                       Eliminar Datos
                     </Text>
                   </LinearGradient>
@@ -159,13 +152,7 @@ const SignInScreen = ({navigation, UsuarioReducer}) => {
                   <LinearGradient
                     colors={['#5982EB', '#A69649']}
                     style={styles.signIn}>
-                    <Text
-                      style={[
-                        styles.textSign,
-                        {
-                          color: '#fff',
-                        },
-                      ]}>
+                    <Text style={[styles.textSign, {color: '#fff'}]}>
                       Ver Mis Cuadrilla
                     </Text>
                   </LinearGradient>
@@ -177,13 +164,7 @@ const SignInScreen = ({navigation, UsuarioReducer}) => {
                   <LinearGradient
                     colors={['#69ABC9', '#69D6C9']}
                     style={styles.signIn}>
-                    <Text
-                      style={[
-                        styles.textSign,
-                        {
-                          color: '#fff',
-                        },
-                      ]}>
+                    <Text style={[styles.textSign, {color: '#fff'}]}>
                       Gestionar Parte Diario
                     </Text>
                   </LinearGradient>
@@ -209,13 +190,7 @@ const SignInScreen = ({navigation, UsuarioReducer}) => {
                   <LinearGradient
                     colors={['#08d3c4', '#06ab9d']}
                     style={styles.signIn}>
-                    <Text
-                      style={[
-                        styles.textSign,
-                        {
-                          color: '#fff',
-                        },
-                      ]}>
+                    <Text style={[styles.textSign, {color: '#fff'}]}>
                       Bajar Maestra
                     </Text>
                   </LinearGradient>
@@ -232,19 +207,9 @@ const SignInScreen = ({navigation, UsuarioReducer}) => {
                   onPress={subir_datos}
                   style={[
                     styles.signIn,
-                    {
-                      borderColor: '#009387',
-                      borderWidth: 1,
-                      marginTop: 15,
-                    },
+                    {borderColor: '#009387', borderWidth: 1, marginTop: 15},
                   ]}>
-                  <Text
-                    style={[
-                      styles.textSign,
-                      {
-                        color: '#009387',
-                      },
-                    ]}>
+                  <Text style={[styles.textSign, {color: '#009387'}]}>
                     Subir datos
                   </Text>
                 </TouchableOpacity>
@@ -258,19 +223,9 @@ const SignInScreen = ({navigation, UsuarioReducer}) => {
                   }
                   style={[
                     styles.signIn,
-                    {
-                      borderColor: '#009387',
-                      borderWidth: 1,
-                      marginTop: 15,
-                    },
+                    {borderColor: '#009387', borderWidth: 1, marginTop: 15},
                   ]}>
-                  <Text
-                    style={[
-                      styles.textSign,
-                      {
-                        color: '#009387',
-                      },
-                    ]}>
+                  <Text style={[styles.textSign, {color: '#009387'}]}>
                     Volver ah iniciar session
                   </Text>
                 </TouchableOpacity>

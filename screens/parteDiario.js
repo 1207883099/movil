@@ -4,10 +4,10 @@ import {MessageAlert} from '../components/elementos/message';
 import {dbMaestra} from '../db-local/db-maestra';
 import {dbParteDiario} from '../db-local/db-parte-diario';
 import {PaginationParteDiario} from '../components/parte-diario/pagination';
+import {GenerarTareaEmpleado} from '../components/parte-diario/generar-tarea-empleado';
 import {InsertarParteDiario} from '../db-local/db-parte-diario';
 import {ModalScreen} from '../components/modal/modal';
 import * as Animatable from 'react-native-animatable';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {getDia} from '../hooks/fechas';
 import {FechaContext} from '../components/context/fecha';
 
@@ -196,7 +196,9 @@ const ParteDiarioScreen = ({navigation}) => {
                       </View>
                     </View>
 
-                    {parte_diario.labores[0].labor === 'ninguno' ? (
+                    <GenerarTareaEmpleado Cuadrillas={Cuadrillas} />
+
+                    {/*parte_diario.labores[0].labor === 'ninguno' ? (
                       <>
                         <Button
                           color="green"
@@ -289,7 +291,7 @@ const ParteDiarioScreen = ({navigation}) => {
                           </>
                         ))}
                       </>
-                    )}
+                    )*/}
                   </>
                 ))}
               </>
