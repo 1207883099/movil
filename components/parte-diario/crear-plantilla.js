@@ -2,7 +2,6 @@ import React, {useState, useEffect} from 'react';
 import {StyleSheet, Text, View, Button, Alert} from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 import {dbMaestra} from '../../db-local/db-maestra';
-import {fecha_actual} from '../../hooks/fechas';
 import {InsertarParteDiario} from '../../db-local/db-parte-diario';
 
 export function CrearPlantilla({setIsModal, setIsReload, navigation}) {
@@ -67,7 +66,7 @@ export function CrearPlantilla({setIsModal, setIsReload, navigation}) {
 
       InsertarParteDiario({
         Mis_Parte_Diario,
-        fecha: fecha_actual(),
+        fecha: new Date().toDateString(),
       });
       setIsModal(false);
       setIsReload(true);

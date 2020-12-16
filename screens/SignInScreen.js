@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useContext, useState} from 'react';
 import {
   View,
   Text,
@@ -16,8 +16,10 @@ import {MisDatos} from '../components/elementos/mis-datos';
 import {obtenerMaestra} from '../api/maestra';
 import {SubirParteDiario} from '../api/parte-diario';
 import {FechaTrabajo} from '../components/elementos/semana-del-ano';
+import {FechaContext} from '../components/context/fecha';
 
 const SignInScreen = ({navigation, UsuarioReducer}) => {
+  const {fechaCtx, setFechaCtx} = useContext(FechaContext);
   const [dataLocal, setDataLocal] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isReload, setIsReload] = useState(false);
@@ -127,7 +129,7 @@ const SignInScreen = ({navigation, UsuarioReducer}) => {
       <View style={styles.container}>
         <ScrollView>
           <MisDatos UsuarioReducer={UsuarioReducer} />
-          <FechaTrabajo />
+          <FechaTrabajo fechaCtx={fechaCtx} setFechaCtx={setFechaCtx} />
           <View style={styles.button}>
             {dataLocal.length > 0 ? (
               <>

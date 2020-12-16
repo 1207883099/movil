@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import {Alert, StyleSheet, Text, Button, ScrollView, View} from 'react-native';
 import {MessageAlert} from '../components/elementos/message';
 import {dbMaestra} from '../db-local/db-maestra';
@@ -8,9 +8,11 @@ import {InsertarParteDiario} from '../db-local/db-parte-diario';
 import {ModalScreen} from '../components/modal/modal';
 import * as Animatable from 'react-native-animatable';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import {fecha_actual, getDia, get_Semana_Del_Ano} from '../hooks/fechas';
+import {getDia} from '../hooks/fechas';
+import {FechaContext} from '../components/context/fecha';
 
 const ParteDiarioScreen = ({navigation}) => {
+  const {fechaCtx} = useContext(FechaContext);
   const [isParteDiario, setIsParteDiario] = useState(true);
   const [isModal, setIsModal] = useState(false);
   const [isReload, setIsReload] = useState(false);
@@ -43,7 +45,7 @@ const ParteDiarioScreen = ({navigation}) => {
           }
         });
 
-        dbParteDiario.find({fecha: fecha_actual()}, async function (err, docs) {
+        dbParteDiario.find({fecha: fechaCtx}, async function (err, docs) {
           if (err) {
             Alert.alert(err.message);
           }
@@ -159,8 +161,8 @@ const ParteDiarioScreen = ({navigation}) => {
             color: '#fff',
             fontSize: 20,
           }}>
-          Parte diario (
-          {'dia ' + getDia(new Date()) + ' - semana ' + get_Semana_Del_Ano()})
+          Parte diario:
+          {' ' + getDia(new Date())}
         </Text>
 
         <Animatable.View animation="fadeInUpBig" style={styles.footer}>

@@ -3,16 +3,15 @@ import {Text, View, StyleSheet} from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 import {suma_resta_fecha, primerDiaSemana, getDia} from '../../hooks/fechas';
 
-export function SelectDia({setSelectDay}) {
-  const [itemFechas, setItemFechas] = useState();
+export function SelectDia({setSelectDay, setFechaCtx}) {
   const [fechas, setFechas] = useState([]);
   const [change, setChange] = useState(0);
 
   useEffect(() => {
     const dataFechas = [];
     for (let i = 0; i < 7; i++) {
-      const g = suma_resta_fecha(new Date(primerDiaSemana()), +i);
-      dataFechas.push({label: getDia(g), value: String(g)});
+      const label = suma_resta_fecha(new Date(primerDiaSemana()), +i);
+      dataFechas.push({label: getDia(label), value: label.toDateString()});
     }
     setFechas(dataFechas);
   }, []);
@@ -25,7 +24,7 @@ export function SelectDia({setSelectDay}) {
           selectedValue={fechas}
           onValueChange={(itemValue) => {
             if (itemValue && change > 0) {
-              setItemFechas(itemValue);
+              setFechaCtx(itemValue);
               setSelectDay(false);
             } else {
               setChange(change + 1);
