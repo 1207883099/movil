@@ -3,7 +3,7 @@ import {Alert, StyleSheet, Text, Button, ScrollView, View} from 'react-native';
 import {MessageAlert} from '../components/elementos/message';
 import {dbMaestra} from '../db-local/db-maestra';
 import {dbParteDiario} from '../db-local/db-parte-diario';
-import {EmpleadosAsignados} from '../components/parte-diario/empleados-asginados';
+import EmpleadosAsignados from '../components/parte-diario/empleados-asginados';
 import {dbCuadrillaPD} from '../db-local/db-cuadrilla-parte-diario';
 import {PaginationParteDiario} from '../components/parte-diario/pagination';
 import {GenerarTareaEmpleado} from '../components/parte-diario/generar-tarea-empleado';
@@ -23,23 +23,22 @@ const ParteDiarioScreen = ({navigation}) => {
   const [MisPartesDiarios, setMisPartesDiarios] = useState({
     _id: '',
     data: [],
+    cuadrilla: undefined,
   });
   const [Sectores, setSectores] = useState([]);
   const [Cuadrillas, setCuadrillas] = useState([]);
   const [DisponiblesParteDiario, setDisponiblesParteDiario] = useState([]);
   const [CPD, setCPD] = useState({
-    _id: undefined,
-    cuadrilla: undefined,
-    idParteDiario: undefined,
+    _id: '',
+    cuadrilla: '',
+    idParteDiario: '',
   });
 
   useEffect(() => {
     try {
       const fetchDb = () => {
         dbMaestra.find({}, async function (err, docs) {
-          if (err) {
-            Alert.alert(err.message);
-          }
+          err && Alert.alert(err.message);
 
           if (IndexDb >= 0) {
             setSectores(docs[0].Sectores);
@@ -48,9 +47,7 @@ const ParteDiarioScreen = ({navigation}) => {
         });
 
         dbParteDiario.find({fecha: fechaCtx}, async function (err, docs) {
-          if (err) {
-            Alert.alert(err.message);
-          }
+          err && Alert.alert(err.message);
 
           if (IndexDb >= 0) {
             let disponibles = [];
@@ -68,7 +65,7 @@ const ParteDiarioScreen = ({navigation}) => {
                 if (toma_parte_diario) {
                   setIsParteDiario(false);
 
-                  DisponiblesParteDiario.length === 0 && setIndexDb(index);
+                  // DisponiblesParteDiario.length === 0 && setIndexDb(index);
 
                   const selectPD =
                     docs[
@@ -80,10 +77,14 @@ const ParteDiarioScreen = ({navigation}) => {
                   setMisPartesDiarios({
                     _id: selectPD._id,
                     data: selectPD.Mis_Parte_Diario,
+                    cuadrilla: selectPD.cuadrilla,
                   });
 
                   dbCuadrillaPD.findOne(
-                    {idParteDiario: selectPD._id},
+                    {
+                      idParteDiario: selectPD._id,
+                      cuadrilla: selectPD.cuadrilla,
+                    },
                     async function (err, CPD) {
                       err && Alert.alert(err.message);
 
@@ -92,6 +93,12 @@ const ParteDiarioScreen = ({navigation}) => {
                           _id: CPD._id,
                           cuadrilla: CPD.cuadrilla,
                           idParteDiario: CPD.idParteDiario,
+                        });
+                      } else {
+                        setCPD({
+                          _id: undefined,
+                          cuadrilla: undefined,
+                          idParteDiario: undefined,
                         });
                       }
                     },
@@ -190,7 +197,7 @@ const ParteDiarioScreen = ({navigation}) => {
                         </Text>
                       </View>
                     </View>
-
+                    {console.log(CPD)}
                     {CPD.cuadrilla ? (
                       <EmpleadosAsignados
                         Empleados={
@@ -198,16 +205,20 @@ const ParteDiarioScreen = ({navigation}) => {
                             (cuadrilla) => cuadrilla.Nombre === CPD.cuadrilla,
                           ).Empleados
                         }
+                        cuadrilla={CPD.cuadrilla}
+                        id_parte_diario={CPD.idParteDiario}
                         actions={true}
                         setIsModal={setIsModal}
                         setIsRender={setIsRender}
                       />
                     ) : (
-                      <GenerarTareaEmpleado
-                        Cuadrillas={Cuadrillas}
-                        id_parte_diario={MisPartesDiarios._id}
-                        setIsReload={setIsReload}
-                      />
+                      CPD.cuadrilla === undefined && (
+                        <GenerarTareaEmpleado
+                          Cuadrillas={Cuadrillas}
+                          id_parte_diario={MisPartesDiarios._id}
+                          setIsReload={setIsReload}
+                        />
+                      )
                     )}
                   </>
                 ))}

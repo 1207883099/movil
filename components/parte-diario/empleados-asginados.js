@@ -1,12 +1,15 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, memo} from 'react';
 import {Text, View, Alert, StyleSheet, Button} from 'react-native';
 import {dbCargos} from '../../db-local/db-cargos';
-import {dbActEmpl} from '../../db-local/db-actividades-empleado';
 import {InsertarCuadrillaPD} from '../../db-local/db-cuadrilla-parte-diario';
-import {InsertarActividadEmpleado} from '../../db-local/db-actividades-empleado';
+import {
+  InsertarActividadEmpleado,
+  dbActEmpl,
+} from '../../db-local/db-actividades-empleado';
+import {dbParteDiario} from '../../db-local/db-parte-diario';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
-export function EmpleadosAsignados({
+function EmpleadosAsignados({
   Empleados,
   actions,
   id_parte_diario,
@@ -24,11 +27,14 @@ export function EmpleadosAsignados({
       setCargos(docs);
     });
 
-    dbActEmpl.find({}, async function (err, docs) {
+    dbActEmpl.find({idParteDiario: id_parte_diario}, async function (
+      err,
+      docs,
+    ) {
       err && Alert.alert(err.message);
       setActivEmple(docs);
     });
-  }, []);
+  }, [id_parte_diario]);
 
   const obtenerCargo = (codigoCargo) => {
     if (Cargos.length) {
@@ -38,10 +44,12 @@ export function EmpleadosAsignados({
   };
 
   const obtener_empleado = (IdEmpleado) => {
-    const result = Empleados.find(
-      (empleado) => empleado.IdEmpleado === IdEmpleado,
-    );
-    return result.Apellido;
+    if (Empleados.length) {
+      const result = Empleados.find(
+        (empleado) => empleado.IdEmpleado === IdEmpleado,
+      );
+      return 'si';
+    }
   };
 
   const finish_template = () => {
@@ -50,11 +58,16 @@ export function EmpleadosAsignados({
       cuadrilla,
     });
 
+    dbParteDiario.update(
+      {_id: id_parte_diario},
+      {$set: {cuadrilla: cuadrilla}},
+    );
+
     Empleados.map((empleado) =>
       InsertarActividadEmpleado({
         idEmpleado: empleado.IdEmpleado,
         idParteDiario: id_parte_diario,
-        actividades: [obtenerCargo(empleado.Cargo)],
+        actividad: obtenerCargo(empleado.Cargo),
       }),
     );
     setIsReload(true);
@@ -69,6 +82,7 @@ export function EmpleadosAsignados({
           color="#009387"
         />
       )}
+
       <Text style={[styles.label, styles.box_actividad]}>Actividades</Text>
       <View style={{padding: 10}} key={0}>
         <Text style={{textAlign: 'center', fontWeight: 'bold', padding: 10}}>
@@ -95,12 +109,7 @@ export function EmpleadosAsignados({
                   {
                     <>
                       <Text style={styles.label_actividad}>
-                        {activEmple.actividades.length > 1
-                          ? activEmple.actividades[0] +
-                            ' +' +
-                            activEmple.actividades.length -
-                            1
-                          : activEmple.actividades[0]}{' '}
+                        {activEmple.actividad}
                         &nbsp; / &nbsp;
                       </Text>
                       <Text style={{fontSize: 12}}>
@@ -170,3 +179,5 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
 });
+
+export default memo(EmpleadosAsignados);

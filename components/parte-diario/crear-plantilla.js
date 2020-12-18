@@ -39,6 +39,7 @@ export function CrearPlantilla({setIsModal, setIsReload, navigation}) {
       InsertarParteDiario({
         Mis_Parte_Diario,
         fecha: new Date().toDateString(),
+        cuadrilla: undefined,
       });
 
       setIsModal(false);
