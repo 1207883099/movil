@@ -40,6 +40,7 @@ export function CrearPlantilla({setIsModal, setIsReload, navigation}) {
         Mis_Parte_Diario,
         fecha: new Date().toDateString(),
       });
+
       setIsModal(false);
       setIsReload(true);
       navigation.navigate('SignInScreen');

@@ -19,21 +19,18 @@ const ParteDiarioScreen = ({navigation}) => {
   const [isReload, setIsReload] = useState(false);
   const [isRender, setIsRender] = useState('');
   const [IndexDb, setIndexDb] = useState(0);
-  const [thisEmpleado, setThisEmpleado] = useState(0);
   const [next_prev, setNext_Prev] = useState({next: false, prev: false});
   const [MisPartesDiarios, setMisPartesDiarios] = useState({
     _id: '',
     data: [],
   });
   const [Sectores, setSectores] = useState([]);
-  const [Labores, setLabores] = useState([]);
   const [Cuadrillas, setCuadrillas] = useState([]);
-  const [LaboresAsignado, setLaboresAsignado] = useState([]);
   const [DisponiblesParteDiario, setDisponiblesParteDiario] = useState([]);
   const [CPD, setCPD] = useState({
-    _id: '',
-    cuadrilla: '',
-    idParteDiario: '',
+    _id: undefined,
+    cuadrilla: undefined,
+    idParteDiario: undefined,
   });
 
   useEffect(() => {
@@ -47,7 +44,6 @@ const ParteDiarioScreen = ({navigation}) => {
           if (IndexDb >= 0) {
             setSectores(docs[0].Sectores);
             setCuadrillas(docs[0].My_Cuadrilla);
-            setLabores(docs[0].Labores);
           }
         });
 
@@ -91,11 +87,13 @@ const ParteDiarioScreen = ({navigation}) => {
                     async function (err, CPD) {
                       err && Alert.alert(err.message);
 
-                      setCPD({
-                        _id: CPD._id,
-                        cuadrilla: CPD.cuadrilla,
-                        idParteDiario: CPD.idParteDiario,
-                      });
+                      if (CPD) {
+                        setCPD({
+                          _id: CPD._id,
+                          cuadrilla: CPD.cuadrilla,
+                          idParteDiario: CPD.idParteDiario,
+                        });
+                      }
                     },
                   );
                 }
@@ -193,12 +191,16 @@ const ParteDiarioScreen = ({navigation}) => {
                       </View>
                     </View>
 
-                    {CPD ? (
+                    {CPD.cuadrilla ? (
                       <EmpleadosAsignados
                         Empleados={
-                          /*Cuadrillas[0].Nombre === CPD.cuadrilla*/ []
+                          Cuadrillas.find(
+                            (cuadrilla) => cuadrilla.Nombre === CPD.cuadrilla,
+                          ).Empleados
                         }
                         actions={true}
+                        setIsModal={setIsModal}
+                        setIsRender={setIsRender}
                       />
                     ) : (
                       <GenerarTareaEmpleado
@@ -207,81 +209,10 @@ const ParteDiarioScreen = ({navigation}) => {
                         setIsReload={setIsReload}
                       />
                     )}
-
-                    {/*parte_diario.labores[0].labor === 'ninguno' ? (
-                      <>
-                        <Button
-                          color="green"
-                          title="Agregar Labores"
-                          onPress={() => {
-                            setIsModal(true);
-                            setIsRender('Agregar-labores');
-                          }}
-                        />
-
-                        {LaboresAsignado.length > 0 && (
-                          <Button
-                            title="Finalizar plantilla"
-                            onPress={finalizar_plantilla}
-                            color="#009387"
-                          />
-                        )}
-                      </>
-                    ) : (
-                      <>
-                        {parte_diario.labores.map((labores, index) => (
-                          <>
-                            <Text>
-                              <Text style={styles.label}>Labor: </Text>
-                              {obtener_labor(labores.labor)}
-                            </Text>
-                            <View style={{padding: 10}} key={index}>
-                              <Text
-                                style={{
-                                  textAlign: 'center',
-                                  fontWeight: 'bold',
-                                  padding: 10,
-                                }}>
-                                Empleados Asignados
-                              </Text>
-                              {labores.Asignado.map((asig, index) => (
-                                <View
-                                  style={styles.row_empleado_asig}
-                                  key={index}>
-                                  <Text>{obtener_empleado(asig.Empleado)}</Text>
-                                  <Text
-                                    style={styles.btn_actividad}
-                                    onPress={() => {
-                                      setIsModal(true);
-                                      setIsRender('Actividades-asignados');
-                                      setThisEmpleado(asig.Empleado);
-                                    }}>
-                                    <MaterialIcons
-                                      name="navigate-next"
-                                      color="#009387"
-                                      size={20}
-                                    />
-                                  </Text>
-                                </View>
-                              ))}
-                            </View>
-                          </>
-                        ))}
-                      </>
-                    )*/}
                   </>
                 ))}
               </>
             )}
-
-            <View
-              style={{
-                borderBottom: 2,
-                borderBottomColor: '#cdcdcd',
-                borderBottomWidth: 2,
-                padding: 10,
-              }}
-            />
           </ScrollView>
         </Animatable.View>
       </View>
@@ -296,7 +227,7 @@ const ParteDiarioScreen = ({navigation}) => {
         />
         <Button
           title="Crear Plantilla"
-          disabled={LaboresAsignado.length > 0}
+          disabled={false}
           onPress={() => {
             setIsModal(true);
             setIsRender('Create-plantilla');
@@ -309,9 +240,6 @@ const ParteDiarioScreen = ({navigation}) => {
         setIsModal={setIsModal}
         setIsReload={setIsReload}
         render={isRender}
-        setLaboresAsignado={setLaboresAsignado}
-        LaboresAsignado={LaboresAsignado}
-        thisEmpleado={thisEmpleado}
         navigation={navigation}
       />
     </>

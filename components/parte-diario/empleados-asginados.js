@@ -1,7 +1,9 @@
 import React, {useEffect, useState} from 'react';
 import {Text, View, Alert, StyleSheet, Button} from 'react-native';
 import {dbCargos} from '../../db-local/db-cargos';
+import {dbActEmpl} from '../../db-local/db-actividades-empleado';
 import {InsertarCuadrillaPD} from '../../db-local/db-cuadrilla-parte-diario';
+import {InsertarActividadEmpleado} from '../../db-local/db-actividades-empleado';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 export function EmpleadosAsignados({
@@ -10,13 +12,21 @@ export function EmpleadosAsignados({
   id_parte_diario,
   cuadrilla,
   setIsReload,
+  setIsModal,
+  setIsRender,
 }) {
   const [Cargos, setCargos] = useState([]);
+  const [ActivEmple, setActivEmple] = useState([]);
 
   useEffect(() => {
     dbCargos.find({}, async function (err, docs) {
       err && Alert.alert(err.message);
       setCargos(docs);
+    });
+
+    dbActEmpl.find({}, async function (err, docs) {
+      err && Alert.alert(err.message);
+      setActivEmple(docs);
     });
   }, []);
 
@@ -27,8 +37,26 @@ export function EmpleadosAsignados({
     }
   };
 
+  const obtener_empleado = (IdEmpleado) => {
+    const result = Empleados.find(
+      (empleado) => empleado.IdEmpleado === IdEmpleado,
+    );
+    return result.Apellido;
+  };
+
   const finish_template = () => {
-    InsertarCuadrillaPD({idParteDiario: id_parte_diario, cuadrilla});
+    InsertarCuadrillaPD({
+      idParteDiario: id_parte_diario,
+      cuadrilla,
+    });
+
+    Empleados.map((empleado) =>
+      InsertarActividadEmpleado({
+        idEmpleado: empleado.IdEmpleado,
+        idParteDiario: id_parte_diario,
+        actividades: [obtenerCargo(empleado.Cargo)],
+      }),
+    );
     setIsReload(true);
   };
 
@@ -46,32 +74,57 @@ export function EmpleadosAsignados({
         <Text style={{textAlign: 'center', fontWeight: 'bold', padding: 10}}>
           Empleados Asignados
         </Text>
-        {Empleados.map((obrero, index) => (
-          <View style={styles.row_empleado_asig} key={index}>
-            <Text>
-              {
-                <>
-                  <Text style={styles.label_actividad}>
-                    {obtenerCargo(obrero.Cargo)} &nbsp; - &nbsp;
+        {ActivEmple.length === 0
+          ? Empleados.map((obrero, index) => (
+              <View style={styles.row_empleado_asig} key={index}>
+                <Text>
+                  {
+                    <>
+                      <Text style={styles.label_actividad}>
+                        {obtenerCargo(obrero.Cargo)} &nbsp; - &nbsp;
+                      </Text>
+                      <Text style={{fontSize: 12}}>{obrero.Apellido}</Text>
+                    </>
+                  }
+                </Text>
+              </View>
+            ))
+          : ActivEmple.map((activEmple, index) => (
+              <View style={styles.row_empleado_asig} key={index}>
+                <Text>
+                  {
+                    <>
+                      <Text style={styles.label_actividad}>
+                        {activEmple.actividades.length > 1
+                          ? activEmple.actividades[0] +
+                            ' +' +
+                            activEmple.actividades.length -
+                            1
+                          : activEmple.actividades[0]}{' '}
+                        &nbsp; / &nbsp;
+                      </Text>
+                      <Text style={{fontSize: 12}}>
+                        {obtener_empleado(activEmple.idEmpleado)}
+                      </Text>
+                    </>
+                  }
+                </Text>
+                {actions && (
+                  <Text
+                    style={styles.btn_actividad}
+                    onPress={() => {
+                      setIsModal(true);
+                      setIsRender('Actions-actividad-empleado');
+                    }}>
+                    <MaterialIcons
+                      name="navigate-next"
+                      color="#009387"
+                      size={20}
+                    />
                   </Text>
-                  <Text style={{fontSize: 12}}>{obrero.Apellido}</Text>
-                </>
-              }
-            </Text>
-            {actions && (
-              <Text
-                style={styles.btn_actividad}
-                onPress={() => {
-                  /* setIsModal(true);
-                        setIsRender('Actividades-asignados');
-                        setThisEmpleado(asig.Empleado); */
-                  console.log('califica');
-                }}>
-                <MaterialIcons name="navigate-next" color="#009387" size={20} />
-              </Text>
-            )}
-          </View>
-        ))}
+                )}
+              </View>
+            ))}
       </View>
     </>
   );
