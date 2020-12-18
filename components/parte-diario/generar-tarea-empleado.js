@@ -1,8 +1,13 @@
 import React, {useState, useEffect} from 'react';
+import {EmpleadosAsignados} from './empleados-asginados';
 import {Text, View, StyleSheet} from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 
-export function GenerarTareaEmpleado({Cuadrillas}) {
+export function GenerarTareaEmpleado({
+  Cuadrillas,
+  id_parte_diario,
+  setIsReload,
+}) {
   const [IsCuadrilla, setIsCuadrilla] = useState('');
   const [Empleados, setEmpleados] = useState([]);
 
@@ -10,6 +15,7 @@ export function GenerarTareaEmpleado({Cuadrillas}) {
     if (Cuadrillas) {
       if (Cuadrillas.length > 1) {
         setIsCuadrilla('');
+        setEmpleados([]);
       } else {
         setIsCuadrilla(Cuadrillas[0].Nombre);
         setEmpleados(Cuadrillas[0].Empleados);
@@ -19,8 +25,7 @@ export function GenerarTareaEmpleado({Cuadrillas}) {
 
   return (
     <>
-      {console.log(Empleados)}
-      {Cuadrillas.length > 1 ? (
+      {Empleados.length === 0 ? (
         <>
           <Text style={[styles.label, {textAlign: 'center'}]}>
             Seleccione la cuadrilla
@@ -50,7 +55,13 @@ export function GenerarTareaEmpleado({Cuadrillas}) {
           </View>
         </>
       ) : (
-        ''
+        <EmpleadosAsignados
+          Empleados={Empleados}
+          actions={false}
+          id_parte_diario={id_parte_diario}
+          cuadrilla={IsCuadrilla}
+          setIsReload={setIsReload}
+        />
       )}
     </>
   );

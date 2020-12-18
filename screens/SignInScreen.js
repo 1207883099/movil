@@ -11,10 +11,12 @@ import {LoaderSpinner} from '../components/loader/spiner-loader';
 import {connect} from 'react-redux';
 import {InsertarMaestra, dbMaestra} from '../db-local/db-maestra';
 import {dbParteDiario} from '../db-local/db-parte-diario';
+import {InsertarCargos, dbCargos} from '../db-local/db-cargos';
 import LinearGradient from 'react-native-linear-gradient';
 import {MisDatos} from '../components/elementos/mis-datos';
 import {obtenerMaestra} from '../api/maestra';
-import {SubirParteDiario} from '../api/parte-diario';
+// import {SubirParteDiario} from '../api/parte-diario';
+import {obtenerCargos} from '../api/cargo';
 import {FechaTrabajo} from '../components/elementos/semana-del-ano';
 import {FechaContext} from '../components/context/fecha';
 
@@ -52,6 +54,10 @@ const SignInScreen = ({navigation, UsuarioReducer}) => {
       if (maestra.data.My_Cuadrilla !== undefined) {
         InsertarMaestra([maestra.data]);
         Alert.alert('Se Obtuvo datos Maestra :)');
+
+        const cargos = await obtenerCargos(UsuarioReducer.MyUser[0].token);
+        cargos.data.length && InsertarCargos(cargos.data);
+
         setIsLoading(false);
         setIsReload(true);
       } else {
@@ -65,20 +71,18 @@ const SignInScreen = ({navigation, UsuarioReducer}) => {
 
   const eliminar_datos = () => {
     dbMaestra.remove({}, {multi: true}, function (err) {
-      if (err) {
-        Alert.alert(err.message);
-        return;
-      }
+      err && Alert.alert(err.message);
     });
 
     dbParteDiario.remove({}, {multi: true}, function (err) {
-      if (err) {
-        Alert.alert(err.message);
-        return;
-      }
+      err && Alert.alert(err.message);
     });
 
-    Alert.alert('Se limpiaron todo los datos de maestra y partes diarios.');
+    dbCargos.remove({}, {multi: true}, function (err) {
+      err && Alert.alert(err.message);
+    });
+
+    Alert.alert('Se limpiaron todo los datos de la aplicacion.');
     setIsReload(true);
 
     navigation.navigate('SplashScreen');
@@ -86,7 +90,7 @@ const SignInScreen = ({navigation, UsuarioReducer}) => {
 
   const subir_datos = async () => {
     setIsLoading(true);
-    try {
+    /*try {
       dbMaestra.find({}, async function (err, docs) {
         if (err) {
           Alert.alert(err.message);
@@ -118,9 +122,10 @@ const SignInScreen = ({navigation, UsuarioReducer}) => {
       setIsLoading(false);
     } catch (error) {
       Alert.alert(error.message);
-    }
+    }*/
 
     setIsLoading(false);
+    Alert.alert('Esta accion aun no esta programada.');
   };
 
   return (
@@ -139,7 +144,7 @@ const SignInScreen = ({navigation, UsuarioReducer}) => {
                     colors={['#EB9058', '#EB5443']}
                     style={styles.signIn}>
                     <Text style={[styles.textSign, {color: '#fff'}]}>
-                      Eliminar Datos
+                      Eliminar Todo
                     </Text>
                   </LinearGradient>
                 </TouchableOpacity>

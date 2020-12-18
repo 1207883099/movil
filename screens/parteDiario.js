@@ -3,9 +3,10 @@ import {Alert, StyleSheet, Text, Button, ScrollView, View} from 'react-native';
 import {MessageAlert} from '../components/elementos/message';
 import {dbMaestra} from '../db-local/db-maestra';
 import {dbParteDiario} from '../db-local/db-parte-diario';
+import {EmpleadosAsignados} from '../components/parte-diario/empleados-asginados';
+import {dbCuadrillaPD} from '../db-local/db-cuadrilla-parte-diario';
 import {PaginationParteDiario} from '../components/parte-diario/pagination';
 import {GenerarTareaEmpleado} from '../components/parte-diario/generar-tarea-empleado';
-import {InsertarParteDiario} from '../db-local/db-parte-diario';
 import {ModalScreen} from '../components/modal/modal';
 import * as Animatable from 'react-native-animatable';
 import {getDia} from '../hooks/fechas';
@@ -29,6 +30,11 @@ const ParteDiarioScreen = ({navigation}) => {
   const [Cuadrillas, setCuadrillas] = useState([]);
   const [LaboresAsignado, setLaboresAsignado] = useState([]);
   const [DisponiblesParteDiario, setDisponiblesParteDiario] = useState([]);
+  const [CPD, setCPD] = useState({
+    _id: '',
+    cuadrilla: '',
+    idParteDiario: '',
+  });
 
   useEffect(() => {
     try {
@@ -65,17 +71,33 @@ const ParteDiarioScreen = ({navigation}) => {
 
                 if (toma_parte_diario) {
                   setIsParteDiario(false);
+
                   DisponiblesParteDiario.length === 0 && setIndexDb(index);
+
                   const selectPD =
                     docs[
                       DisponiblesParteDiario.length
                         ? DisponiblesParteDiario[IndexDb]
                         : index
                     ];
+
                   setMisPartesDiarios({
                     _id: selectPD._id,
                     data: selectPD.Mis_Parte_Diario,
                   });
+
+                  dbCuadrillaPD.findOne(
+                    {idParteDiario: selectPD._id},
+                    async function (err, CPD) {
+                      err && Alert.alert(err.message);
+
+                      setCPD({
+                        _id: CPD._id,
+                        cuadrilla: CPD.cuadrilla,
+                        idParteDiario: CPD.idParteDiario,
+                      });
+                    },
+                  );
                 }
                 toma_parte_diario = false;
               }
@@ -110,23 +132,12 @@ const ParteDiarioScreen = ({navigation}) => {
     });
   };
 
-  const obtener_labor = (IdLabor) => {
+  /*const obtener_labor = (IdLabor) => {
     if (Labores.length > 0) {
       const resul_labor = Labores.find((labor) => labor.IdLabor === IdLabor);
       return resul_labor.Nombre;
     }
-  };
-
-  const obtener_empleado = (IdEmpleado) => {
-    return Cuadrillas.map((cuadrilla) => {
-      const result_empleado = cuadrilla.Empleados.find(
-        (empleado) => empleado.IdEmpleado === IdEmpleado,
-      );
-      if (result_empleado !== undefined) {
-        return result_empleado.Nombre + ' - ' + result_empleado.Apellido;
-      }
-    });
-  };
+  };*/
 
   const obtenerSector = (IdSector) => {
     if (Sectores.length > 0) {
@@ -135,20 +146,6 @@ const ParteDiarioScreen = ({navigation}) => {
       );
       return Result_Sector.Nombre + ' - ' + Result_Sector.Nombre_Hacienda;
     }
-  };
-
-  const finalizar_plantilla = () => {
-    console.log('final');
-    const ParteDiario = {
-      tipo: MisPartesDiarios.data[0].tipo,
-      sector: MisPartesDiarios.data[0].sector,
-      labores: LaboresAsignado,
-    };
-
-    const Mis_Parte_Diario = [];
-    Mis_Parte_Diario.push(ParteDiario);
-    InsertarParteDiario([{Mis_Parte_Diario}]);
-    setIsReload(true);
   };
 
   return (
@@ -182,13 +179,13 @@ const ParteDiarioScreen = ({navigation}) => {
                       Eliminar parte diario
                     </Text>
                     <View style={styles.header}>
-                      <View style={styles.box}>
+                      <View style={[styles.box, {width: '75%'}]}>
                         <Text>
                           <Text style={styles.label}>Sector: </Text>
                           {obtenerSector(parte_diario.sector)}
                         </Text>
                       </View>
-                      <View style={styles.box}>
+                      <View style={[styles.box, {width: 80}]}>
                         <Text>
                           <Text style={styles.label}>Tipo: </Text>
                           {parte_diario.tipo}
@@ -196,7 +193,20 @@ const ParteDiarioScreen = ({navigation}) => {
                       </View>
                     </View>
 
-                    <GenerarTareaEmpleado Cuadrillas={Cuadrillas} />
+                    {CPD ? (
+                      <EmpleadosAsignados
+                        Empleados={
+                          /*Cuadrillas[0].Nombre === CPD.cuadrilla*/ []
+                        }
+                        actions={true}
+                      />
+                    ) : (
+                      <GenerarTareaEmpleado
+                        Cuadrillas={Cuadrillas}
+                        id_parte_diario={MisPartesDiarios._id}
+                        setIsReload={setIsReload}
+                      />
+                    )}
 
                     {/*parte_diario.labores[0].labor === 'ninguno' ? (
                       <>
@@ -216,39 +226,6 @@ const ParteDiarioScreen = ({navigation}) => {
                             color="#009387"
                           />
                         )}
-
-                        {LaboresAsignado.map((labores, index) => (
-                          <>
-                            <Text>{'\n'}</Text>
-                            <Text>
-                              <Text style={styles.label}>Labor: </Text>
-                              {obtener_labor(labores.labor)}
-                            </Text>
-                            <View style={{padding: 10}} key={index}>
-                              <Text
-                                style={{
-                                  textAlign: 'center',
-                                  fontWeight: 'bold',
-                                  padding: 10,
-                                }}>
-                                Empleados Asignados
-                              </Text>
-                              {labores.Asignado.map((asig, index) => (
-                                <Text
-                                  style={{
-                                    color: '#000',
-                                    borderBottom: 2,
-                                    borderBottomStyle: 'solid',
-                                    borderBottomColor: '#cddcdcd',
-                                    borderBottomWidth: 2,
-                                  }}
-                                  key={index}>
-                                  {obtener_empleado(asig.Empleado)}
-                                </Text>
-                              ))}
-                            </View>
-                          </>
-                        ))}
                       </>
                     ) : (
                       <>
@@ -382,23 +359,6 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderStyle: 'solid',
     borderColor: 'red',
-    marginBottom: 10,
-  },
-  btn_actividad: {
-    borderWidth: 1,
-    borderStyle: 'solid',
-    borderColor: '#009387',
-    padding: 5,
-  },
-  row_empleado_asig: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    color: '#000',
-    padding: 5,
-    borderWidth: 2,
-    borderStyle: 'solid',
-    borderColor: '#cdcdcd',
     marginBottom: 10,
   },
 });
