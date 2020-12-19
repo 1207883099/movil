@@ -10,6 +10,7 @@ import {GenerarTareaEmpleado} from '../components/parte-diario/generar-tarea-emp
 import {ModalScreen} from '../components/modal/modal';
 import * as Animatable from 'react-native-animatable';
 import {getDia} from '../hooks/fechas';
+import {CrearPlantilla} from '../components/parte-diario/crear-plantilla';
 import {FechaContext} from '../components/context/fecha';
 
 const ParteDiarioScreen = ({navigation}) => {
@@ -17,7 +18,6 @@ const ParteDiarioScreen = ({navigation}) => {
   const [isParteDiario, setIsParteDiario] = useState(true);
   const [isModal, setIsModal] = useState(false);
   const [isReload, setIsReload] = useState(false);
-  const [isRender, setIsRender] = useState('');
   const [IndexDb, setIndexDb] = useState(0);
   const [next_prev, setNext_Prev] = useState({next: false, prev: false});
   const [MisPartesDiarios, setMisPartesDiarios] = useState({
@@ -37,12 +37,12 @@ const ParteDiarioScreen = ({navigation}) => {
   useEffect(() => {
     try {
       const fetchDb = () => {
-        dbMaestra.find({}, async function (err, docs) {
+        dbMaestra.find({}, async function (err, dataMaestra) {
           err && Alert.alert(err.message);
 
           if (IndexDb >= 0) {
-            setSectores(docs[0].Sectores);
-            setCuadrillas(docs[0].My_Cuadrilla);
+            setSectores(dataMaestra[0].Sectores);
+            setCuadrillas(dataMaestra[0].My_Cuadrilla);
           }
         });
 
@@ -206,8 +206,8 @@ const ParteDiarioScreen = ({navigation}) => {
                         cuadrilla={CPD.cuadrilla}
                         id_parte_diario={MisPartesDiarios._id}
                         actions={true}
-                        setIsModal={setIsModal}
-                        setIsRender={setIsRender}
+                        idSector={parte_diario.sector}
+                        setIsReload={setIsReload}
                       />
                     ) : (
                       CPD.cuadrilla === undefined && (
@@ -239,18 +239,17 @@ const ParteDiarioScreen = ({navigation}) => {
           disabled={false}
           onPress={() => {
             setIsModal(true);
-            setIsRender('Create-plantilla');
           }}
         />
       </View>
 
-      <ModalScreen
-        isModal={isModal}
-        setIsModal={setIsModal}
-        setIsReload={setIsReload}
-        render={isRender}
-        navigation={navigation}
-      />
+      <ModalScreen isModal={isModal} setIsModal={setIsModal}>
+        <CrearPlantilla
+          setIsReload={setIsReload}
+          setIsModal={setIsModal}
+          navigation={navigation}
+        />
+      </ModalScreen>
     </>
   );
 };

@@ -1,12 +1,16 @@
 import React, {useEffect, useState, memo} from 'react';
 import {Text, View, Alert, StyleSheet, Button} from 'react-native';
+/* DB LOCAL */
 import {dbCargos} from '../../db-local/db-cargos';
-import {InsertarCuadrillaPD} from '../../db-local/db-cuadrilla-parte-diario';
 import {
   InsertarActividadEmpleado,
   dbActEmpl,
 } from '../../db-local/db-actividades-empleado';
 import {dbParteDiario} from '../../db-local/db-parte-diario';
+import {InsertarCuadrillaPD} from '../../db-local/db-cuadrilla-parte-diario';
+/* COMPONENTS */
+import {ModalScreen} from '../modal/modal';
+import {CalificarActividad} from './calificar-actividad';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 function EmpleadosAsignados({
@@ -15,24 +19,25 @@ function EmpleadosAsignados({
   id_parte_diario,
   cuadrilla,
   setIsReload,
-  setIsModal,
-  setIsRender,
+  idSector,
 }) {
   const [Cargos, setCargos] = useState([]);
   const [ActivEmple, setActivEmple] = useState([]);
+  const [isModal, setIsModal] = useState(false);
+  const [selectIdActiEmple, SetselectActiEmple] = useState('');
 
   useEffect(() => {
-    dbCargos.find({}, async function (err, docs) {
+    dbCargos.find({}, async function (err, dataCargos) {
       err && Alert.alert(err.message);
-      setCargos(docs);
+      setCargos(dataCargos);
     });
 
     dbActEmpl.find({idParteDiario: id_parte_diario}, async function (
       err,
-      docs,
+      dataActEmpl,
     ) {
       err && Alert.alert(err.message);
-      setActivEmple(docs);
+      setActivEmple(dataActEmpl);
     });
   }, [id_parte_diario]);
 
@@ -72,6 +77,9 @@ function EmpleadosAsignados({
         idEmpleado: empleado.IdEmpleado,
         idParteDiario: id_parte_diario,
         actividad: obtenerCargo(empleado.Cargo),
+        hectaria: 0,
+        lote: 0,
+        observaciones: '',
       }),
     );
     setIsReload(true);
@@ -90,7 +98,7 @@ function EmpleadosAsignados({
       <Text style={[styles.label, styles.box_actividad]}>Actividades</Text>
       <View style={{padding: 10}} key={0}>
         <Text style={{textAlign: 'center', fontWeight: 'bold', padding: 10}}>
-          Empleados Asignados
+          Empleados Asignados {cuadrilla && ': ' + cuadrilla}
         </Text>
         {ActivEmple.length === 0
           ? Empleados.map((obrero, index) => (
@@ -127,7 +135,7 @@ function EmpleadosAsignados({
                     style={styles.btn_actividad}
                     onPress={() => {
                       setIsModal(true);
-                      setIsRender('Actions-actividad-empleado');
+                      SetselectActiEmple(activEmple._id);
                     }}>
                     <MaterialIcons
                       name="navigate-next"
@@ -139,6 +147,15 @@ function EmpleadosAsignados({
               </View>
             ))}
       </View>
+
+      <ModalScreen isModal={isModal} setIsModal={setIsModal}>
+        <CalificarActividad
+          selectIdActiEmple={selectIdActiEmple}
+          setIsModal={setIsModal}
+          setIsReload={setIsReload}
+          idSector={idSector}
+        />
+      </ModalScreen>
     </>
   );
 }
