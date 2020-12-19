@@ -10,17 +10,23 @@ import {
   TextInput,
   Alert,
 } from 'react-native';
+/* COMPONENTS */
 import * as Animatable from 'react-native-animatable';
 import LinearGradient from 'react-native-linear-gradient';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {useTheme} from '@react-navigation/native';
 import {useNetInfo} from '@react-native-community/netinfo';
 import {NetworkInfo} from 'react-native-network-info';
-import {dbMaestra} from '../db-local/db-maestra';
-import {getDomain, setDomain} from '../api/config';
 import {LoaderSpinner} from '../components/loader/spiner-loader';
-import {setUsuario} from '../redux/model/usuarios';
+/* DB LOCAL */
+import {dbMaestra} from '../db-local/db-maestra';
+import {dbEntryHistory, InsertarEntry} from '../db-local/db-history-entry';
+/* FETCH API */
 import {Auth} from '../api/usuario';
+import {getDomain, setDomain} from '../api/config';
+import {setUsuario} from '../redux/model/usuarios';
+/* FECHAS */
+import {get_Semana_Del_Ano} from '../hooks/fechas';
 
 const SplashScreen = ({navigation, route, setUsuario}) => {
   const {colors} = useTheme();
@@ -28,40 +34,52 @@ const SplashScreen = ({navigation, route, setUsuario}) => {
   const [isLogind, setIsLogind] = useState(false);
 
   useEffect(() => {
-    if (!netInfo.isConnected) {
+    !netInfo.isConnected &&
       Alert.alert('Necesitas conneccion a internet para bajar o subir datos.');
-    }
 
     if (route.params === undefined) {
-      dbMaestra.find({}, async function (err, docs) {
-        if (err) {
-          Alert.alert(err.message);
+      dbEntryHistory.find({}, async function (err, dataHistory) {
+        err && Alert.alert(err.message);
+        if (dataHistory.length) {
+          const ultimoHistory = dataHistory[dataHistory.length - 1];
+          if (ultimoHistory.semana !== get_Semana_Del_Ano()) {
+            Alert.alert(
+              'Has empezado otra semana, asegurate de limpiar los datos antes de terminar la semana..! ----- de lo contrario ya no podras ver ni gestionar los partes diarios, debido a que no pertenecen a esta semana.',
+            );
+          }
         }
 
-        if (docs.length > 0) {
-          navigation.navigate('SignInScreen');
-        }
+        dbMaestra.find({}, async function (err, docs) {
+          err && Alert.alert(err.message);
+
+          if (docs.length > 0) {
+            navigation.navigate('SignInScreen');
+          }
+        });
       });
     }
   }, [netInfo, route, navigation]);
 
   const btn_empezar = async () => {
-    setIsLogind(true);
     if (getDomain()) {
       if (getDomain().indexOf('https') !== -1) {
         try {
+          setIsLogind(true);
           NetworkInfo.getIPAddress()
             .then(async (ip) => {
               const auth = await Auth(ip);
               if (auth.data.feedback) {
                 Alert.alert(auth.data.feedback);
+                setIsLogind(false);
               } else {
+                InsertarEntry({semana: get_Semana_Del_Ano()});
                 setUsuario(auth.data.MyUser);
                 navigation.navigate('SignInScreen');
               }
             })
-            .catch((err) => Alert.alert(err.message));
+            .catch((err) => Alert.alert(err.message), setIsLogind(false));
         } catch (error) {
+          setIsLogind(false);
           Alert.alert(error.message);
         }
       } else {
@@ -70,7 +88,6 @@ const SplashScreen = ({navigation, route, setUsuario}) => {
     } else {
       Alert.alert('Inserta la URL de autorizacion.');
     }
-    setIsLogind(false);
   };
 
   return (
@@ -87,6 +104,8 @@ const SplashScreen = ({navigation, route, setUsuario}) => {
           placeholder="Inserta la URL autorizada"
         />
       </View>
+      {console.log(isLogind)}
+      {isLogind && <LoaderSpinner color="white" />}
       <Animatable.View
         style={[
           styles.footer,
@@ -106,18 +125,14 @@ const SplashScreen = ({navigation, route, setUsuario}) => {
         </Text>
         <Text style={styles.text}>Procede a iniciar session</Text>
         <View style={styles.button}>
-          {isLogind ? (
-            <LoaderSpinner />
-          ) : (
-            <TouchableOpacity onPress={btn_empezar}>
-              <LinearGradient
-                colors={['#08d4c4', '#01ab9d']}
-                style={styles.signIn}>
-                <Text style={styles.textSign}>Empezar</Text>
-                <MaterialIcons name="navigate-next" color="#fff" size={20} />
-              </LinearGradient>
-            </TouchableOpacity>
-          )}
+          <TouchableOpacity onPress={btn_empezar}>
+            <LinearGradient
+              colors={['#08d4c4', '#01ab9d']}
+              style={styles.signIn}>
+              <Text style={styles.textSign}>Empezar</Text>
+              <MaterialIcons name="navigate-next" color="#fff" size={20} />
+            </LinearGradient>
+          </TouchableOpacity>
         </View>
       </Animatable.View>
     </View>

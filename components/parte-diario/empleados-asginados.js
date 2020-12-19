@@ -48,7 +48,11 @@ function EmpleadosAsignados({
       const result = Empleados.find(
         (empleado) => empleado.IdEmpleado === IdEmpleado,
       );
-      return 'si';
+      if (result === undefined) {
+        return 'llamismo';
+      } else {
+        return result.Apellido;
+      }
     }
   };
 
@@ -59,7 +63,7 @@ function EmpleadosAsignados({
     });
 
     dbParteDiario.update(
-      {_id: id_parte_diario},
+      {_id: id_parte_diario, cuadrilla: 'undefined'},
       {$set: {cuadrilla: cuadrilla}},
     );
 

@@ -7,32 +7,39 @@ import {
   StyleSheet,
   Alert,
 } from 'react-native';
-import {LoaderSpinner} from '../components/loader/spiner-loader';
 import {connect} from 'react-redux';
+/* EMPIEZA DB LOCAL */
 import {InsertarMaestra, dbMaestra} from '../db-local/db-maestra';
+import {dbEntryHistory} from '../db-local/db-history-entry';
+import {dbCuadrillaPD} from '../db-local/db-cuadrilla-parte-diario';
+import {dbActEmpl} from '../db-local/db-actividades-empleado';
 import {dbParteDiario} from '../db-local/db-parte-diario';
 import {InsertarCargos, dbCargos} from '../db-local/db-cargos';
+/* COMPONENTS */
 import LinearGradient from 'react-native-linear-gradient';
 import {MisDatos} from '../components/elementos/mis-datos';
+import {FechaTrabajo} from '../components/elementos/semana-del-ano';
+import {FechaContext} from '../components/context/fecha';
+import {LoaderSpinner} from '../components/loader/spiner-loader';
+/* FETCH API */
 import {obtenerMaestra} from '../api/maestra';
 // import {SubirParteDiario} from '../api/parte-diario';
 import {obtenerCargos} from '../api/cargo';
-import {FechaTrabajo} from '../components/elementos/semana-del-ano';
-import {FechaContext} from '../components/context/fecha';
+/* HOOKS */
+import {get_Semana_Del_Ano} from '../hooks/fechas';
 
 const SignInScreen = ({navigation, UsuarioReducer}) => {
   const {fechaCtx, setFechaCtx} = useContext(FechaContext);
   const [dataLocal, setDataLocal] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isReload, setIsReload] = useState(false);
+  const [lastHistory, setLastHistory] = useState();
 
   useEffect(() => {
     try {
       const fetchDB = () => {
         dbMaestra.find({}, async function (err, docs) {
-          if (err) {
-            Alert.alert(err.message);
-          }
+          err && Alert.alert(err.message);
           setDataLocal(docs);
         });
       };
@@ -40,6 +47,12 @@ const SignInScreen = ({navigation, UsuarioReducer}) => {
       if (isReload) {
         setIsReload(false);
       }
+
+      dbEntryHistory.find({}, async function (err, dataHistory) {
+        err && Alert.alert(err.message);
+        const ultimoHistory = dataHistory[dataHistory.length - 1];
+        setLastHistory(ultimoHistory.semana);
+      });
 
       fetchDB();
     } catch (error) {
@@ -79,6 +92,18 @@ const SignInScreen = ({navigation, UsuarioReducer}) => {
     });
 
     dbCargos.remove({}, {multi: true}, function (err) {
+      err && Alert.alert(err.message);
+    });
+
+    dbActEmpl.remove({}, {multi: true}, function (err) {
+      err && Alert.alert(err.message);
+    });
+
+    dbCuadrillaPD.remove({}, {multi: true}, function (err) {
+      err && Alert.alert(err.message);
+    });
+
+    dbEntryHistory.remove({}, {multi: true}, function (err) {
       err && Alert.alert(err.message);
     });
 
@@ -165,7 +190,15 @@ const SignInScreen = ({navigation, UsuarioReducer}) => {
 
                 <TouchableOpacity
                   style={styles.delete}
-                  onPress={() => navigation.navigate('ParteDiario')}>
+                  onPress={() => {
+                    if (lastHistory !== get_Semana_Del_Ano()) {
+                      Alert.alert(
+                        'Has empezado otra semana, asegurate de limpiar los datos antes de terminar la semana..! ----- de lo contrario ya no podras ver ni gestionar los partes diarios, debido a que no pertenecen a esta semana.',
+                      );
+                    } else {
+                      navigation.navigate('ParteDiario');
+                    }
+                  }}>
                   <LinearGradient
                     colors={['#69ABC9', '#69D6C9']}
                     style={styles.signIn}>

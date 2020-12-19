@@ -126,9 +126,7 @@ const ParteDiarioScreen = ({navigation}) => {
 
   const delete_parte_diario = (_id) => {
     dbParteDiario.remove({_id}, {multi: true}, function (err, numRemoved) {
-      if (err) {
-        Alert.alert(err.message);
-      }
+      err && Alert.alert(err.message);
 
       Alert.alert(
         `Se elimino el registro con el _id ${_id + ' cantidad:' + numRemoved}.`,
@@ -197,7 +195,7 @@ const ParteDiarioScreen = ({navigation}) => {
                         </Text>
                       </View>
                     </View>
-                    {console.log(CPD)}
+
                     {CPD.cuadrilla ? (
                       <EmpleadosAsignados
                         Empleados={
@@ -206,7 +204,7 @@ const ParteDiarioScreen = ({navigation}) => {
                           ).Empleados
                         }
                         cuadrilla={CPD.cuadrilla}
-                        id_parte_diario={CPD.idParteDiario}
+                        id_parte_diario={MisPartesDiarios._id}
                         actions={true}
                         setIsModal={setIsModal}
                         setIsRender={setIsRender}

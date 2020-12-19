@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {EmpleadosAsignados} from './empleados-asginados';
+import EmpleadosAsignados from './empleados-asginados';
 import {Text, View, StyleSheet} from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 
