@@ -7,30 +7,39 @@ import {
   StyleSheet,
   Alert,
 } from 'react-native';
-import {LoaderSpinner} from '../components/loader/spiner-loader';
 import {connect} from 'react-redux';
+/* EMPIEZA DB LOCAL */
 import {InsertarMaestra, dbMaestra} from '../db-local/db-maestra';
+import {dbEntryHistory} from '../db-local/db-history-entry';
+import {dbCuadrillaPD} from '../db-local/db-cuadrilla-parte-diario';
+import {dbActEmpl} from '../db-local/db-actividades-empleado';
 import {dbParteDiario} from '../db-local/db-parte-diario';
+import {InsertarCargos, dbCargos} from '../db-local/db-cargos';
+/* COMPONENTS */
 import LinearGradient from 'react-native-linear-gradient';
 import {MisDatos} from '../components/elementos/mis-datos';
-import {obtenerMaestra} from '../api/maestra';
-import {SubirParteDiario} from '../api/parte-diario';
 import {FechaTrabajo} from '../components/elementos/semana-del-ano';
 import {FechaContext} from '../components/context/fecha';
+import {LoaderSpinner} from '../components/loader/spiner-loader';
+/* FETCH API */
+import {obtenerMaestra} from '../api/maestra';
+// import {SubirParteDiario} from '../api/parte-diario';
+import {obtenerCargos} from '../api/cargo';
+/* HOOKS */
+import {get_Semana_Del_Ano} from '../hooks/fechas';
 
 const SignInScreen = ({navigation, UsuarioReducer}) => {
   const {fechaCtx, setFechaCtx} = useContext(FechaContext);
   const [dataLocal, setDataLocal] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isReload, setIsReload] = useState(false);
+  const [lastHistory, setLastHistory] = useState();
 
   useEffect(() => {
     try {
       const fetchDB = () => {
         dbMaestra.find({}, async function (err, docs) {
-          if (err) {
-            Alert.alert(err.message);
-          }
+          err && Alert.alert(err.message);
           setDataLocal(docs);
         });
       };
@@ -38,6 +47,12 @@ const SignInScreen = ({navigation, UsuarioReducer}) => {
       if (isReload) {
         setIsReload(false);
       }
+
+      dbEntryHistory.find({}, async function (err, dataHistory) {
+        err && Alert.alert(err.message);
+        const ultimoHistory = dataHistory[dataHistory.length - 1];
+        setLastHistory(ultimoHistory.semana);
+      });
 
       fetchDB();
     } catch (error) {
@@ -52,6 +67,10 @@ const SignInScreen = ({navigation, UsuarioReducer}) => {
       if (maestra.data.My_Cuadrilla !== undefined) {
         InsertarMaestra([maestra.data]);
         Alert.alert('Se Obtuvo datos Maestra :)');
+
+        const cargos = await obtenerCargos(UsuarioReducer.MyUser[0].token);
+        cargos.data.length && InsertarCargos(cargos.data);
+
         setIsLoading(false);
         setIsReload(true);
       } else {
@@ -65,29 +84,38 @@ const SignInScreen = ({navigation, UsuarioReducer}) => {
 
   const eliminar_datos = () => {
     dbMaestra.remove({}, {multi: true}, function (err) {
-      if (err) {
-        Alert.alert(err.message);
-        return;
-      }
-      setIsReload(true);
+      err && Alert.alert(err.message);
     });
 
     dbParteDiario.remove({}, {multi: true}, function (err) {
-      if (err) {
-        Alert.alert(err.message);
-        return;
-      }
-      setIsReload(true);
+      err && Alert.alert(err.message);
     });
 
-    Alert.alert('Se limpiaron todo los datos de maestra y partes diarios.');
+    dbCargos.remove({}, {multi: true}, function (err) {
+      err && Alert.alert(err.message);
+    });
+
+    dbActEmpl.remove({}, {multi: true}, function (err) {
+      err && Alert.alert(err.message);
+    });
+
+    dbCuadrillaPD.remove({}, {multi: true}, function (err) {
+      err && Alert.alert(err.message);
+    });
+
+    dbEntryHistory.remove({}, {multi: true}, function (err) {
+      err && Alert.alert(err.message);
+    });
+
+    Alert.alert('Se limpiaron todo los datos de la aplicacion.');
+    setIsReload(true);
 
     navigation.navigate('SplashScreen');
   };
 
   const subir_datos = async () => {
     setIsLoading(true);
-    try {
+    /*try {
       dbMaestra.find({}, async function (err, docs) {
         if (err) {
           Alert.alert(err.message);
@@ -119,9 +147,10 @@ const SignInScreen = ({navigation, UsuarioReducer}) => {
       setIsLoading(false);
     } catch (error) {
       Alert.alert(error.message);
-    }
+    }*/
 
     setIsLoading(false);
+    Alert.alert('Esta accion aun no esta programada.');
   };
 
   return (
@@ -139,14 +168,8 @@ const SignInScreen = ({navigation, UsuarioReducer}) => {
                   <LinearGradient
                     colors={['#EB9058', '#EB5443']}
                     style={styles.signIn}>
-                    <Text
-                      style={[
-                        styles.textSign,
-                        {
-                          color: '#fff',
-                        },
-                      ]}>
-                      Eliminar Datos
+                    <Text style={[styles.textSign, {color: '#fff'}]}>
+                      Eliminar Todo
                     </Text>
                   </LinearGradient>
                 </TouchableOpacity>
@@ -159,13 +182,7 @@ const SignInScreen = ({navigation, UsuarioReducer}) => {
                   <LinearGradient
                     colors={['#5982EB', '#A69649']}
                     style={styles.signIn}>
-                    <Text
-                      style={[
-                        styles.textSign,
-                        {
-                          color: '#fff',
-                        },
-                      ]}>
+                    <Text style={[styles.textSign, {color: '#fff'}]}>
                       Ver Mis Cuadrilla
                     </Text>
                   </LinearGradient>
@@ -173,17 +190,19 @@ const SignInScreen = ({navigation, UsuarioReducer}) => {
 
                 <TouchableOpacity
                   style={styles.delete}
-                  onPress={() => navigation.navigate('ParteDiario')}>
+                  onPress={() => {
+                    if (lastHistory !== get_Semana_Del_Ano()) {
+                      Alert.alert(
+                        'Has empezado otra semana, asegurate de limpiar los datos antes de terminar la semana..! ----- de lo contrario ya no podras ver ni gestionar los partes diarios, debido a que no pertenecen a esta semana.',
+                      );
+                    } else {
+                      navigation.navigate('ParteDiario');
+                    }
+                  }}>
                   <LinearGradient
                     colors={['#69ABC9', '#69D6C9']}
                     style={styles.signIn}>
-                    <Text
-                      style={[
-                        styles.textSign,
-                        {
-                          color: '#fff',
-                        },
-                      ]}>
+                    <Text style={[styles.textSign, {color: '#fff'}]}>
                       Gestionar Parte Diario
                     </Text>
                   </LinearGradient>
@@ -209,13 +228,7 @@ const SignInScreen = ({navigation, UsuarioReducer}) => {
                   <LinearGradient
                     colors={['#08d3c4', '#06ab9d']}
                     style={styles.signIn}>
-                    <Text
-                      style={[
-                        styles.textSign,
-                        {
-                          color: '#fff',
-                        },
-                      ]}>
+                    <Text style={[styles.textSign, {color: '#fff'}]}>
                       Bajar Maestra
                     </Text>
                   </LinearGradient>
@@ -232,19 +245,9 @@ const SignInScreen = ({navigation, UsuarioReducer}) => {
                   onPress={subir_datos}
                   style={[
                     styles.signIn,
-                    {
-                      borderColor: '#009387',
-                      borderWidth: 1,
-                      marginTop: 15,
-                    },
+                    {borderColor: '#009387', borderWidth: 1, marginTop: 15},
                   ]}>
-                  <Text
-                    style={[
-                      styles.textSign,
-                      {
-                        color: '#009387',
-                      },
-                    ]}>
+                  <Text style={[styles.textSign, {color: '#009387'}]}>
                     Subir datos
                   </Text>
                 </TouchableOpacity>
@@ -258,19 +261,9 @@ const SignInScreen = ({navigation, UsuarioReducer}) => {
                   }
                   style={[
                     styles.signIn,
-                    {
-                      borderColor: '#009387',
-                      borderWidth: 1,
-                      marginTop: 15,
-                    },
+                    {borderColor: '#009387', borderWidth: 1, marginTop: 15},
                   ]}>
-                  <Text
-                    style={[
-                      styles.textSign,
-                      {
-                        color: '#009387',
-                      },
-                    ]}>
+                  <Text style={[styles.textSign, {color: '#009387'}]}>
                     Volver ah iniciar session
                   </Text>
                 </TouchableOpacity>

@@ -31,34 +31,6 @@ export function CrearPlantilla({setIsModal, setIsReload, navigation}) {
       const ParteDiario = {
         tipo: selectTipo,
         sector: selectSectorValue,
-        labores: [
-          {
-            labor: 'ninguno',
-            Asignado: [
-              {
-                Empleado: 'ninguno',
-                observacion: 'ninguno',
-                tareas: [
-                  {
-                    Actividad: 'ninguno',
-                    Hectarea: 'ninguno',
-                    Lote: 'ninguno',
-                  },
-                  {
-                    Actividad: 'ninguno',
-                    Hectarea: 'ninguno',
-                    Lote: 'ninguno',
-                  },
-                  {
-                    Actividad: 'ninguno',
-                    Hectarea: 'ninguno',
-                    Lote: 'ninguno',
-                  },
-                ],
-              },
-            ],
-          },
-        ],
       };
 
       const Mis_Parte_Diario = [];
@@ -67,7 +39,9 @@ export function CrearPlantilla({setIsModal, setIsReload, navigation}) {
       InsertarParteDiario({
         Mis_Parte_Diario,
         fecha: new Date().toDateString(),
+        cuadrilla: 'undefined',
       });
+
       setIsModal(false);
       setIsReload(true);
       navigation.navigate('SignInScreen');

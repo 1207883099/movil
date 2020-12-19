@@ -1,7 +1,5 @@
 import React from 'react';
 import {CrearPlantilla} from '../parte-diario/crear-plantilla';
-import {AgregarLabores} from '../parte-diario/agregar-labores';
-import {TareasAsginados} from '../parte-diario/tareas-asignados';
 import {
   Alert,
   Modal,
@@ -16,9 +14,6 @@ export function ModalScreen({
   setIsModal,
   setIsReload,
   render,
-  setLaboresAsignado,
-  LaboresAsignado,
-  thisEmpleado,
   navigation,
 }) {
   return (
@@ -40,20 +35,7 @@ export function ModalScreen({
                   navigation={navigation}
                 />
               )}
-              {render === 'Agregar-labores' && (
-                <AgregarLabores
-                  setLaboresAsignado={setLaboresAsignado}
-                  LaboresAsignado={LaboresAsignado}
-                  setIsModal={setIsModal}
-                />
-              )}
-              {render === 'Actividades-asignados' && (
-                <TareasAsginados
-                  thisEmpleado={thisEmpleado}
-                  setIsReload={setIsReload}
-                  setIsModal={setIsModal}
-                />
-              )}
+              {render === 'Actions-actividad-empleado' && <Text>sip</Text>}
 
               <View
                 style={{

@@ -2,7 +2,6 @@ import React, {useEffect, useState} from 'react';
 import {Picker} from '@react-native-picker/picker';
 import {View, Text, Button, StyleSheet, Alert} from 'react-native';
 import {dbMaestra} from '../../db-local/db-maestra';
-import {MessageAlert} from '../elementos/message';
 
 export function AgregarLabores({
   setLaboresAsignado,
@@ -208,8 +207,6 @@ export function AgregarLabores({
           </View>
         </>
       )}
-
-      {false && <MessageAlert background="#cdcdcd" content="cosa" />}
 
       {SelectEmpleado && (
         <Button
