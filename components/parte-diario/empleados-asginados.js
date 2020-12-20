@@ -100,6 +100,7 @@ function EmpleadosAsignados({
             <AddActividad
               id_parte_diario={id_parte_diario}
               cuadrilla={cuadrilla}
+              setIsReload={setIsReload}
             />
           </View>
         )}

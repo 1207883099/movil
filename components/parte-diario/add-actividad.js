@@ -6,7 +6,7 @@ import {Picker} from '@react-native-picker/picker';
 import {InsertarActividadEmpleado} from '../../db-local/db-actividades-empleado';
 import {dbMaestra} from '../../db-local/db-maestra';
 
-export function AddActividad({id_parte_diario, cuadrilla}) {
+export function AddActividad({id_parte_diario, cuadrilla, setIsReload}) {
   const [isModal, setIsModal] = useState(false);
   const [empleado, setEmpleado] = useState();
   const [labor, setLabor] = useState();
@@ -30,7 +30,6 @@ export function AddActividad({id_parte_diario, cuadrilla}) {
   }, [cuadrilla]);
 
   const anadirActividad = () => {
-    console.log(id_parte_diario);
     if (empleado && labor && actividad) {
       console.group(empleado, labor, actividad);
       InsertarActividadEmpleado({
@@ -38,6 +37,8 @@ export function AddActividad({id_parte_diario, cuadrilla}) {
         idParteDiario: id_parte_diario,
         actividad: actividad,
       });
+      setIsReload(true);
+      setIsModal(false);
     } else {
       Alert.alert('Campos vacios, revise y vuelve a intentar');
     }

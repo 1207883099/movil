@@ -59,14 +59,14 @@ export function CalificarActividad({
   };
 
   const saveDataActividad = () => {
-    if (hectarea && selectLote && observaciones) {
+    if (hectarea && selectLote) {
       dbActEmpl.update(
         {_id: selectIdActiEmple},
         {
           $set: {
             hectaria: hectarea,
             lote: selectLote,
-            observaciones: observaciones,
+            observaciones: observaciones ? observaciones : 'none',
           },
         },
       );
