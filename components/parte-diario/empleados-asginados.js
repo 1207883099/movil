@@ -12,6 +12,7 @@ import {InsertarCuadrillaPD} from '../../db-local/db-cuadrilla-parte-diario';
 import {ModalScreen} from '../modal/modal';
 import {CalificarActividad} from './calificar-actividad';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import {AddActividad} from './add-actividad';
 
 function EmpleadosAsignados({
   Empleados,
@@ -77,9 +78,6 @@ function EmpleadosAsignados({
         idEmpleado: empleado.IdEmpleado,
         idParteDiario: id_parte_diario,
         actividad: obtenerCargo(empleado.Cargo),
-        hectaria: 0,
-        lote: 0,
-        observaciones: '',
       }),
     );
     setIsReload(true);
@@ -95,7 +93,17 @@ function EmpleadosAsignados({
         />
       )}
 
-      <Text style={[styles.label, styles.box_actividad]}>Actividades</Text>
+      <View style={styles.header}>
+        <Text style={[styles.label, styles.box_actividad]}>Actividades</Text>
+        {ActivEmple.length !== 0 && (
+          <View>
+            <AddActividad
+              id_parte_diario={id_parte_diario}
+              cuadrilla={cuadrilla}
+            />
+          </View>
+        )}
+      </View>
       <View style={{padding: 10}} key={0}>
         <Text style={{textAlign: 'center', fontWeight: 'bold', padding: 10}}>
           Empleados Asignados {cuadrilla && ': ' + cuadrilla}
@@ -165,6 +173,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'left',
     paddingBottom: 15,
+  },
+  header: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   btn_actividad: {
     borderWidth: 1,
