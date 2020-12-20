@@ -1,5 +1,4 @@
 import React from 'react';
-import {CrearPlantilla} from '../parte-diario/crear-plantilla';
 import {
   Alert,
   Modal,
@@ -9,13 +8,7 @@ import {
   View,
 } from 'react-native';
 
-export function ModalScreen({
-  isModal,
-  setIsModal,
-  setIsReload,
-  render,
-  navigation,
-}) {
+export function ModalScreen({isModal, setIsModal, children}) {
   return (
     <>
       <View style={styles.centeredView}>
@@ -28,14 +21,7 @@ export function ModalScreen({
           }}>
           <View style={styles.centeredView}>
             <View style={styles.modalView}>
-              {render === 'Create-plantilla' && (
-                <CrearPlantilla
-                  setIsReload={setIsReload}
-                  setIsModal={setIsModal}
-                  navigation={navigation}
-                />
-              )}
-              {render === 'Actions-actividad-empleado' && <Text>sip</Text>}
+              {children}
 
               <View
                 style={{

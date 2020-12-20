@@ -23,11 +23,9 @@ const SignInScreen = ({navigation}) => {
     setIsLoading(true);
     try {
       const fetchTest = () => {
-        dbMaestra.find({}, async function (err, docs) {
-          if (err) {
-            Alert.alert(err.message);
-          }
-          setMisCuadrillas(docs[0].My_Cuadrilla);
+        dbMaestra.find({}, async function (err, dataMaestra) {
+          err && Alert.alert(err.message);
+          setMisCuadrillas(dataMaestra[0].My_Cuadrilla);
           setIsLoading(false);
         });
       };

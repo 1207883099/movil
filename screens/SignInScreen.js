@@ -83,34 +83,51 @@ const SignInScreen = ({navigation, UsuarioReducer}) => {
   };
 
   const eliminar_datos = () => {
-    dbMaestra.remove({}, {multi: true}, function (err) {
-      err && Alert.alert(err.message);
-    });
+    Alert.alert(
+      'Limpiar datos de aplicacion',
+      'Asegurate haber subido los datos antes de pasar a limpiar la app',
+      [
+        {
+          text: 'Cancel',
+          onPress: () => console.log('Cancel delete data'),
+          style: 'cancel',
+        },
+        {
+          text: 'OK',
+          onPress: () => {
+            dbMaestra.remove({}, {multi: true}, function (err) {
+              err && Alert.alert(err.message);
+            });
 
-    dbParteDiario.remove({}, {multi: true}, function (err) {
-      err && Alert.alert(err.message);
-    });
+            dbParteDiario.remove({}, {multi: true}, function (err) {
+              err && Alert.alert(err.message);
+            });
 
-    dbCargos.remove({}, {multi: true}, function (err) {
-      err && Alert.alert(err.message);
-    });
+            dbCargos.remove({}, {multi: true}, function (err) {
+              err && Alert.alert(err.message);
+            });
 
-    dbActEmpl.remove({}, {multi: true}, function (err) {
-      err && Alert.alert(err.message);
-    });
+            dbActEmpl.remove({}, {multi: true}, function (err) {
+              err && Alert.alert(err.message);
+            });
 
-    dbCuadrillaPD.remove({}, {multi: true}, function (err) {
-      err && Alert.alert(err.message);
-    });
+            dbCuadrillaPD.remove({}, {multi: true}, function (err) {
+              err && Alert.alert(err.message);
+            });
 
-    dbEntryHistory.remove({}, {multi: true}, function (err) {
-      err && Alert.alert(err.message);
-    });
+            dbEntryHistory.remove({}, {multi: true}, function (err) {
+              err && Alert.alert(err.message);
+            });
 
-    Alert.alert('Se limpiaron todo los datos de la aplicacion.');
-    setIsReload(true);
+            Alert.alert('Se limpiaron todo los datos de la aplicacion.');
+            setIsReload(true);
 
-    navigation.navigate('SplashScreen');
+            navigation.navigate('SplashScreen');
+          },
+        },
+      ],
+      {cancelable: false},
+    );
   };
 
   const subir_datos = async () => {

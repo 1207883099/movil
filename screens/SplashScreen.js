@@ -61,16 +61,15 @@ const SplashScreen = ({navigation, route, setUsuario}) => {
   }, [netInfo, route, navigation]);
 
   const btn_empezar = async () => {
+    setIsLogind(true);
     if (getDomain()) {
       if (getDomain().indexOf('https') !== -1) {
         try {
-          setIsLogind(true);
           NetworkInfo.getIPAddress()
             .then(async (ip) => {
               const auth = await Auth(ip);
               if (auth.data.feedback) {
                 Alert.alert(auth.data.feedback);
-                setIsLogind(false);
               } else {
                 InsertarEntry({semana: get_Semana_Del_Ano()});
                 setUsuario(auth.data.MyUser);
@@ -104,7 +103,6 @@ const SplashScreen = ({navigation, route, setUsuario}) => {
           placeholder="Inserta la URL autorizada"
         />
       </View>
-      {console.log(isLogind)}
       {isLogind && <LoaderSpinner color="white" />}
       <Animatable.View
         style={[
