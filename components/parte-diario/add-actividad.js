@@ -9,10 +9,8 @@ import {dbMaestra} from '../../db-local/db-maestra';
 export function AddActividad({id_parte_diario, cuadrilla, setIsReload}) {
   const [isModal, setIsModal] = useState(false);
   const [empleado, setEmpleado] = useState();
-  const [labor, setLabor] = useState();
   const [actividad, setActividad] = useState();
   ///////////////////
-  const [labores, setLabores] = useState([]);
   const [empleados, setEmpleados] = useState([]);
   const [actividades, setActividades] = useState([]);
 
@@ -20,7 +18,6 @@ export function AddActividad({id_parte_diario, cuadrilla, setIsReload}) {
     dbMaestra.find({}, async function (err, dataMaestra) {
       err && Alert.alert(err.message);
 
-      setLabores(dataMaestra[0].Labores);
       setActividades(dataMaestra[0].Actividades);
       setEmpleados(
         dataMaestra[0].My_Cuadrilla.find((item) => item.Nombre === cuadrilla)
@@ -30,8 +27,8 @@ export function AddActividad({id_parte_diario, cuadrilla, setIsReload}) {
   }, [cuadrilla]);
 
   const anadirActividad = () => {
-    if (empleado && labor && actividad) {
-      console.group(empleado, labor, actividad);
+    if (empleado && actividad) {
+      console.group(empleado, actividad);
       InsertarActividadEmpleado({
         idEmpleado: empleado,
         idParteDiario: id_parte_diario,
@@ -68,41 +65,22 @@ export function AddActividad({id_parte_diario, cuadrilla, setIsReload}) {
           </Picker>
         </View>
 
-        <Text style={styles.tarea_text}>Labores</Text>
-        <View style={styles.select}>
-          <Picker
-            selectedValue={labores}
-            onValueChange={(itemValue) => setLabor(itemValue)}>
-            {labores.map((labor, index) => (
-              <Picker.Item
-                key={index}
-                label={labor.Nombre}
-                value={labor.IdLabor}
-              />
-            ))}
-          </Picker>
-        </View>
-
-        {labor && (
-          <>
-            <Text style={styles.tarea_text}>Actividades</Text>
-            <View style={styles.select}>
-              <Picker
-                selectedValue={actividades}
-                onValueChange={(itemValue) => setActividad(itemValue)}>
-                {actividades
-                  .filter((item) => item.IdLabor === labor)
-                  .map((actividad, index) => (
-                    <Picker.Item
-                      key={index}
-                      label={actividad.Nombre}
-                      value={actividad.Nombre}
-                    />
-                  ))}
-              </Picker>
-            </View>
-          </>
-        )}
+        <>
+          <Text style={styles.tarea_text}>Actividades</Text>
+          <View style={styles.select}>
+            <Picker
+              selectedValue={actividades}
+              onValueChange={(itemValue) => setActividad(itemValue)}>
+              {actividades.map((actividad, index) => (
+                <Picker.Item
+                  key={index}
+                  label={actividad.Nombre}
+                  value={actividad.Nombre}
+                />
+              ))}
+            </Picker>
+          </View>
+        </>
 
         <Button
           title="Guardar nueva actividad"
@@ -140,8 +118,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     borderWidth: 1,
     borderStyle: 'solid',
-    borderColor: '#009387',
-    color: '#009387',
+    borderColor: 'green',
+    color: 'green',
     fontSize: 12,
     marginTop: 10,
   },

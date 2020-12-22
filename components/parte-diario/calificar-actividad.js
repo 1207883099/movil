@@ -1,5 +1,4 @@
 import React, {useEffect, useState} from 'react';
-import {Picker} from '@react-native-picker/picker';
 import {
   View,
   Text,
@@ -23,9 +22,8 @@ export function CalificarActividad({
     actividad: 'Cargando',
   });
   const [lotes, setLotes] = useState([]);
-  const [observaciones, setObservaciones] = useState();
   const [selectLote, setSelectLote] = useState();
-  const [hectarea, setHectarea] = useState();
+  const [hectarea, setHectarea] = useState(0);
   const [updateSelect, setUpdateSelect] = useState(false);
 
   useEffect(() => {
@@ -35,8 +33,7 @@ export function CalificarActividad({
     ) {
       err && Alert.alert(err.message);
       setActvEmpld(dataActEmpl);
-      setObservaciones(dataActEmpl.observaciones && dataActEmpl.observaciones);
-      setHectarea(dataActEmpl.hectaria && dataActEmpl.hectaria);
+      setHectarea(dataActEmpl.hectaria && Number(dataActEmpl.hectaria));
       setSelectLote(dataActEmpl.lote && dataActEmpl.lote);
     });
 
@@ -66,7 +63,6 @@ export function CalificarActividad({
           $set: {
             hectaria: hectarea,
             lote: selectLote,
-            observaciones: observaciones ? observaciones : 'none',
           },
         },
       );
@@ -77,39 +73,31 @@ export function CalificarActividad({
     }
   };
 
-  const renderSelect = () => {
-    return (
-      <View style={styles.select}>
-        <Picker
-          selectedValue={lotes}
-          onValueChange={(itemValue) => setSelectLote(itemValue)}>
-          {lotes.map((lote, index) => (
-            <Picker.Item key={index} label={lote.Nombre} value={lote.IdLote} />
-          ))}
-        </Picker>
-      </View>
-    );
-  };
-
   return (
     <ScrollView>
+      {console.log(typeof hectarea)}
       <View style={styles.head}>
         <Text style={styles.tarea_text}>Actividad ------{'>'}</Text>
-        <Text style={styles.box_actividad}>{actvEmpld.actividad}</Text>
+        <Text
+          style={[
+            styles.box_actividad,
+            {borderColor: '#b08b05', color: '#b08b05'},
+          ]}>
+          {actvEmpld.actividad}
+        </Text>
       </View>
-      <View style={styles.box_tareas}>
-        <View style={styles.row_tareas}>
-          <Text style={styles.tarea_text}>Hectaria:</Text>
-          <TextInput
-            defaultValue={actvEmpld.hectaria && actvEmpld.hectaria}
-            onChangeText={(value) => setHectarea(value)}
-            style={styles.text_input}
-            placeholder="Inserta hectareas"
-          />
-        </View>
+      <View style={styles.head}>
+        <Text style={styles.tarea_text}>Hectaria ------{'>'}</Text>
+        <Text
+          style={[
+            styles.box_actividad,
+            {borderColor: 'royalblue', color: 'royalblue'},
+          ]}>
+          {hectarea}
+        </Text>
       </View>
 
-      <Text style={styles.tarea_text}>Lote:</Text>
+      <Text style={styles.tarea_text}>Lotes:</Text>
       {actvEmpld.lote ? (
         <>
           <View style={[styles.head, {marginBottom: 20}]}>
@@ -123,20 +111,28 @@ export function CalificarActividad({
               Cambiar
             </Text>
           </View>
-
-          {updateSelect && renderSelect()}
         </>
       ) : (
-        renderSelect()
+        lotes.map((lote) => (
+          <View style={[styles.head, {marginBottom: 10}]}>
+            <View>
+              <Text>{lote.Nombre}</Text>
+            </View>
+            <View>
+              <TextInput
+                defaultValue={actvEmpld.hectaria && actvEmpld.hectaria}
+                onChangeText={(value) =>
+                  setHectarea(
+                    hectarea ? hectarea + Number(value) : 0 + Number(value),
+                  )
+                }
+                style={styles.text_input}
+                placeholder="Insertar valor"
+              />
+            </View>
+          </View>
+        ))
       )}
-
-      <Text style={styles.tarea_text}>Observaciones:</Text>
-      <TextInput
-        defaultValue={actvEmpld.observaciones && actvEmpld.observaciones}
-        style={[styles.text_input, {height: 60, marginBottom: 20}]}
-        placeholder="Escriba las observaciones: (opcional)"
-        onChangeText={(value) => setObservaciones(value)}
-      />
 
       <Button title="Guardar" color="#009387" onPress={saveDataActividad} />
     </ScrollView>
@@ -157,12 +153,14 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     padding: 10,
     textAlign: 'center',
+    marginBottom: 20,
   },
   text_input: {
     borderWidth: 2,
     borderColor: '#cdcdcd',
     padding: 5,
     borderRadius: 10,
+    width: 160,
   },
   select: {
     height: 50,
@@ -178,8 +176,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     borderWidth: 1,
     borderStyle: 'solid',
-    borderColor: '#b08b05',
-    color: '#b08b05',
     fontSize: 12,
     marginTop: 10,
   },

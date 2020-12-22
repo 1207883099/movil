@@ -94,7 +94,30 @@ function EmpleadosAsignados({
       )}
 
       <View style={styles.header}>
-        <Text style={[styles.label, styles.box_actividad]}>Actividades</Text>
+        <Text
+          style={[
+            styles.label,
+            styles.box_actividad,
+            {borderColor: '#b08b05', color: '#b08b05'},
+          ]}>
+          Actividades
+        </Text>
+        <Text
+          style={[
+            styles.label,
+            styles.box_actividad,
+            {borderColor: 'royalblue', color: 'royalblue'},
+          ]}>
+          Hectareas
+        </Text>
+        <Text
+          style={[
+            styles.label,
+            styles.box_actividad,
+            {borderColor: '#009387', color: '#009387'},
+          ]}>
+          Calificar
+        </Text>
         {ActivEmple.length !== 0 && (
           <View>
             <AddActividad
@@ -115,10 +138,11 @@ function EmpleadosAsignados({
                 <Text>
                   {
                     <>
-                      <Text style={styles.label_actividad}>
-                        {obtenerCargo(obrero.Cargo)} &nbsp; - &nbsp;
-                      </Text>
                       <Text style={{fontSize: 12}}>{obrero.Apellido}</Text>
+                      <Text
+                        style={[styles.label_actividad, {color: '#b08b05'}]}>
+                        &nbsp; - &nbsp; {obtenerCargo(obrero.Cargo)}
+                      </Text>
                     </>
                   }
                 </Text>
@@ -129,12 +153,16 @@ function EmpleadosAsignados({
                 <Text>
                   {
                     <>
-                      <Text style={styles.label_actividad}>
-                        {activEmple.actividad}
-                        &nbsp; / &nbsp;
-                      </Text>
                       <Text style={{fontSize: 12}}>
                         {obtener_empleado(activEmple.idEmpleado)}
+                      </Text>
+                      <Text
+                        style={[styles.label_actividad, {color: '#b08b05'}]}>
+                        &nbsp; / &nbsp; {activEmple.actividad}
+                      </Text>
+                      <Text
+                        style={[styles.label_actividad, {color: 'royalblue'}]}>
+                        &nbsp; / &nbsp; 10
                       </Text>
                     </>
                   }
@@ -184,7 +212,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderStyle: 'solid',
     borderColor: '#009387',
-    padding: 5,
+    padding: 4,
   },
   row_empleado_asig: {
     flex: 1,
@@ -198,18 +226,15 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   box_actividad: {
-    width: 90,
+    width: 80,
     height: 29,
     textAlign: 'center',
     borderWidth: 1,
     borderStyle: 'solid',
-    borderColor: '#b08b05',
-    color: '#b08b05',
     fontSize: 12,
     marginTop: 10,
   },
   label_actividad: {
-    color: '#b08b05',
     fontWeight: 'bold',
     fontSize: 12,
   },

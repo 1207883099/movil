@@ -5,7 +5,6 @@ import {suma_resta_fecha, primerDiaSemana, getDia} from '../../hooks/fechas';
 
 export function SelectDia({setSelectDay, setFechaCtx}) {
   const [fechas, setFechas] = useState([]);
-  const [change, setChange] = useState(0);
 
   useEffect(() => {
     const dataFechas = [];
@@ -23,13 +22,12 @@ export function SelectDia({setSelectDay, setFechaCtx}) {
         <Picker
           selectedValue={fechas}
           onValueChange={(itemValue) => {
-            if (itemValue && change > 0) {
+            if (itemValue) {
               setFechaCtx(itemValue);
               setSelectDay(false);
-            } else {
-              setChange(change + 1);
             }
           }}>
+          <Picker.Item label="** Selecciona **" value="" />
           {fechas.map((fecha, index) => (
             <Picker.Item key={index} label={fecha.label} value={fecha.value} />
           ))}
