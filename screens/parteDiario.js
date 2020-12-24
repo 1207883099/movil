@@ -135,13 +135,6 @@ const ParteDiarioScreen = ({navigation}) => {
     });
   };
 
-  /*const obtener_labor = (IdLabor) => {
-    if (Labores.length > 0) {
-      const resul_labor = Labores.find((labor) => labor.IdLabor === IdLabor);
-      return resul_labor.Nombre;
-    }
-  };*/
-
   const obtenerSector = (IdSector) => {
     if (Sectores.length > 0) {
       const Result_Sector = Sectores.find(
@@ -208,6 +201,7 @@ const ParteDiarioScreen = ({navigation}) => {
                         actions={true}
                         idSector={parte_diario.sector}
                         setIsReload={setIsReload}
+                        navigation={navigation}
                       />
                     ) : (
                       CPD.cuadrilla === undefined && (

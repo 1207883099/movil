@@ -21,6 +21,7 @@ function EmpleadosAsignados({
   cuadrilla,
   setIsReload,
   idSector,
+  navigation,
 }) {
   const [Cargos, setCargos] = useState([]);
   const [ActivEmple, setActivEmple] = useState([]);
@@ -123,7 +124,7 @@ function EmpleadosAsignados({
             <AddActividad
               id_parte_diario={id_parte_diario}
               cuadrilla={cuadrilla}
-              setIsReload={setIsReload}
+              navigation={navigation}
             />
           </View>
         )}
@@ -162,7 +163,8 @@ function EmpleadosAsignados({
                       </Text>
                       <Text
                         style={[styles.label_actividad, {color: 'royalblue'}]}>
-                        &nbsp; / &nbsp; 10
+                        &nbsp; / &nbsp;{' '}
+                        {activEmple.hectaria ? activEmple.hectaria : 0}
                       </Text>
                     </>
                   }

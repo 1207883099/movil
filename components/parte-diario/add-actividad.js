@@ -6,7 +6,7 @@ import {Picker} from '@react-native-picker/picker';
 import {InsertarActividadEmpleado} from '../../db-local/db-actividades-empleado';
 import {dbMaestra} from '../../db-local/db-maestra';
 
-export function AddActividad({id_parte_diario, cuadrilla, setIsReload}) {
+export function AddActividad({id_parte_diario, cuadrilla, navigation}) {
   const [isModal, setIsModal] = useState(false);
   const [empleado, setEmpleado] = useState();
   const [actividad, setActividad] = useState();
@@ -34,7 +34,7 @@ export function AddActividad({id_parte_diario, cuadrilla, setIsReload}) {
         idParteDiario: id_parte_diario,
         actividad: actividad,
       });
-      setIsReload(true);
+      navigation.navigate('SignInScreen');
       setIsModal(false);
     } else {
       Alert.alert('Campos vacios, revise y vuelve a intentar');
@@ -54,14 +54,17 @@ export function AddActividad({id_parte_diario, cuadrilla, setIsReload}) {
         <View style={styles.select}>
           <Picker
             selectedValue={empleados}
-            onValueChange={(itemValue) => setEmpleado(itemValue)}>
-            {empleados.map((empleado, index) => (
-              <Picker.Item
-                key={index}
-                label={empleado.Apellido + ' - ' + empleado.Nombre}
-                value={empleado.IdEmpleado}
-              />
-            ))}
+            onValueChange={(itemValue) => itemValue && setEmpleado(itemValue)}>
+            <Picker.Item label="** SELECCIONA **" value={''} />
+            {empleados
+              .sort((a, b) => a.Apellido > b.Apellido)
+              .map((empleado, index) => (
+                <Picker.Item
+                  key={index}
+                  label={empleado.Apellido + ' - ' + empleado.Nombre}
+                  value={empleado.IdEmpleado}
+                />
+              ))}
           </Picker>
         </View>
 
@@ -70,14 +73,19 @@ export function AddActividad({id_parte_diario, cuadrilla, setIsReload}) {
           <View style={styles.select}>
             <Picker
               selectedValue={actividades}
-              onValueChange={(itemValue) => setActividad(itemValue)}>
-              {actividades.map((actividad, index) => (
-                <Picker.Item
-                  key={index}
-                  label={actividad.Nombre}
-                  value={actividad.Nombre}
-                />
-              ))}
+              onValueChange={(itemValue) =>
+                itemValue && setActividad(itemValue)
+              }>
+              <Picker.Item label="** SELECCIONA **" value={''} />
+              {actividades
+                .sort((a, b) => a.Nombre > b.Nombre)
+                .map((actividad, index) => (
+                  <Picker.Item
+                    key={index}
+                    label={actividad.Nombre}
+                    value={actividad.Nombre}
+                  />
+                ))}
             </Picker>
           </View>
         </>

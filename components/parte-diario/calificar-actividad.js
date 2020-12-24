@@ -75,7 +75,6 @@ export function CalificarActividad({
 
   return (
     <ScrollView>
-      {console.log(typeof hectarea)}
       <View style={styles.head}>
         <Text style={styles.tarea_text}>Actividad ------{'>'}</Text>
         <Text
