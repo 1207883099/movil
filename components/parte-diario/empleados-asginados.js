@@ -13,6 +13,7 @@ import {ModalScreen} from '../modal/modal';
 import {CalificarActividad} from './calificar-actividad';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {AddActividad} from './add-actividad';
+import {CambioActividad} from './cambio-actividad';
 
 function EmpleadosAsignados({
   Empleados,
@@ -24,8 +25,13 @@ function EmpleadosAsignados({
   navigation,
 }) {
   const [Cargos, setCargos] = useState([]);
-  const [ActivEmple, setActivEmple] = useState([]);
   const [isModal, setIsModal] = useState(false);
+  const [ActivEmple, setActivEmple] = useState([]);
+  const [ActivChange, setActivChange] = useState({
+    actividad: undefined,
+    idActividadEmple: undefined,
+  });
+  const [isModalChangeAct, setIsModalChangeAct] = useState(false);
   const [selectIdActiEmple, SetselectActiEmple] = useState('');
 
   useEffect(() => {
@@ -159,7 +165,17 @@ function EmpleadosAsignados({
                       </Text>
                       <Text
                         style={[styles.label_actividad, {color: '#b08b05'}]}>
-                        &nbsp; / &nbsp; {activEmple.actividad}
+                        &nbsp; / &nbsp;{' '}
+                        <Text
+                          onPress={() => {
+                            setActivChange({
+                              actividad: activEmple.actividad,
+                              idActividadEmple: activEmple._id,
+                            });
+                            setIsModalChangeAct(true);
+                          }}>
+                          {activEmple.actividad}
+                        </Text>
                       </Text>
                       <Text
                         style={[styles.label_actividad, {color: 'royalblue'}]}>
@@ -193,6 +209,14 @@ function EmpleadosAsignados({
           setIsModal={setIsModal}
           setIsReload={setIsReload}
           idSector={idSector}
+        />
+      </ModalScreen>
+
+      <ModalScreen isModal={isModalChangeAct} setIsModal={setIsModalChangeAct}>
+        <CambioActividad
+          ActivChange={ActivChange}
+          setIsModalChangeAct={setIsModalChangeAct}
+          setIsReload={setIsReload}
         />
       </ModalScreen>
     </>
