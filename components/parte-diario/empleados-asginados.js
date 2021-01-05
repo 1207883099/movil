@@ -6,6 +6,7 @@ import {
   InsertarActividadEmpleado,
   dbActEmpl,
 } from '../../db-local/db-actividades-empleado';
+import {dbMaestra} from '../../db-local/db-maestra';
 import {dbParteDiario} from '../../db-local/db-parte-diario';
 import {InsertarCuadrillaPD} from '../../db-local/db-cuadrilla-parte-diario';
 /* COMPONENTS */
@@ -25,6 +26,7 @@ function EmpleadosAsignados({
   navigation,
 }) {
   const [Cargos, setCargos] = useState([]);
+  const [Actividades, setActividades] = useState([]);
   const [isModal, setIsModal] = useState(false);
   const [ActivEmple, setActivEmple] = useState([]);
   const [ActivChange, setActivChange] = useState({
@@ -47,12 +49,32 @@ function EmpleadosAsignados({
       err && Alert.alert(err.message);
       setActivEmple(dataActEmpl);
     });
+
+    dbMaestra.find({}, async function (err, dataMaestra) {
+      err && Alert.alert(err.message);
+      setActividades(dataMaestra[0].Actividades);
+    });
   }, [id_parte_diario]);
 
-  const obtenerCargo = (codigoCargo) => {
+  const obtenerCargo = (codigoCargo, propiedad) => {
     if (Cargos.length) {
-      const NameCargo = Cargos.find((cargo) => cargo.Codigo === codigoCargo);
-      return NameCargo.Nombre;
+      const Cargo = Cargos.find((cargo) => cargo.Codigo === codigoCargo);
+      return obtenerActividad(Cargo.ActividadId, propiedad);
+    }
+  };
+
+  const obtenerActividad = (idActividad, propiedad) => {
+    if (Cargos.length) {
+      const Actividad = Actividades.find(
+        (activi) => activi.IdActividad === idActividad,
+      );
+      if (Actividad) {
+        return propiedad === 'ActividadId'
+          ? Actividad.IdActividad
+          : Actividad.Nombre;
+      } else {
+        return 'Cargando...';
+      }
     }
   };
 
@@ -84,7 +106,7 @@ function EmpleadosAsignados({
       InsertarActividadEmpleado({
         idEmpleado: empleado.IdEmpleado,
         idParteDiario: id_parte_diario,
-        actividad: obtenerCargo(empleado.Cargo),
+        actividad: obtenerCargo(empleado.Cargo, 'ActividadId'),
       }),
     );
     setIsReload(true);
@@ -148,7 +170,7 @@ function EmpleadosAsignados({
                       <Text style={{fontSize: 12}}>{obrero.Apellido}</Text>
                       <Text
                         style={[styles.label_actividad, {color: '#b08b05'}]}>
-                        &nbsp; - &nbsp; {obtenerCargo(obrero.Cargo)}
+                        &nbsp; - &nbsp; {obtenerCargo(obrero.Cargo, 'Nombre')}
                       </Text>
                     </>
                   }
@@ -174,7 +196,7 @@ function EmpleadosAsignados({
                             });
                             setIsModalChangeAct(true);
                           }}>
-                          {activEmple.actividad}
+                          {obtenerActividad(activEmple.actividad, 'Nombre')}
                         </Text>
                       </Text>
                       <Text
