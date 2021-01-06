@@ -6,6 +6,7 @@ import {
   InsertarActividadEmpleado,
   dbActEmpl,
 } from '../../db-local/db-actividades-empleado';
+import {dbTarifas} from '../../db-local/db-tarifas';
 import {dbMaestra} from '../../db-local/db-maestra';
 import {dbParteDiario} from '../../db-local/db-parte-diario';
 import {InsertarCuadrillaPD} from '../../db-local/db-cuadrilla-parte-diario';
@@ -26,6 +27,7 @@ function EmpleadosAsignados({
   navigation,
 }) {
   const [Cargos, setCargos] = useState([]);
+  const [Tarifas, setTarifas] = useState([]);
   const [Actividades, setActividades] = useState([]);
   const [isModal, setIsModal] = useState(false);
   const [ActivEmple, setActivEmple] = useState([]);
@@ -54,6 +56,11 @@ function EmpleadosAsignados({
       err && Alert.alert(err.message);
       setActividades(dataMaestra[0].Actividades);
     });
+
+    dbTarifas.find({}, async function (err, dataTarifas) {
+      err && Alert.alert(err.message);
+      setTarifas(dataTarifas);
+    });
   }, [id_parte_diario]);
 
   const obtenerCargo = (codigoCargo, propiedad) => {
@@ -64,7 +71,7 @@ function EmpleadosAsignados({
   };
 
   const obtenerActividad = (idActividad, propiedad) => {
-    if (Cargos.length) {
+    if (Actividades.length) {
       const Actividad = Actividades.find(
         (activi) => activi.IdActividad === idActividad,
       );
@@ -78,13 +85,22 @@ function EmpleadosAsignados({
     }
   };
 
+  const obtenerTarifa = (IdActividad) => {
+    if (Tarifas.length) {
+      const Tarifa = Tarifas.find(
+        (tarifa) => tarifa.IdActividad === IdActividad,
+      );
+      return Tarifa;
+    }
+  };
+
   const obtener_empleado = (IdEmpleado) => {
     if (Empleados.length) {
       const result = Empleados.find(
         (empleado) => empleado.IdEmpleado === IdEmpleado,
       );
       if (result === undefined) {
-        return 'llamismo';
+        return 'Cargando...';
       } else {
         return result.Apellido;
       }
@@ -102,13 +118,17 @@ function EmpleadosAsignados({
       {$set: {cuadrilla: cuadrilla}},
     );
 
-    Empleados.map((empleado) =>
+    Empleados.map((empleado) => {
+      const ActividadId = obtenerCargo(empleado.Cargo, 'ActividadId');
+      const Tarifa = obtenerTarifa(ActividadId);
+
       InsertarActividadEmpleado({
         idEmpleado: empleado.IdEmpleado,
         idParteDiario: id_parte_diario,
-        actividad: obtenerCargo(empleado.Cargo, 'ActividadId'),
-      }),
-    );
+        actividad: ActividadId,
+        isLote: Tarifa.ValidaHectareas,
+      });
+    });
     setIsReload(true);
   };
 
