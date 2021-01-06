@@ -1,5 +1,6 @@
 import Datastore from 'react-native-local-mongodb';
 import AsyncStorage from '@react-native-community/async-storage';
+import {Alert} from 'react-native';
 
 export const dbCargos = new Datastore({
   filename: 'asyncStorageCargos',
@@ -9,9 +10,7 @@ export const dbCargos = new Datastore({
 
 export function InsertarCargos(data) {
   dbCargos.insert(data, function (err, newDoc) {
-    if (err) {
-      console.log(err);
-    }
+    err && Alert.alert(err);
     console.log('SE INSERTO NUEVOS VALORES EN CARGOS ' + newDoc);
   });
 }

@@ -20,6 +20,15 @@ export function CambioActividad({
     });
   }, []);
 
+  const obtenerActividad = (idActividad) => {
+    if (actividades.length) {
+      const Actividad = actividades.find(
+        (activi) => activi.IdActividad === idActividad,
+      );
+      return Actividad ? Actividad.Nombre : 'Cargando...';
+    }
+  };
+
   const cambioActividad = () => {
     dbActEmpl.update(
       {_id: ActivChange.idActividadEmple},
@@ -34,7 +43,10 @@ export function CambioActividad({
     <>
       <Text>
         Actividad Actual:{' '}
-        <Text style={{color: '#b08b05'}}> {ActivChange.actividad}</Text>
+        <Text style={{color: '#b08b05'}}>
+          {' '}
+          {obtenerActividad(ActivChange.actividad)}
+        </Text>
       </Text>
       <Text style={styles.tarea_text}>Actividades</Text>
       <View style={styles.select}>

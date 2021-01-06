@@ -1,5 +1,6 @@
 import Datastore from 'react-native-local-mongodb';
 import AsyncStorage from '@react-native-community/async-storage';
+import {Alert} from 'react-native';
 
 export const dbCuadrillaPD = new Datastore({
   filename: 'asyncStorageCuadrillaPD',
@@ -9,9 +10,7 @@ export const dbCuadrillaPD = new Datastore({
 
 export function InsertarCuadrillaPD(data) {
   dbCuadrillaPD.insert(data, function (err, newDoc) {
-    if (err) {
-      console.log(err);
-    }
+    err && Alert.alert(err);
     console.log('SE INSERTO UN NUEVO VALOR EN CUADRILLA PD' + newDoc);
   });
 }

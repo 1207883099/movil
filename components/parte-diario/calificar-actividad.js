@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 /* DB LOCAL */
 import {dbActEmpl} from '../../db-local/db-actividades-empleado';
+import {dbTarifas} from '../../db-local/db-tarifas';
 import {dbMaestra} from '../../db-local/db-maestra';
 
 export function CalificarActividad({
@@ -22,8 +23,11 @@ export function CalificarActividad({
     actividad: 'Cargando',
   });
   const [lotes, setLotes] = useState([]);
+  const [Actividades, setActividades] = useState([]);
+  const [Tarifas, setTarifas] = useState();
   const [selectLote, setSelectLote] = useState();
   const [hectarea, setHectarea] = useState(0);
+  const [isLote, setIsLote] = useState(false);
   const [updateSelect, setUpdateSelect] = useState(false);
 
   useEffect(() => {
@@ -33,8 +37,17 @@ export function CalificarActividad({
     ) {
       err && Alert.alert(err.message);
       setActvEmpld(dataActEmpl);
-      setHectarea(dataActEmpl.hectaria && Number(dataActEmpl.hectaria));
       setSelectLote(dataActEmpl.lote && dataActEmpl.lote);
+      setHectarea(dataActEmpl.hectaria && Number(dataActEmpl.hectaria));
+      setIsLote(dataActEmpl.isLote);
+
+      dbTarifas.findOne({IdActividad: dataActEmpl.actividad}, async function (
+        err,
+        dataTarifas,
+      ) {
+        err && Alert.alert(err.message);
+        setTarifas(dataTarifas);
+      });
     });
 
     dbMaestra.find({}, async function (err, dataMaestra) {
@@ -43,6 +56,7 @@ export function CalificarActividad({
         (item) => item.IdSector === idSector,
       );
       setLotes(result);
+      setActividades(dataMaestra[0].Actividades);
     });
   }, [idSector, selectIdActiEmple]);
 
@@ -55,64 +69,26 @@ export function CalificarActividad({
     }
   };
 
-  const saveDataActividad = () => {
-    if (hectarea && selectLote) {
-      dbActEmpl.update(
-        {_id: selectIdActiEmple},
-        {
-          $set: {
-            hectaria: hectarea,
-            lote: selectLote,
-          },
-        },
+  const obtenerActividad = (idActividad, propiedad) => {
+    if (Actividades.length) {
+      const Actividad = Actividades.find(
+        (activi) => activi.IdActividad === idActividad,
       );
-      setIsModal(false);
-      setIsReload(true);
-    } else {
-      Alert.alert('Campos vacios, vuelva a intentarlo');
+      if (Actividad) {
+        return propiedad === 'ActividadId'
+          ? Actividad.IdActividad
+          : Actividad.Nombre;
+      } else {
+        return 'Cargando...';
+      }
     }
   };
 
-  return (
-    <ScrollView>
-      <View style={styles.head}>
-        <Text style={styles.tarea_text}>Actividad ------{'>'}</Text>
-        <Text
-          style={[
-            styles.box_actividad,
-            {borderColor: '#b08b05', color: '#b08b05'},
-          ]}>
-          {actvEmpld.actividad}
-        </Text>
-      </View>
-      <View style={styles.head}>
-        <Text style={styles.tarea_text}>Hectaria ------{'>'}</Text>
-        <Text
-          style={[
-            styles.box_actividad,
-            {borderColor: 'royalblue', color: 'royalblue'},
-          ]}>
-          {hectarea}
-        </Text>
-      </View>
-
-      <Text style={styles.tarea_text}>Lotes:</Text>
-      {actvEmpld.lote ? (
-        <>
-          <View style={[styles.head, {marginBottom: 20}]}>
-            <Text>
-              <Text style={styles.tarea_text}>Actual: </Text>
-              {obtenerLote(actvEmpld.lote)}
-            </Text>
-            <Text
-              style={styles.update_bottom}
-              onPress={() => setUpdateSelect(!updateSelect)}>
-              Cambiar
-            </Text>
-          </View>
-        </>
-      ) : (
-        lotes.map((lote) => (
+  const renderLotes = () => {
+    return (
+      <>
+        <Text style={styles.tarea_text}>Lotes:</Text>
+        {lotes.map((lote) => (
           <View style={[styles.head, {marginBottom: 10}]}>
             <View>
               <Text>{lote.Nombre}</Text>
@@ -130,7 +106,89 @@ export function CalificarActividad({
               />
             </View>
           </View>
-        ))
+        ))}
+      </>
+    );
+  };
+
+  const saveDataActividad = () => {
+    if (hectarea) {
+      if (Tarifas.Minimo >= hectarea && Tarifas.Maximo <= hectarea) {
+        dbActEmpl.update(
+          {_id: selectIdActiEmple},
+          {
+            $set: {
+              hectaria: hectarea,
+              lote: selectLote + 7,
+            },
+          },
+        );
+        setIsModal(false);
+        setIsReload(true);
+      } else {
+        Alert.alert('Los valores no estan dentro del rango permitido');
+      }
+    } else {
+      Alert.alert('Campos vacios, vuelva a intentarlo');
+    }
+  };
+
+  return (
+    <ScrollView>
+      <View style={styles.head}>
+        <Text style={styles.tarea_text}>Actividad ------{'>'}</Text>
+        <Text
+          style={[
+            styles.box_actividad,
+            {borderColor: '#b08b05', color: '#b08b05'},
+          ]}>
+          {obtenerActividad(actvEmpld.actividad, 'Nombre')}
+        </Text>
+      </View>
+      <View style={styles.head}>
+        <Text style={styles.tarea_text}>Hectaria ------{'>'}</Text>
+        <Text
+          style={[
+            styles.box_actividad,
+            {borderColor: 'royalblue', color: 'royalblue'},
+          ]}>
+          {hectarea}
+        </Text>
+      </View>
+
+      {actvEmpld.hectaria && (
+        <>
+          <View style={[styles.head, {marginBottom: 20}]}>
+            <Text>
+              <Text style={styles.tarea_text}>Actual: </Text>
+              {obtenerLote(actvEmpld.lote)}
+            </Text>
+            <Text
+              style={styles.update_bottom}
+              onPress={() => setUpdateSelect(!updateSelect)}>
+              Cambiar
+            </Text>
+          </View>
+        </>
+      )}
+
+      {!actvEmpld.hectaria && isLote ? (
+        renderLotes()
+      ) : (
+        <View style={{marginBottom: 10}}>
+          <View style={styles.head}>
+            <Text>Minimo: {Tarifas.Minimo}</Text>
+            <Text>Maximo: {Tarifas.Maximo}</Text>
+          </View>
+          <View style={{marginTop: 10}}>
+            <TextInput
+              defaultValue={actvEmpld.hectaria && actvEmpld.hectaria}
+              onChangeText={(value) => setHectarea(Number(value))}
+              style={styles.text_input}
+              placeholder="Insertar valor"
+            />
+          </View>
+        </View>
       )}
 
       <Button title="Guardar" color="#009387" onPress={saveDataActividad} />
@@ -159,7 +217,7 @@ const styles = StyleSheet.create({
     borderColor: '#cdcdcd',
     padding: 5,
     borderRadius: 10,
-    width: 160,
+    width: '100%',
   },
   select: {
     height: 50,

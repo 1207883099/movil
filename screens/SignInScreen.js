@@ -14,6 +14,7 @@ import {dbEntryHistory} from '../db-local/db-history-entry';
 import {dbCuadrillaPD} from '../db-local/db-cuadrilla-parte-diario';
 import {dbActEmpl} from '../db-local/db-actividades-empleado';
 import {dbParteDiario} from '../db-local/db-parte-diario';
+import {InsertarTarifas} from '../db-local/db-tarifas';
 import {InsertarCargos, dbCargos} from '../db-local/db-cargos';
 /* COMPONENTS */
 import LinearGradient from 'react-native-linear-gradient';
@@ -25,6 +26,7 @@ import {LoaderSpinner} from '../components/loader/spiner-loader';
 import {obtenerMaestra} from '../api/maestra';
 // import {SubirParteDiario} from '../api/parte-diario';
 import {obtenerCargos} from '../api/cargo';
+import {obtenerTarifas} from '../api/tarifa';
 /* HOOKS */
 import {get_Semana_Del_Ano} from '../hooks/fechas';
 
@@ -70,6 +72,9 @@ const SignInScreen = ({navigation, UsuarioReducer}) => {
 
         const cargos = await obtenerCargos(UsuarioReducer.MyUser[0].token);
         cargos.data.length && InsertarCargos(cargos.data);
+
+        const tarifas = await obtenerTarifas(UsuarioReducer.MyUser[0].token);
+        tarifas.data.length && InsertarTarifas(tarifas.data);
 
         setIsLoading(false);
         setIsReload(true);
