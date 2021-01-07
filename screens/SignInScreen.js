@@ -11,17 +11,16 @@ import {connect} from 'react-redux';
 /* EMPIEZA DB LOCAL */
 import {InsertarMaestra, dbMaestra} from '../db-local/db-maestra';
 import {dbEntryHistory} from '../db-local/db-history-entry';
-import {dbCuadrillaPD} from '../db-local/db-cuadrilla-parte-diario';
-import {dbActEmpl} from '../db-local/db-actividades-empleado';
-import {dbParteDiario} from '../db-local/db-parte-diario';
 import {InsertarTarifas} from '../db-local/db-tarifas';
-import {InsertarCargos, dbCargos} from '../db-local/db-cargos';
+import {InsertarCargos} from '../db-local/db-cargos';
 /* COMPONENTS */
 import LinearGradient from 'react-native-linear-gradient';
 import {MisDatos} from '../components/elementos/mis-datos';
 import {FechaTrabajo} from '../components/elementos/semana-del-ano';
 import {FechaContext} from '../components/context/fecha';
 import {LoaderSpinner} from '../components/loader/spiner-loader';
+import {DeleteData} from '../components/elementos/DeleteData';
+import {UploadData} from '../components/elementos/uploadData';
 /* FETCH API */
 import {obtenerMaestra} from '../api/maestra';
 // import {SubirParteDiario} from '../api/parte-diario';
@@ -87,94 +86,6 @@ const SignInScreen = ({navigation, UsuarioReducer}) => {
     setIsLoading(false);
   };
 
-  const eliminar_datos = () => {
-    Alert.alert(
-      'Limpiar datos de aplicacion',
-      'Asegurate haber subido los datos antes de pasar a limpiar la app',
-      [
-        {
-          text: 'Cancel',
-          onPress: () => console.log('Cancel delete data'),
-          style: 'cancel',
-        },
-        {
-          text: 'OK',
-          onPress: () => {
-            dbMaestra.remove({}, {multi: true}, function (err) {
-              err && Alert.alert(err.message);
-            });
-
-            dbParteDiario.remove({}, {multi: true}, function (err) {
-              err && Alert.alert(err.message);
-            });
-
-            dbCargos.remove({}, {multi: true}, function (err) {
-              err && Alert.alert(err.message);
-            });
-
-            dbActEmpl.remove({}, {multi: true}, function (err) {
-              err && Alert.alert(err.message);
-            });
-
-            dbCuadrillaPD.remove({}, {multi: true}, function (err) {
-              err && Alert.alert(err.message);
-            });
-
-            dbEntryHistory.remove({}, {multi: true}, function (err) {
-              err && Alert.alert(err.message);
-            });
-
-            Alert.alert('Se limpiaron todo los datos de la aplicacion.');
-            setIsReload(true);
-
-            navigation.navigate('SplashScreen');
-          },
-        },
-      ],
-      {cancelable: false},
-    );
-  };
-
-  const subir_datos = async () => {
-    setIsLoading(true);
-    /*try {
-      dbMaestra.find({}, async function (err, docs) {
-        if (err) {
-          Alert.alert(err.message);
-        }
-
-        if (docs.some((data, index) => docs[index].Mis_Parte_Diario)) {
-          const partes_diario = docs.filter(
-            (data, index) => docs[index].Mis_Parte_Diario,
-          );
-          const resParteDiario = await SubirParteDiario(partes_diario);
-
-          if (resParteDiario.data.upload) {
-            Alert.alert(
-              `EXITO, se acabo de subir: ${partes_diario.length} partes diarios`,
-            );
-            eliminar_datos();
-          } else {
-            Alert.alert(
-              'ERROR, algo acabo de fallar al momento de subir los parte diarios.',
-            );
-          }
-        } else {
-          Alert.alert(
-            'No tienes datos que subir, crea y gestionar parte diarios y luego vuelve.',
-          );
-        }
-      });
-
-      setIsLoading(false);
-    } catch (error) {
-      Alert.alert(error.message);
-    }*/
-
-    setIsLoading(false);
-    Alert.alert('Esta accion aun no esta programada.');
-  };
-
   return (
     <>
       <View style={styles.container}>
@@ -184,17 +95,7 @@ const SignInScreen = ({navigation, UsuarioReducer}) => {
           <View style={styles.button}>
             {dataLocal.length > 0 ? (
               <>
-                <TouchableOpacity
-                  style={styles.delete}
-                  onPress={eliminar_datos}>
-                  <LinearGradient
-                    colors={['#EB9058', '#EB5443']}
-                    style={styles.signIn}>
-                    <Text style={[styles.textSign, {color: '#fff'}]}>
-                      Eliminar Todo
-                    </Text>
-                  </LinearGradient>
-                </TouchableOpacity>
+                <DeleteData navigation={navigation} setIsReload={setIsReload} />
 
                 <TouchableOpacity
                   style={styles.delete}
@@ -263,16 +164,7 @@ const SignInScreen = ({navigation, UsuarioReducer}) => {
             {dataLocal.length > 0 &&
             UsuarioReducer.MyUser[0].movil_ip !== undefined ? (
               <>
-                <TouchableOpacity
-                  onPress={subir_datos}
-                  style={[
-                    styles.signIn,
-                    {borderColor: '#009387', borderWidth: 1, marginTop: 15},
-                  ]}>
-                  <Text style={[styles.textSign, {color: '#009387'}]}>
-                    Subir datos
-                  </Text>
-                </TouchableOpacity>
+                <UploadData setIsLoading={setIsLoading} />
                 {isLoading && <LoaderSpinner />}
               </>
             ) : (
@@ -291,6 +183,17 @@ const SignInScreen = ({navigation, UsuarioReducer}) => {
                 </TouchableOpacity>
               )
             )}
+
+            <TouchableOpacity
+              onPress={() => navigation.navigate('Configuracion')}
+              style={[
+                styles.signIn,
+                {borderColor: '#009387', borderWidth: 1, marginTop: 15},
+              ]}>
+              <Text style={[styles.textSign, {color: '#009387'}]}>
+                Configuracion
+              </Text>
+            </TouchableOpacity>
           </View>
         </ScrollView>
       </View>

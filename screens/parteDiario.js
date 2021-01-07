@@ -231,9 +231,7 @@ const ParteDiarioScreen = ({navigation}) => {
         <Button
           title="Crear Plantilla"
           disabled={false}
-          onPress={() => {
-            setIsModal(true);
-          }}
+          onPress={() => setIsModal(true)}
         />
       </View>
 
