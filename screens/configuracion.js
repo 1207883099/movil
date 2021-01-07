@@ -1,78 +1,137 @@
-import React from 'react';
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-shadow */
+import React, {useState, useEffect} from 'react';
 import {
   View,
   ScrollView,
   Text,
+  Alert,
   TouchableOpacity,
   StyleSheet,
 } from 'react-native';
+import {LoaderSpinner} from '../components/loader/spiner-loader';
 import LinearGradient from 'react-native-linear-gradient';
+import {TipoRol} from '../components/configuracion/TIpoRol';
+import {Haciendas} from '../components/configuracion/hacienda';
+import {EjercicioFiscal} from '../components/configuracion/fiscal';
+import {SectorConfig} from '../components/configuracion/sector';
+import {PeriodoConfig} from '../components/configuracion/periodo';
+/* BD LOCAL */
+import {dbConfiguracion} from '../db-local/db-configuracion';
+/* API */
 
 const Configuracion = ({navigation}) => {
+  const [loading, setLoading] = useState(false);
+  const [isReload, setIsReload] = useState(false);
+  const [confiAll, setConfiAll] = useState({
+    rol: undefined,
+    hacienda: undefined,
+    fiscal: undefined,
+    sector: undefined,
+    periodo: undefined,
+    divicion: undefined,
+  });
+
+  useEffect(() => {
+    dbConfiguracion.find({}, async function (err, dataConfi) {
+      err && Alert.alert(err.message);
+      let dataFind = {
+        rol: undefined,
+        hacienda: undefined,
+        fiscal: undefined,
+        sector: undefined,
+        periodo: undefined,
+        divicion: undefined,
+      };
+
+      const obtenerSection = (section) => {
+        if (dataConfi.length) {
+          const sectionFind = dataConfi.find(
+            (item) => item.section === section,
+          );
+          return sectionFind ? sectionFind.Nombre : '';
+        }
+      };
+
+      dataFind.rol = obtenerSection('Rol');
+      dataFind.hacienda = obtenerSection('Hacienda');
+      dataFind.fiscal = obtenerSection('Fiscal');
+      dataFind.sector = obtenerSection('Sector');
+      dataFind.periodo = obtenerSection('Periodo');
+      dataFind.divicion = obtenerSection('Divicion');
+      setConfiAll(dataFind);
+    });
+
+    if (isReload) {
+      setIsReload(false);
+    }
+  }, [isReload]);
+
   return (
     <View style={styles.container}>
       <ScrollView>
         <View style={styles.button}>
           <Text style={styles.subTitle}>Configuracion</Text>
-          <TouchableOpacity
-            style={styles.item}
-            onPress={() => console.log('efe')}>
-            <LinearGradient
-              colors={['#0993B5', '#C7C7C7']}
-              style={styles.signIn}>
-              <Text style={[styles.text, {color: '#fff'}]}>
-                Anonimo por ahora
-              </Text>
-            </LinearGradient>
-          </TouchableOpacity>
+          {loading ? (
+            <LoaderSpinner />
+          ) : (
+            <>
+              <TipoRol
+                Rol={confiAll.rol}
+                setLoading={setLoading}
+                setIsReload={setIsReload}
+              />
 
-          <TouchableOpacity
-            style={styles.item}
-            onPress={() => console.log('efe')}>
-            <LinearGradient
-              colors={['#0993B5', '#C7C7C7']}
-              style={styles.signIn}>
-              <Text style={[styles.text, {color: '#fff'}]}>
-                Anonimo por ahora
-              </Text>
-            </LinearGradient>
-          </TouchableOpacity>
+              <Haciendas
+                Hacienda={confiAll.hacienda}
+                setLoading={setLoading}
+                setIsReload={setIsReload}
+              />
 
-          <TouchableOpacity
-            style={styles.item}
-            onPress={() => console.log('efe')}>
-            <LinearGradient
-              colors={['#0993B5', '#C7C7C7']}
-              style={styles.signIn}>
-              <Text style={[styles.text, {color: '#fff'}]}>
-                Anonimo por ahora
-              </Text>
-            </LinearGradient>
-          </TouchableOpacity>
+              <EjercicioFiscal
+                Fiscal={confiAll.fiscal}
+                setLoading={setLoading}
+                setIsReload={setIsReload}
+              />
 
-          <TouchableOpacity
-            style={styles.item}
-            onPress={() => console.log('efe')}>
-            <LinearGradient
-              colors={['#0993B5', '#C7C7C7']}
-              style={styles.signIn}>
-              <Text style={[styles.text, {color: '#fff'}]}>
-                Anonimo por ahora
-              </Text>
-            </LinearGradient>
-          </TouchableOpacity>
+              <SectorConfig
+                Sector={confiAll.sector}
+                setLoading={setLoading}
+                setIsReload={setIsReload}
+              />
 
-          <TouchableOpacity
-            style={styles.item}
-            onPress={() => console.log('efe')}>
-            <LinearGradient
-              colors={['#0993B5', '#C7C7C7']}
-              style={styles.signIn}>
-              <Text style={[styles.text, {color: '#fff'}]}>
-                Anonimo por ahora
-              </Text>
-            </LinearGradient>
-          </TouchableOpacity>
+              <PeriodoConfig
+                Periodo={confiAll.periodo}
+                setLoading={setLoading}
+                setIsReload={setIsReload}
+              />
+
+              <TouchableOpacity
+                style={styles.item}
+                onPress={() => console.log('efe')}>
+                <LinearGradient
+                  colors={['#0993B5', '#C7C7C7']}
+                  style={styles.signIn}>
+                  <Text style={[styles.text, {color: '#fff'}]}>
+                    Division: (
+                    {confiAll.divicion ? confiAll.divicion : 'Ninguno'})
+                  </Text>
+                </LinearGradient>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.item}
+                onPress={() => navigation.navigate('SignInScreen')}>
+                <LinearGradient
+                  colors={['#EB9058', '#EB5443']}
+                  style={styles.signIn}>
+                  <Text style={[styles.text, {color: '#fff'}]}>
+                    Terminar configuracion
+                  </Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            </>
+          )}
         </View>
       </ScrollView>
     </View>
