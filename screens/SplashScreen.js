@@ -1,5 +1,4 @@
-import React, {useEffect, useState} from 'react';
-import {connect} from 'react-redux';
+import React, {useEffect, useState, useContext} from 'react';
 import {
   View,
   Text,
@@ -18,17 +17,18 @@ import {useTheme} from '@react-navigation/native';
 import {useNetInfo} from '@react-native-community/netinfo';
 import {NetworkInfo} from 'react-native-network-info';
 import {LoaderSpinner} from '../components/loader/spiner-loader';
+import {MyUserContext} from '../components/context/MyUser';
 /* DB LOCAL */
 import {dbMaestra} from '../db-local/db-maestra';
 import {dbEntryHistory, InsertarEntry} from '../db-local/db-history-entry';
 /* FETCH API */
 import {Auth} from '../api/usuario';
 import {getDomain, setDomain} from '../api/config';
-import {setUsuario} from '../redux/model/usuarios';
 /* FECHAS */
 import {get_Semana_Del_Ano} from '../hooks/fechas';
 
-const SplashScreen = ({navigation, route, setUsuario}) => {
+const SplashScreen = ({navigation, route}) => {
+  const {setUserCtx} = useContext(MyUserContext);
   const {colors} = useTheme();
   const netInfo = useNetInfo();
   const [isLogind, setIsLogind] = useState(false);
@@ -72,7 +72,7 @@ const SplashScreen = ({navigation, route, setUsuario}) => {
                 Alert.alert(auth.data.feedback);
               } else {
                 InsertarEntry({semana: get_Semana_Del_Ano()});
-                setUsuario(auth.data.MyUser);
+                setUserCtx(auth.data.MyUser);
                 navigation.navigate('SignInScreen');
               }
             })
@@ -137,15 +137,7 @@ const SplashScreen = ({navigation, route, setUsuario}) => {
   );
 };
 
-const mapStateToProps = ({UsuarioReducer}) => {
-  return {UsuarioReducer};
-};
-
-const mapDispatchToProp = {
-  setUsuario,
-};
-
-export default connect(mapStateToProps, mapDispatchToProp)(SplashScreen);
+export default SplashScreen;
 
 ///// Styles ....
 

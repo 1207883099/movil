@@ -46,21 +46,25 @@ export function PeriodoConfig({Periodo, setLoading, setIsReload}) {
       const fiscal = dataConfig.find((item) => item.section === 'Fiscal');
       const Rol = dataConfig.find((item) => item.section === 'Rol');
 
-      obtenerConfiguracion(
-        'token-static',
-        'PeriodoNomina',
-        fiscal.value,
-        Rol.value,
-      )
-        .then((periodos) => {
-          if (periodos.data.length) {
-            setModal(true);
-            setPeriodos(periodos.data);
-          } else {
-            Alert.alert('No hay datos de rol');
-          }
-        })
-        .catch((error) => Alert.alert(error.message));
+      if (fiscal && Rol) {
+        obtenerConfiguracion(
+          'token-static',
+          'PeriodoNomina',
+          fiscal.value,
+          Rol.value,
+        )
+          .then((periodos) => {
+            if (periodos.data.length) {
+              setModal(true);
+              setPeriodos(periodos.data);
+            } else {
+              Alert.alert('No hay datos de rol');
+            }
+          })
+          .catch((error) => Alert.alert(error.message));
+      } else {
+        Alert.alert('Se necesita configurar Rol y fiscal antes que periodo.');
+      }
     });
 
     setLoading(false);

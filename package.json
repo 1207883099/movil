@@ -1,5 +1,5 @@
 {
-  "name": "rnv5",
+  "name": "clementina",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -31,12 +31,7 @@
     "react-native-reanimated": "^1.7.0",
     "react-native-safe-area-context": "^0.7.3",
     "react-native-screens": "^2.0.0-beta.8",
-    "react-native-vector-icons": "^6.6.0",
-    "react-redux": "^7.2.1",
-    "redux": "^4.0.5",
-    "redux-devtools-extension": "^2.13.8",
-    "redux-thunk": "^2.3.0",
-    "remote-redux-devtools": "^0.5.16"
+    "react-native-vector-icons": "^6.6.0"
   },
   "devDependencies": {
     "@babel/core": "^7.6.2",

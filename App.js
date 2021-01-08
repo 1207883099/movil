@@ -7,7 +7,6 @@
  */
 
 import React, {useState} from 'react';
-import {LoaderSpinner} from './components/loader/spiner-loader';
 import {
   NavigationContainer,
   DefaultTheme as NavigationDefaultTheme,
@@ -18,23 +17,19 @@ import {
   DefaultTheme as PaperDefaultTheme,
   DarkTheme as PaperDarkTheme,
 } from 'react-native-paper';
-import {Provider} from 'react-redux';
-import Store from './redux/index';
 import {createStackNavigator} from '@react-navigation/stack';
-import UserReducer, {initialData} from './redux/model/usuarios';
 import SplashScreen from './screens/SplashScreen';
 import SignInScreen from './screens/SignInScreen';
 import SignUpScreen from './screens/SignUpScreen';
 import ParteDiario from './screens/parteDiario';
 import Configuracion from './screens/configuracion';
 import FechaContextProvider from './components/context/fecha';
+import MyUserContextProvider from './components/context/MyUser';
 
 const RootStack = createStackNavigator();
 
 const App = () => {
   const [isDarkTheme] = useState(false);
-
-  const [loginState] = React.useReducer(UserReducer, initialData);
 
   const CustomDefaultTheme = {
     ...NavigationDefaultTheme,
@@ -60,14 +55,10 @@ const App = () => {
 
   const theme = isDarkTheme ? CustomDarkTheme : CustomDefaultTheme;
 
-  if (loginState.loading) {
-    return <LoaderSpinner />;
-  }
-
   return (
-    <Provider store={Store()}>
-      <PaperProvider theme={theme}>
-        <NavigationContainer theme={theme}>
+    <PaperProvider theme={theme}>
+      <NavigationContainer theme={theme}>
+        <MyUserContextProvider>
           <FechaContextProvider>
             <RootStack.Navigator headerMode="none">
               <RootStack.Screen name="SplashScreen" component={SplashScreen} />
@@ -80,9 +71,9 @@ const App = () => {
               />
             </RootStack.Navigator>
           </FechaContextProvider>
-        </NavigationContainer>
-      </PaperProvider>
-    </Provider>
+        </MyUserContextProvider>
+      </NavigationContainer>
+    </PaperProvider>
   );
 };
 

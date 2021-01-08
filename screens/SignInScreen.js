@@ -7,7 +7,6 @@ import {
   StyleSheet,
   Alert,
 } from 'react-native';
-import {connect} from 'react-redux';
 /* EMPIEZA DB LOCAL */
 import {InsertarMaestra, dbMaestra} from '../db-local/db-maestra';
 import {dbEntryHistory} from '../db-local/db-history-entry';
@@ -21,6 +20,7 @@ import {FechaContext} from '../components/context/fecha';
 import {LoaderSpinner} from '../components/loader/spiner-loader';
 import {DeleteData} from '../components/elementos/DeleteData';
 import {UploadData} from '../components/elementos/uploadData';
+import {MyUserContext} from '../components/context/MyUser';
 /* FETCH API */
 import {obtenerMaestra} from '../api/maestra';
 // import {SubirParteDiario} from '../api/parte-diario';
@@ -29,8 +29,9 @@ import {obtenerTarifas} from '../api/tarifa';
 /* HOOKS */
 import {get_Semana_Del_Ano} from '../hooks/fechas';
 
-const SignInScreen = ({navigation, UsuarioReducer}) => {
+const SignInScreen = ({navigation}) => {
   const {fechaCtx, setFechaCtx} = useContext(FechaContext);
+  const {UserCtx} = useContext(MyUserContext);
   const [dataLocal, setDataLocal] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isReload, setIsReload] = useState(false);
@@ -64,15 +65,15 @@ const SignInScreen = ({navigation, UsuarioReducer}) => {
   const bajar_maestra = async () => {
     setIsLoading(true);
     try {
-      const maestra = await obtenerMaestra(UsuarioReducer.MyUser[0].token);
+      const maestra = await obtenerMaestra(UserCtx.token);
       if (maestra.data.My_Cuadrilla !== undefined) {
         InsertarMaestra([maestra.data]);
         Alert.alert('Se Obtuvo datos Maestra :)');
 
-        const cargos = await obtenerCargos(UsuarioReducer.MyUser[0].token);
+        const cargos = await obtenerCargos(UserCtx.token);
         cargos.data.length && InsertarCargos(cargos.data);
 
-        const tarifas = await obtenerTarifas(UsuarioReducer.MyUser[0].token);
+        const tarifas = await obtenerTarifas(UserCtx.token);
         tarifas.data.length && InsertarTarifas(tarifas.data);
 
         setIsLoading(false);
@@ -90,7 +91,7 @@ const SignInScreen = ({navigation, UsuarioReducer}) => {
     <>
       <View style={styles.container}>
         <ScrollView>
-          <MisDatos UsuarioReducer={UsuarioReducer} />
+          <MisDatos UserCtx={UserCtx} />
           <FechaTrabajo fechaCtx={fechaCtx} setFechaCtx={setFechaCtx} />
           <View style={styles.button}>
             {dataLocal.length > 0 ? (
@@ -161,8 +162,7 @@ const SignInScreen = ({navigation, UsuarioReducer}) => {
               </>
             )}
 
-            {dataLocal.length > 0 &&
-            UsuarioReducer.MyUser[0].movil_ip !== undefined ? (
+            {dataLocal.length > 0 && UserCtx.movil_ip !== undefined ? (
               <>
                 <UploadData setIsLoading={setIsLoading} />
                 {isLoading && <LoaderSpinner />}
@@ -201,11 +201,7 @@ const SignInScreen = ({navigation, UsuarioReducer}) => {
   );
 };
 
-const mapStateToProps = ({UsuarioReducer}) => {
-  return {UsuarioReducer};
-};
-
-export default connect(mapStateToProps, null)(SignInScreen);
+export default SignInScreen;
 
 const styles = StyleSheet.create({
   container: {

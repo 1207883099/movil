@@ -1,7 +1,7 @@
 import React from 'react';
 import {View, Text} from 'react-native';
 
-export function MisDatos({UsuarioReducer}) {
+export function MisDatos({UserCtx}) {
   return (
     <>
       <View style={{padding: 10, backgroundColor: '#cdcdcd'}}>
@@ -13,17 +13,17 @@ export function MisDatos({UsuarioReducer}) {
             <Text>
               Ip Movil:{' '}
               <Text style={{fontWeight: 'bold'}}>
-                {UsuarioReducer.MyUser[0].movil_ip === undefined
+                {UserCtx.movil_ip === undefined
                   ? 'Indefinido'
-                  : UsuarioReducer.MyUser[0].movil_ip}
+                  : UserCtx.movil_ip}
               </Text>
             </Text>
             <Text>
               Ingreso el:{' '}
               <Text style={{fontWeight: 'bold'}}>
-                {UsuarioReducer.MyUser[0].fecha_ingreso === undefined
+                {UserCtx.fecha_ingreso === undefined
                   ? 'Indefinido'
-                  : UsuarioReducer.MyUser[0].fecha_ingreso}
+                  : UserCtx.fecha_ingreso}
               </Text>
             </Text>
           </View>
@@ -31,17 +31,15 @@ export function MisDatos({UsuarioReducer}) {
             <Text>
               Nombres:{' '}
               <Text style={{fontWeight: 'bold'}}>
-                {UsuarioReducer.MyUser[0].Nombre === undefined
-                  ? 'Indefinido'
-                  : UsuarioReducer.MyUser[0].Nombre}
+                {UserCtx.Nombre === undefined ? 'Indefinido' : UserCtx.Nombre}
               </Text>
             </Text>
             <Text>
               Apellidos:{' '}
               <Text style={{fontWeight: 'bold'}}>
-                {UsuarioReducer.MyUser[0].Apellido === undefined
+                {UserCtx.Apellido === undefined
                   ? 'Indefinido'
-                  : UsuarioReducer.MyUser[0].Apellido}
+                  : UserCtx.Apellido}
               </Text>
             </Text>
           </View>
