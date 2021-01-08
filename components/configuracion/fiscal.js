@@ -1,5 +1,5 @@
 /* eslint-disable no-shadow */
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   TouchableOpacity,
   Text,
@@ -11,17 +11,31 @@ import {
 import {obtenerConfiguracion} from '../../api/configuracion';
 import LinearGradient from 'react-native-linear-gradient';
 import {ModalScreen} from '../../components/modal/modal';
-import {InsertarConfiguracion} from '../../db-local/db-configuracion';
+import {
+  InsertarConfiguracion,
+  dbConfiguracion,
+} from '../../db-local/db-configuracion';
 import {Picker} from '@react-native-picker/picker';
 
 export function EjercicioFiscal({Fiscal, setLoading, setIsReload}) {
   const [modal, setModal] = useState(false);
+  const [isUpdate, setIsUpdate] = useState(false);
   const [fiscal, setFiscal] = useState([]);
   const [selectFiscal, setSelectFiscal] = useState({
     IdDetalleCatalogo: undefined,
     Valor1: undefined,
     Valor2: undefined,
   });
+
+  useEffect(() => {
+    dbConfiguracion.findOne({section: 'Fiscal'}, async function (
+      err,
+      dataConfig,
+    ) {
+      err && Alert.alert(err.message);
+      dataConfig && setIsUpdate(true);
+    });
+  }, []);
 
   const getEjercicioFiscal = () => {
     setLoading(true);
@@ -51,12 +65,25 @@ export function EjercicioFiscal({Fiscal, setLoading, setIsReload}) {
   };
 
   const save = () => {
-    InsertarConfiguracion({
-      section: 'Fiscal',
-      IdDetalleCatalogo: selectFiscal.IdDetalleCatalogo,
-      value: selectFiscal.Valor1,
-      Nombre: selectFiscal.Valor2,
-    });
+    if (isUpdate) {
+      dbConfiguracion.update(
+        {section: 'Fiscal'},
+        {
+          $set: {
+            IdDetalleCatalogo: selectFiscal.IdDetalleCatalogo,
+            value: selectFiscal.Valor1,
+            Nombre: selectFiscal.Valor2,
+          },
+        },
+      );
+    } else {
+      InsertarConfiguracion({
+        section: 'Fiscal',
+        IdDetalleCatalogo: selectFiscal.IdDetalleCatalogo,
+        value: selectFiscal.Valor1,
+        Nombre: selectFiscal.Valor2,
+      });
+    }
     setModal(false);
     setIsReload(true);
   };

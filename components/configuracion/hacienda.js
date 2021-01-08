@@ -1,5 +1,5 @@
 /* eslint-disable no-shadow */
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   TouchableOpacity,
   Text,
@@ -11,16 +11,30 @@ import {
 import {obtenerConfiguracion} from '../../api/configuracion';
 import LinearGradient from 'react-native-linear-gradient';
 import {ModalScreen} from '../../components/modal/modal';
-import {InsertarConfiguracion} from '../../db-local/db-configuracion';
+import {
+  InsertarConfiguracion,
+  dbConfiguracion,
+} from '../../db-local/db-configuracion';
 import {Picker} from '@react-native-picker/picker';
 
 export function Haciendas({Hacienda, setLoading, setIsReload}) {
   const [modal, setModal] = useState(false);
+  const [isUpdate, setIsUpdate] = useState(false);
   const [haciendas, setHaciendas] = useState([]);
   const [selectHacienda, setSelectHacienda] = useState({
     IdHacienda: undefined,
     Nombre: undefined,
   });
+
+  useEffect(() => {
+    dbConfiguracion.findOne({section: 'Hacienda'}, async function (
+      err,
+      dataConfig,
+    ) {
+      err && Alert.alert(err.message);
+      dataConfig && setIsUpdate(true);
+    });
+  }, []);
 
   const getHaciendas = () => {
     setLoading(true);
@@ -49,11 +63,23 @@ export function Haciendas({Hacienda, setLoading, setIsReload}) {
   };
 
   const save = () => {
-    InsertarConfiguracion({
-      section: 'Hacienda',
-      value: selectHacienda.IdHacienda,
-      Nombre: selectHacienda.Nombre,
-    });
+    if (isUpdate) {
+      dbConfiguracion.update(
+        {section: 'Hacienda'},
+        {
+          $set: {
+            value: selectHacienda.IdHacienda,
+            Nombre: selectHacienda.Nombre,
+          },
+        },
+      );
+    } else {
+      InsertarConfiguracion({
+        section: 'Hacienda',
+        value: selectHacienda.IdHacienda,
+        Nombre: selectHacienda.Nombre,
+      });
+    }
     setModal(false);
     setIsReload(true);
   };

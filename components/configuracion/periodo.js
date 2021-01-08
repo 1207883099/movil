@@ -1,5 +1,5 @@
 /* eslint-disable no-shadow */
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   TouchableOpacity,
   Text,
@@ -19,12 +19,23 @@ import {Picker} from '@react-native-picker/picker';
 
 export function PeriodoConfig({Periodo, setLoading, setIsReload}) {
   const [modal, setModal] = useState(false);
+  const [isUpdate, setIsUpdate] = useState(false);
   const [periodos, setPeriodos] = useState([]);
   const [selectPeriodo, setSelectPeriodo] = useState({
     IdPeriodoNomina: undefined,
     EjercicioFiscal: undefined,
     Numero: undefined,
   });
+
+  useEffect(() => {
+    dbConfiguracion.findOne({section: 'Periodo'}, async function (
+      err,
+      dataConfig,
+    ) {
+      err && Alert.alert(err.message);
+      dataConfig && setIsUpdate(true);
+    });
+  }, []);
 
   const getPeriodos = () => {
     setLoading(true);
@@ -62,11 +73,23 @@ export function PeriodoConfig({Periodo, setLoading, setIsReload}) {
   };
 
   const save = () => {
-    InsertarConfiguracion({
-      section: 'Periodo',
-      value: selectPeriodo.IdPeriodoNomina,
-      Nombre: selectPeriodo.Numero,
-    });
+    if (isUpdate) {
+      dbConfiguracion.update(
+        {section: 'Periodo'},
+        {
+          $set: {
+            value: selectPeriodo.IdPeriodoNomina,
+            Nombre: selectPeriodo.Numero,
+          },
+        },
+      );
+    } else {
+      InsertarConfiguracion({
+        section: 'Periodo',
+        value: selectPeriodo.IdPeriodoNomina,
+        Nombre: selectPeriodo.Numero,
+      });
+    }
     setModal(false);
     setIsReload(true);
   };

@@ -1,5 +1,5 @@
 /* eslint-disable no-shadow */
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   TouchableOpacity,
   Text,
@@ -19,6 +19,7 @@ import {Picker} from '@react-native-picker/picker';
 
 export function SectorConfig({Sector, setLoading, setIsReload}) {
   const [modal, setModal] = useState(false);
+  const [isUpdate, setIsUpdate] = useState(false);
   const [sectores, setSectores] = useState([]);
   const [selectSector, setSelectSector] = useState({
     IdSector: undefined,
@@ -26,6 +27,16 @@ export function SectorConfig({Sector, setLoading, setIsReload}) {
     IdHacienda: undefined,
     Nombre_Hacienda: undefined,
   });
+
+  useEffect(() => {
+    dbConfiguracion.findOne({section: 'Sector'}, async function (
+      err,
+      dataConfig,
+    ) {
+      err && Alert.alert(err.message);
+      dataConfig && setIsUpdate(true);
+    });
+  }, []);
 
   const getSectores = () => {
     setLoading(true);
@@ -57,12 +68,23 @@ export function SectorConfig({Sector, setLoading, setIsReload}) {
   };
 
   const save = () => {
-    console.log(selectSector);
-    InsertarConfiguracion({
-      section: 'Sector',
-      IdSector: selectSector.IdSector,
-      Nombre: selectSector.Nombre + ' - ' + selectSector.Nombre_Hacienda,
-    });
+    if (isUpdate) {
+      dbConfiguracion.update(
+        {section: 'Sector'},
+        {
+          $set: {
+            IdSector: selectSector.IdSector,
+            Nombre: selectSector.Nombre + ' - ' + selectSector.Nombre_Hacienda,
+          },
+        },
+      );
+    } else {
+      InsertarConfiguracion({
+        section: 'Sector',
+        IdSector: selectSector.IdSector,
+        Nombre: selectSector.Nombre + ' - ' + selectSector.Nombre_Hacienda,
+      });
+    }
     setModal(false);
     setIsReload(true);
   };

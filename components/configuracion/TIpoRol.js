@@ -1,5 +1,5 @@
 /* eslint-disable no-shadow */
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   TouchableOpacity,
   Text,
@@ -11,16 +11,30 @@ import {
 import {obtenerConfiguracion} from '../../api/configuracion';
 import LinearGradient from 'react-native-linear-gradient';
 import {ModalScreen} from '../../components/modal/modal';
-import {InsertarConfiguracion} from '../../db-local/db-configuracion';
+import {
+  InsertarConfiguracion,
+  dbConfiguracion,
+} from '../../db-local/db-configuracion';
 import {Picker} from '@react-native-picker/picker';
 
 export function TipoRol({Rol, setLoading, setIsReload}) {
   const [modal, setModal] = useState(false);
+  const [isUpdate, setIsUpdate] = useState(false);
   const [roles, setRoles] = useState([]);
   const [selectRol, setSelectRol] = useState({
     IdTipoRol: undefined,
     Nombre: undefined,
   });
+
+  useEffect(() => {
+    dbConfiguracion.findOne({section: 'Fiscal'}, async function (
+      err,
+      dataConfig,
+    ) {
+      err && Alert.alert(err.message);
+      dataConfig && setIsUpdate(true);
+    });
+  }, []);
 
   const getRoles = () => {
     setLoading(true);
@@ -47,11 +61,23 @@ export function TipoRol({Rol, setLoading, setIsReload}) {
   };
 
   const save = () => {
-    InsertarConfiguracion({
-      section: 'Rol',
-      value: selectRol.IdTipoRol,
-      Nombre: selectRol.Nombre,
-    });
+    if (isUpdate) {
+      dbConfiguracion.update(
+        {section: 'Rol'},
+        {
+          $set: {
+            value: selectRol.IdTipoRol,
+            Nombre: selectRol.Nombre,
+          },
+        },
+      );
+    } else {
+      InsertarConfiguracion({
+        section: 'Rol',
+        value: selectRol.IdTipoRol,
+        Nombre: selectRol.Nombre,
+      });
+    }
     setModal(false);
     setIsReload(true);
   };
