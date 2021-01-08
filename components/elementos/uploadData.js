@@ -43,7 +43,12 @@ export function UploadData() {
   };
 
   return (
-    <TouchableOpacity onPress={subir_datos} style={styles.signIn}>
+    <TouchableOpacity
+      onPress={subir_datos}
+      style={[
+        styles.signIn,
+        {borderColor: '#009387', borderWidth: 1, marginTop: 15},
+      ]}>
       <Text style={[styles.textSign, {color: '#009387'}]}>Subir datos</Text>
     </TouchableOpacity>
   );
@@ -54,7 +59,13 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     borderColor: '#009387',
-    borderWidth: 1,
-    marginTop: 15,
+  },
+  signIn: {
+    width: '100%',
+    height: 50,
+    padding: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 10,
   },
 });
