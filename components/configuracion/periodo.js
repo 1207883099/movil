@@ -58,7 +58,7 @@ export function PeriodoConfig({Periodo, setLoading, setIsReload}) {
               setModal(true);
               setPeriodos(periodos.data);
             } else {
-              Alert.alert('No hay datos de rol');
+              Alert.alert('No hay datos de periodos');
             }
           })
           .catch((error) => Alert.alert(error.message));

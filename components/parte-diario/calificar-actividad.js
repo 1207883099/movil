@@ -24,7 +24,10 @@ export function CalificarActividad({
   });
   const [lotes, setLotes] = useState([]);
   const [Actividades, setActividades] = useState([]);
-  const [Tarifas, setTarifas] = useState();
+  const [Tarifas, setTarifas] = useState({
+    Minimo: undefined,
+    Maximo: undefined,
+  });
   const [selectLote, setSelectLote] = useState();
   const [hectarea, setHectarea] = useState(0);
   const [isLote, setIsLote] = useState(false);
@@ -113,7 +116,7 @@ export function CalificarActividad({
 
   const saveDataActividad = () => {
     if (hectarea) {
-      if (Tarifas.Minimo >= hectarea && Tarifas.Maximo <= hectarea) {
+      if (hectarea >= Tarifas.Minimo && hectarea <= Tarifas.Maximo) {
         dbActEmpl.update(
           {_id: selectIdActiEmple},
           {
