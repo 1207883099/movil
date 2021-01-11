@@ -36,6 +36,7 @@ function EmpleadosAsignados({
     idActividadEmple: undefined,
   });
   const [isModalChangeAct, setIsModalChangeAct] = useState(false);
+  const [ReloadEmplAsig, setReloadEmplAsig] = useState(false);
   const [selectIdActiEmple, SetselectActiEmple] = useState('');
 
   useEffect(() => {
@@ -61,7 +62,11 @@ function EmpleadosAsignados({
       err && Alert.alert(err.message);
       setTarifas(dataTarifas);
     });
-  }, [id_parte_diario]);
+
+    if (ReloadEmplAsig) {
+      setReloadEmplAsig(false);
+    }
+  }, [id_parte_diario, ReloadEmplAsig]);
 
   const obtenerCargo = (codigoCargo, propiedad) => {
     if (Cargos.length) {
@@ -157,7 +162,7 @@ function EmpleadosAsignados({
             styles.box_actividad,
             {borderColor: 'royalblue', color: 'royalblue'},
           ]}>
-          Hectareas
+          Hectareas / $
         </Text>
         <Text
           style={[
@@ -221,8 +226,9 @@ function EmpleadosAsignados({
                       </Text>
                       <Text
                         style={[styles.label_actividad, {color: 'royalblue'}]}>
-                        &nbsp; / &nbsp;{' '}
-                        {activEmple.hectaria ? activEmple.hectaria : 0}
+                        &nbsp; / {activEmple.hectaria ? activEmple.hectaria : 0}
+                        {' / '} ${' '}
+                        {activEmple.valorTotal ? activEmple.valorTotal : 0}
                       </Text>
                     </>
                   }
@@ -249,6 +255,7 @@ function EmpleadosAsignados({
         <CalificarActividad
           selectIdActiEmple={selectIdActiEmple}
           setIsModal={setIsModal}
+          setReloadEmplAsig={setReloadEmplAsig}
           setIsReload={setIsReload}
           idSector={idSector}
         />

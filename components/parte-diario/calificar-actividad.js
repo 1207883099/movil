@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import React, {useEffect, useState} from 'react';
 import {
   View,
@@ -17,6 +18,7 @@ export function CalificarActividad({
   selectIdActiEmple,
   setIsModal,
   setIsReload,
+  setReloadEmplAsig,
   idSector,
 }) {
   const [actvEmpld, setActvEmpld] = useState({
@@ -27,6 +29,7 @@ export function CalificarActividad({
   const [Tarifas, setTarifas] = useState({
     Minimo: undefined,
     Maximo: undefined,
+    ValorTarifa: undefined,
   });
   const [selectLote, setSelectLote] = useState();
   const [hectarea, setHectarea] = useState(0);
@@ -41,7 +44,7 @@ export function CalificarActividad({
       err && Alert.alert(err.message);
       setActvEmpld(dataActEmpl);
       setSelectLote(dataActEmpl.lote && dataActEmpl.lote);
-      setHectarea(dataActEmpl.hectaria && Number(dataActEmpl.hectaria));
+      setHectarea(dataActEmpl.hectaria ? Number(dataActEmpl.hectaria) : 0);
       setIsLote(dataActEmpl.isLote);
 
       dbTarifas.findOne({IdActividad: dataActEmpl.actividad}, async function (
@@ -90,6 +93,14 @@ export function CalificarActividad({
   const renderLotes = () => {
     return (
       <>
+        <View
+          style={{
+            borderBottom: 2,
+            borderBottomColor: '#cdcdcd',
+            borderBottomWidth: 2,
+            padding: 10,
+          }}
+        />
         <Text style={styles.tarea_text}>Lotes:</Text>
         {lotes.map((lote) => (
           <View style={[styles.head, {marginBottom: 10}]}>
@@ -123,11 +134,14 @@ export function CalificarActividad({
             $set: {
               hectaria: hectarea,
               lote: selectLote + 7,
+              valorTotal: (Tarifas.ValorTarifa * hectarea).toFixed(2),
             },
           },
         );
+
         setIsModal(false);
         setIsReload(true);
+        setReloadEmplAsig(true);
       } else {
         Alert.alert('Los valores no estan dentro del rango permitido');
       }
@@ -155,7 +169,17 @@ export function CalificarActividad({
             styles.box_actividad,
             {borderColor: 'royalblue', color: 'royalblue'},
           ]}>
-          {hectarea}
+          # {hectarea.toFixed(2)}
+        </Text>
+      </View>
+      <View style={styles.head}>
+        <Text style={styles.tarea_text}>Valor total ------{'>'}</Text>
+        <Text
+          style={[
+            styles.box_actividad,
+            {borderColor: '#009387', color: '#009387'},
+          ]}>
+          $ {(Tarifas.ValorTarifa * hectarea).toFixed(2)}
         </Text>
       </View>
 
@@ -175,14 +199,15 @@ export function CalificarActividad({
         </>
       )}
 
+      <View style={styles.head}>
+        <Text>Minimo: {Tarifas.Minimo}</Text>
+        <Text>Maximo: {Tarifas.Maximo}</Text>
+      </View>
+
       {!actvEmpld.hectaria && isLote ? (
         renderLotes()
       ) : (
         <View style={{marginBottom: 10}}>
-          <View style={styles.head}>
-            <Text>Minimo: {Tarifas.Minimo}</Text>
-            <Text>Maximo: {Tarifas.Maximo}</Text>
-          </View>
           <View style={{marginTop: 10}}>
             <TextInput
               defaultValue={actvEmpld.hectaria && actvEmpld.hectaria}

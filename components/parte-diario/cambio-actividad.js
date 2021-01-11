@@ -9,7 +9,7 @@ export function CambioActividad({
   setIsModalChangeAct,
   setIsReload,
 }) {
-  const [actividad, setActividad] = useState();
+  const [actividad, setActividad] = useState('');
   const [actividades, setActividades] = useState([]);
 
   useEffect(() => {
@@ -67,7 +67,7 @@ export function CambioActividad({
       </View>
 
       <Button
-        title="Cambiar Actividad"
+        title={`Cambiar Actividad: ${actividad}`}
         color="#009387"
         onPress={cambioActividad}
       />

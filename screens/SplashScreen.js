@@ -21,7 +21,7 @@ import {LoaderSpinner} from '../components/loader/spiner-loader';
 import {MyUserContext} from '../components/context/MyUser';
 /* DB LOCAL */
 import {dbMaestra} from '../db-local/db-maestra';
-import {dbEntryHistory, InsertarEntry} from '../db-local/db-history-entry';
+import {InsertarEntry} from '../db-local/db-history-entry';
 import {dbConfiguracion} from '../db-local/db-configuracion';
 /* FETCH API */
 import {Auth} from '../api/usuario';
@@ -41,26 +41,14 @@ const SplashScreen = ({navigation, route}) => {
       Alert.alert('Necesitas conneccion a internet para bajar o subir datos.');
 
     if (route.params === undefined) {
-      dbEntryHistory.find({}, async function (err, dataHistory) {
+      dbMaestra.find({}, async function (err, dataMaestra) {
         err && Alert.alert(err.message);
-        if (dataHistory.length) {
-          const ultimoHistory = dataHistory[dataHistory.length - 1];
-          if (ultimoHistory.semana !== get_Semana_Del_Ano()) {
-            Alert.alert(
-              'Has empezado otra semana, asegurate de limpiar los datos antes de terminar la semana..! ----- de lo contrario ya no podras ver ni gestionar los partes diarios, debido a que no pertenecen a esta semana.',
-            );
-          }
-        }
+        dataMaestra.length && navigation.navigate('SignInScreen');
+      });
 
-        dbMaestra.find({}, async function (err, dataMaestra) {
-          err && Alert.alert(err.message);
-          dataMaestra.length && navigation.navigate('SignInScreen');
-        });
-
-        dbConfiguracion.find({}, async function (err, dataConfig) {
-          err && Alert.alert(err.message);
-          setCompleteConfig(dataConfig.length >= 5 ? true : false);
-        });
+      dbConfiguracion.find({}, async function (err, dataConfig) {
+        err && Alert.alert(err.message);
+        setCompleteConfig(dataConfig.length >= 5 ? true : false);
       });
     }
   }, [netInfo, route, navigation]);
@@ -100,9 +88,7 @@ const SplashScreen = ({navigation, route}) => {
     <View style={styles.container}>
       <StatusBar backgroundColor="#009387" barStyle="light-content" />
       <View style={styles.header}>
-        <Text style={{color: '#fff', fontSize: 17, fontWeight: 'bold'}}>
-          Inserta la direccion autorizada
-        </Text>
+        <Text style={styles.titleInput}>Inserta la direccion autorizada</Text>
         <TextInput
           onChangeText={(value) => setDomain(value)}
           style={styles.input}
@@ -208,4 +194,5 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
   },
+  titleInput: {color: '#fff', fontSize: 17, fontWeight: 'bold'},
 });

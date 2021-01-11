@@ -8,10 +8,8 @@ import {
   Alert,
 } from 'react-native';
 /* EMPIEZA DB LOCAL */
-import {InsertarMaestra, dbMaestra} from '../db-local/db-maestra';
+import {dbMaestra} from '../db-local/db-maestra';
 import {dbEntryHistory} from '../db-local/db-history-entry';
-import {InsertarTarifas} from '../db-local/db-tarifas';
-import {InsertarCargos} from '../db-local/db-cargos';
 import {dbConfiguracion} from '../db-local/db-configuracion';
 /* COMPONENTS */
 import LinearGradient from 'react-native-linear-gradient';
@@ -21,12 +19,8 @@ import {FechaContext} from '../components/context/fecha';
 import {LoaderSpinner} from '../components/loader/spiner-loader';
 import {DeleteData} from '../components/elementos/DeleteData';
 import {UploadData} from '../components/elementos/uploadData';
+import {DownloadData} from '../components/elementos/downloadData';
 import {MyUserContext} from '../components/context/MyUser';
-/* FETCH API */
-import {obtenerMaestra} from '../api/maestra';
-// import {SubirParteDiario} from '../api/parte-diario';
-import {obtenerCargos} from '../api/cargo';
-import {obtenerTarifas} from '../api/tarifa';
 /* HOOKS */
 import {get_Semana_Del_Ano} from '../hooks/fechas';
 
@@ -72,31 +66,6 @@ const SignInScreen = ({navigation}) => {
     }
   }, [isReload]);
 
-  const bajar_maestra = async () => {
-    setIsLoading(true);
-    try {
-      const maestra = await obtenerMaestra(UserCtx.token);
-      if (maestra.data.My_Cuadrilla !== undefined) {
-        InsertarMaestra([maestra.data]);
-        Alert.alert('Se Obtuvo datos Maestra :)');
-
-        const cargos = await obtenerCargos(UserCtx.token);
-        cargos.data.length && InsertarCargos(cargos.data);
-
-        const tarifas = await obtenerTarifas(UserCtx.token);
-        tarifas.data.length && InsertarTarifas(tarifas.data);
-
-        setIsLoading(false);
-        setIsReload(true);
-      } else {
-        Alert.alert('Datos vacios de la maestra :(');
-      }
-    } catch (error) {
-      Alert.alert(error.message);
-    }
-    setIsLoading(false);
-  };
-
   return (
     <>
       <View style={styles.container}>
@@ -121,8 +90,8 @@ const SignInScreen = ({navigation}) => {
                   <LinearGradient
                     colors={['#5982EB', '#A69649']}
                     style={styles.signIn}>
-                    <Text style={[styles.textSign, {color: '#fff'}]}>
-                      Ver Mis Cuadrilla
+                    <Text style={[styles.textSign, styles.colorWhite]}>
+                      Ver Mis Cuadrillas
                     </Text>
                   </LinearGradient>
                 </TouchableOpacity>
@@ -132,7 +101,7 @@ const SignInScreen = ({navigation}) => {
                   onPress={() => {
                     if (lastHistory !== get_Semana_Del_Ano()) {
                       Alert.alert(
-                        'Has empezado otra semana, asegurate de limpiar los datos.',
+                        'Asegurate de limpiar los datos regularmente.',
                       );
                     }
                     navigation.navigate('ParteDiario');
@@ -140,7 +109,7 @@ const SignInScreen = ({navigation}) => {
                   <LinearGradient
                     colors={['#69ABC9', '#69D6C9']}
                     style={styles.signIn}>
-                    <Text style={[styles.textSign, {color: '#fff'}]}>
+                    <Text style={[styles.textSign, styles.colorWhite]}>
                       Gestionar Parte Diario
                     </Text>
                   </LinearGradient>
@@ -162,16 +131,11 @@ const SignInScreen = ({navigation}) => {
               </>
             ) : (
               <>
-                <TouchableOpacity style={styles.signIn} onPress={bajar_maestra}>
-                  <LinearGradient
-                    colors={['#08d3c4', '#06ab9d']}
-                    style={styles.signIn}>
-                    <Text style={[styles.textSign, {color: '#fff'}]}>
-                      Bajar Maestra
-                    </Text>
-                  </LinearGradient>
-                </TouchableOpacity>
-
+                <DownloadData
+                  UserCtx={UserCtx}
+                  setIsLoading={setIsLoading}
+                  setIsReload={setIsReload}
+                />
                 {isLoading && <LoaderSpinner />}
               </>
             )}
@@ -256,5 +220,8 @@ const styles = StyleSheet.create({
   textSign: {
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  colorWhite: {
+    color: '#fff',
   },
 });
