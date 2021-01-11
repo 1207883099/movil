@@ -121,12 +121,19 @@ const Configuracion = ({navigation}) => {
 
               <TouchableOpacity
                 style={styles.item}
-                onPress={() => navigation.navigate('SignInScreen')}>
+                onPress={() => {
+                  const {rol, hacienda, fiscal, sector, periodo} = confiAll;
+                  if (rol && hacienda && fiscal && sector && periodo) {
+                    navigation.navigate('SignInScreen');
+                  } else {
+                    Alert.alert('Completa la configuracion');
+                  }
+                }}>
                 <LinearGradient
                   colors={['#EB9058', '#EB5443']}
                   style={styles.signIn}>
                   <Text style={[styles.text, {color: '#fff'}]}>
-                    Terminar configuracion
+                    Volver Atras
                   </Text>
                 </LinearGradient>
               </TouchableOpacity>

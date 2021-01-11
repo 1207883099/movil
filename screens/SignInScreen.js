@@ -12,6 +12,7 @@ import {InsertarMaestra, dbMaestra} from '../db-local/db-maestra';
 import {dbEntryHistory} from '../db-local/db-history-entry';
 import {InsertarTarifas} from '../db-local/db-tarifas';
 import {InsertarCargos} from '../db-local/db-cargos';
+import {dbConfiguracion} from '../db-local/db-configuracion';
 /* COMPONENTS */
 import LinearGradient from 'react-native-linear-gradient';
 import {MisDatos} from '../components/elementos/mis-datos';
@@ -36,19 +37,20 @@ const SignInScreen = ({navigation}) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isReload, setIsReload] = useState(false);
   const [lastHistory, setLastHistory] = useState();
+  const [fiscal, setFiscal] = useState({
+    valuie: undefined,
+    Nombre: undefined,
+  });
+  const [periodo, setPeriodo] = useState({
+    Nombre: undefined,
+  });
 
   useEffect(() => {
     try {
-      const fetchDB = () => {
-        dbMaestra.find({}, async function (err, docs) {
-          err && Alert.alert(err.message);
-          setDataLocal(docs);
-        });
-      };
-
-      if (isReload) {
-        setIsReload(false);
-      }
+      dbMaestra.find({}, async function (err, dataMaestra) {
+        err && Alert.alert(err.message);
+        setDataLocal(dataMaestra);
+      });
 
       dbEntryHistory.find({}, async function (err, dataHistory) {
         err && Alert.alert(err.message);
@@ -56,7 +58,15 @@ const SignInScreen = ({navigation}) => {
         setLastHistory(ultimoHistory.semana);
       });
 
-      fetchDB();
+      dbConfiguracion.find({}, async function (err, dataConfig) {
+        err && Alert.alert(err.message);
+        setFiscal(dataConfig.find((item) => item.section === 'Fiscal'));
+        setPeriodo(dataConfig.find((item) => item.section === 'Periodo'));
+      });
+
+      if (isReload) {
+        setIsReload(false);
+      }
     } catch (error) {
       Alert.alert(error.message);
     }
@@ -92,7 +102,12 @@ const SignInScreen = ({navigation}) => {
       <View style={styles.container}>
         <ScrollView>
           <MisDatos UserCtx={UserCtx} />
-          <FechaTrabajo fechaCtx={fechaCtx} setFechaCtx={setFechaCtx} />
+          <FechaTrabajo
+            fechaCtx={fechaCtx}
+            setFechaCtx={setFechaCtx}
+            semana={periodo.Nombre}
+            year={fiscal.Nombre}
+          />
           <View style={styles.button}>
             {dataLocal.length > 0 ? (
               <>
@@ -117,11 +132,10 @@ const SignInScreen = ({navigation}) => {
                   onPress={() => {
                     if (lastHistory !== get_Semana_Del_Ano()) {
                       Alert.alert(
-                        'Has empezado otra semana, asegurate de limpiar los datos antes de terminar la semana..! ----- de lo contrario ya no podras ver ni gestionar los partes diarios, debido a que no pertenecen a esta semana.',
+                        'Has empezado otra semana, asegurate de limpiar los datos.',
                       );
-                    } else {
-                      navigation.navigate('ParteDiario');
                     }
+                    navigation.navigate('ParteDiario');
                   }}>
                   <LinearGradient
                     colors={['#69ABC9', '#69D6C9']}

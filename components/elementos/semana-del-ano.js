@@ -1,9 +1,9 @@
 import React, {useState} from 'react';
 import {SelectDia} from './select-dia';
 import {View, Text} from 'react-native';
-import {get_Semana_Del_Ano, getDia} from '../../hooks/fechas';
+import {getDia} from '../../hooks/fechas';
 
-export function FechaTrabajo({fechaCtx, setFechaCtx}) {
+export function FechaTrabajo({fechaCtx, setFechaCtx, semana, year}) {
   const [selectDay, setSelectDay] = useState(false);
   return (
     <>
@@ -12,9 +12,8 @@ export function FechaTrabajo({fechaCtx, setFechaCtx}) {
           <Text style={{fontWeight: 'bold'}}>
             {getDia(new Date(fechaCtx))}{' '}
           </Text>
-          de la semana:{' '}
-          <Text style={{fontWeight: 'bold'}}>{get_Semana_Del_Ano()}</Text> del{' '}
-          <Text style={{fontWeight: 'bold'}}>{new Date().getFullYear()}</Text>
+          de la semana: <Text style={{fontWeight: 'bold'}}>{semana}</Text> del{' '}
+          <Text style={{fontWeight: 'bold'}}>{year}</Text>
         </Text>
         {selectDay ? (
           <SelectDia setSelectDay={setSelectDay} setFechaCtx={setFechaCtx} />

@@ -1,3 +1,4 @@
+/* eslint-disable no-shadow */
 import React, {useEffect, useState, useContext} from 'react';
 import {
   View,
@@ -21,6 +22,7 @@ import {MyUserContext} from '../components/context/MyUser';
 /* DB LOCAL */
 import {dbMaestra} from '../db-local/db-maestra';
 import {dbEntryHistory, InsertarEntry} from '../db-local/db-history-entry';
+import {dbConfiguracion} from '../db-local/db-configuracion';
 /* FETCH API */
 import {Auth} from '../api/usuario';
 import {getDomain, setDomain} from '../api/config';
@@ -32,6 +34,7 @@ const SplashScreen = ({navigation, route}) => {
   const {colors} = useTheme();
   const netInfo = useNetInfo();
   const [isLogind, setIsLogind] = useState(false);
+  const [completeConfig, setCompleteConfig] = useState(false);
 
   useEffect(() => {
     !netInfo.isConnected &&
@@ -49,12 +52,14 @@ const SplashScreen = ({navigation, route}) => {
           }
         }
 
-        dbMaestra.find({}, async function (err, docs) {
+        dbMaestra.find({}, async function (err, dataMaestra) {
           err && Alert.alert(err.message);
+          dataMaestra.length && navigation.navigate('SignInScreen');
+        });
 
-          if (docs.length > 0) {
-            navigation.navigate('SignInScreen');
-          }
+        dbConfiguracion.find({}, async function (err, dataConfig) {
+          err && Alert.alert(err.message);
+          setCompleteConfig(dataConfig.length >= 5 ? true : false);
         });
       });
     }
@@ -73,7 +78,9 @@ const SplashScreen = ({navigation, route}) => {
               } else {
                 InsertarEntry({semana: get_Semana_Del_Ano()});
                 setUserCtx(auth.data.MyUser);
-                navigation.navigate('SignInScreen');
+                completeConfig
+                  ? navigation.navigate('SignInScreen')
+                  : navigation.navigate('Configuracion');
               }
             })
             .catch((err) => Alert.alert(err.message), setIsLogind(false));
