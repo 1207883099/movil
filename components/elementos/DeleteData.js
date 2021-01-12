@@ -8,6 +8,7 @@ import {dbCuadrillaPD} from '../../db-local/db-cuadrilla-parte-diario';
 import {dbActEmpl} from '../../db-local/db-actividades-empleado';
 import {dbParteDiario} from '../../db-local/db-parte-diario';
 import {dbCargos} from '../../db-local/db-cargos';
+import {dbConfiguracion} from '../../db-local/db-configuracion';
 
 export function DeleteData({navigation, setIsReload}) {
   const eliminar_datos = () => {
@@ -28,6 +29,10 @@ export function DeleteData({navigation, setIsReload}) {
             });
 
             dbParteDiario.remove({}, {multi: true}, function (err) {
+              err && Alert.alert(err.message);
+            });
+
+            dbConfiguracion.remove({}, {multi: true}, function (err) {
               err && Alert.alert(err.message);
             });
 

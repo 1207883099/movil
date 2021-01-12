@@ -6,7 +6,7 @@ import {Picker} from '@react-native-picker/picker';
 import {InsertarActividadEmpleado} from '../../db-local/db-actividades-empleado';
 import {dbMaestra} from '../../db-local/db-maestra';
 
-export function AddActividad({id_parte_diario, cuadrilla, navigation}) {
+export function AddActividad({id_parte_diario, cuadrilla, setReloadEmplAsig}) {
   const [isModal, setIsModal] = useState(false);
   const [empleado, setEmpleado] = useState();
   const [actividad, setActividad] = useState();
@@ -34,8 +34,9 @@ export function AddActividad({id_parte_diario, cuadrilla, navigation}) {
         idParteDiario: id_parte_diario,
         actividad: actividad,
       });
-      navigation.navigate('SignInScreen');
+
       setIsModal(false);
+      setReloadEmplAsig(true);
     } else {
       Alert.alert('Campos vacios, revise y vuelve a intentar');
     }
@@ -83,7 +84,7 @@ export function AddActividad({id_parte_diario, cuadrilla, navigation}) {
                   <Picker.Item
                     key={index}
                     label={actividad.Nombre}
-                    value={actividad.Nombre}
+                    value={actividad.IdActividad}
                   />
                 ))}
             </Picker>
@@ -91,7 +92,9 @@ export function AddActividad({id_parte_diario, cuadrilla, navigation}) {
         </>
 
         <Button
-          title="Guardar nueva actividad"
+          title={`Guardar nueva actividad: ${empleado && empleado} - ${
+            actividad && actividad
+          }`}
           color="#009387"
           onPress={anadirActividad}
         />

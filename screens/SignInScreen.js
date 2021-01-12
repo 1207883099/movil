@@ -54,8 +54,10 @@ const SignInScreen = ({navigation}) => {
 
       dbConfiguracion.find({}, async function (err, dataConfig) {
         err && Alert.alert(err.message);
-        setFiscal(dataConfig.find((item) => item.section === 'Fiscal'));
-        setPeriodo(dataConfig.find((item) => item.section === 'Periodo'));
+        if (dataConfig.length) {
+          setFiscal(dataConfig.find((item) => item.section === 'Fiscal'));
+          setPeriodo(dataConfig.find((item) => item.section === 'Periodo'));
+        }
       });
 
       if (isReload) {

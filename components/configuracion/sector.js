@@ -1,3 +1,4 @@
+/* eslint-disable no-sequences */
 /* eslint-disable no-shadow */
 import React, {useState, useEffect} from 'react';
 import {
@@ -8,19 +9,20 @@ import {
   View,
   Button,
 } from 'react-native';
-import {dbMaestra} from '../../db-local/db-maestra';
 import LinearGradient from 'react-native-linear-gradient';
 import {ModalScreen} from '../../components/modal/modal';
 import {
   InsertarConfiguracion,
   dbConfiguracion,
 } from '../../db-local/db-configuracion';
+import {obtenerConfiguracion} from '../../api/configuracion';
 import {Picker} from '@react-native-picker/picker';
 
 export function SectorConfig({Sector, setLoading, setIsReload}) {
   const [modal, setModal] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);
   const [sectores, setSectores] = useState([]);
+  const [sectoresAll, setSectoresAll] = useState([]);
   const [selectSector, setSelectSector] = useState({
     IdSector: undefined,
     Nombre: undefined,
@@ -41,22 +43,58 @@ export function SectorConfig({Sector, setLoading, setIsReload}) {
   const getSectores = () => {
     setLoading(true);
 
-    dbConfiguracion.findOne({section: 'Hacienda'}, async function (
-      err,
-      dataConfig,
-    ) {
-      err && Alert.alert(err.message);
-
-      dbMaestra.find({}, async function (err, dataMaestra) {
+    if (isUpdate) {
+      dbConfiguracion.find({}, async function (err, dataConfig) {
         err && Alert.alert(err.message);
-        setSectores(
-          dataMaestra[0].Sectores.filter(
-            (item) => item.IdHacienda === dataConfig.value,
-          ),
-        );
-        setModal(true);
+
+        if (dataConfig.length) {
+          const findHacienda = dataConfig.find(
+            (item) => item.section === 'Hacienda',
+          );
+          const SectoresAll = dataConfig.find(
+            (item) => item.section === 'Sector',
+          );
+
+          setSectores(
+            SectoresAll.dataAll.filter(
+              (item) => item.IdHacienda === findHacienda.value,
+            ),
+          );
+          setModal(true);
+        } else {
+          Alert.alert('Se necesita configurar hacienda antes que sector.');
+        }
       });
-    });
+    } else {
+      obtenerConfiguracion('token-static', 'Sector')
+        .then((sectores) => {
+          if (sectores.data.length) {
+            dbConfiguracion.findOne({section: 'Hacienda'}, async function (
+              err,
+              dataConfig,
+            ) {
+              err && Alert.alert(err.message);
+
+              if (dataConfig.value) {
+                setSectores(
+                  sectores.data.filter(
+                    (item) => item.IdHacienda === dataConfig.value,
+                  ),
+                );
+                setSectoresAll(sectores.data);
+                setModal(true);
+              } else {
+                Alert.alert(
+                  'Se necesita configurar hacienda antes que sector.',
+                );
+              }
+            });
+          } else {
+            Alert.alert('No hay datos de sectores');
+          }
+        })
+        .catch((error) => Alert.alert(error.message));
+    }
 
     setLoading(false);
   };
@@ -68,25 +106,31 @@ export function SectorConfig({Sector, setLoading, setIsReload}) {
   };
 
   const save = () => {
-    if (isUpdate) {
-      dbConfiguracion.update(
-        {section: 'Sector'},
-        {
-          $set: {
-            IdSector: selectSector.IdSector,
-            Nombre: selectSector.Nombre + ' - ' + selectSector.Nombre_Hacienda,
+    if (selectSector.IdSector) {
+      if (isUpdate) {
+        dbConfiguracion.update(
+          {section: 'Sector'},
+          {
+            $set: {
+              IdSector: selectSector.IdSector,
+              Nombre:
+                selectSector.Nombre + ' - ' + selectSector.Nombre_Hacienda,
+            },
           },
-        },
-      );
+        );
+      } else {
+        InsertarConfiguracion({
+          section: 'Sector',
+          IdSector: selectSector.IdSector,
+          Nombre: selectSector.Nombre + ' - ' + selectSector.Nombre_Hacienda,
+          dataAll: sectoresAll,
+        });
+      }
+      setModal(false);
+      setIsReload(true);
     } else {
-      InsertarConfiguracion({
-        section: 'Sector',
-        IdSector: selectSector.IdSector,
-        Nombre: selectSector.Nombre + ' - ' + selectSector.Nombre_Hacienda,
-      });
+      Alert.alert('Selecciona algun sector.');
     }
-    setModal(false);
-    setIsReload(true);
   };
 
   return (
@@ -120,17 +164,17 @@ export function SectorConfig({Sector, setLoading, setIsReload}) {
             <Picker.Item label="** SELECCIONA **" value={''} />
             {sectores
               .sort((a, b) => a.Nombre > b.Nombre)
-              .map((rol, index) => (
+              .map((sector, index) => (
                 <Picker.Item
                   key={index}
-                  label={rol.Nombre}
-                  value={rol.Nombre}
+                  label={sector.Nombre}
+                  value={sector.Nombre}
                 />
               ))}
           </Picker>
         </View>
         <Text style={{marginBottom: 10}}>
-          Si das click a guardar sin seleccionar alguna fecha, se guardara la
+          Si das click a guardar sin seleccionar algun sector, se guardara el
           asignado por defecto.
         </Text>
 

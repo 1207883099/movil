@@ -7,6 +7,7 @@ import {dbActEmpl} from '../../db-local/db-actividades-empleado';
 export function CambioActividad({
   ActivChange,
   setIsModalChangeAct,
+  setReloadEmplAsig,
   setIsReload,
 }) {
   const [actividad, setActividad] = useState('');
@@ -37,6 +38,7 @@ export function CambioActividad({
 
     setIsModalChangeAct(false);
     setIsReload(true);
+    setReloadEmplAsig(true);
   };
 
   return (
@@ -60,7 +62,7 @@ export function CambioActividad({
               <Picker.Item
                 key={index}
                 label={actividad.Nombre}
-                value={actividad.Nombre}
+                value={actividad.IdActividad}
               />
             ))}
         </Picker>

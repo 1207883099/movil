@@ -40,20 +40,32 @@ export function EjercicioFiscal({Fiscal, setLoading, setIsReload}) {
   const getEjercicioFiscal = () => {
     setLoading(true);
 
-    obtenerConfiguracion('token-static', 'EjercicioFiscal')
-      .then((fiscal) => {
-        if (fiscal.data.length) {
-          setModal(true);
-          setFiscal(fiscal.data);
-          setSelectFiscal(
-            fiscal.data.find((item) => `${item.Valor2}` === '2020'),
-          );
-          // ${new Date().getFullYear()} actualizar esta linea en production
-        } else {
-          Alert.alert('No hay datos de rol');
-        }
-      })
-      .catch((error) => Alert.alert(error.message));
+    if (isUpdate) {
+      dbConfiguracion.findOne({section: 'Fiscal'}, async function (
+        err,
+        dataConfig,
+      ) {
+        err && Alert.alert(err.message);
+
+        setFiscal(dataConfig.dataAll);
+        setModal(true);
+      });
+    } else {
+      obtenerConfiguracion('token-static', 'EjercicioFiscal')
+        .then((fiscal) => {
+          if (fiscal.data.length) {
+            setModal(true);
+            setFiscal(fiscal.data);
+            setSelectFiscal(
+              fiscal.data.find((item) => `${item.Valor2}` === '2020'),
+            );
+            // ${new Date().getFullYear()} actualizar esta linea en production
+          } else {
+            Alert.alert('No hay datos de rol');
+          }
+        })
+        .catch((error) => Alert.alert(error.message));
+    }
 
     setLoading(false);
   };
@@ -82,6 +94,7 @@ export function EjercicioFiscal({Fiscal, setLoading, setIsReload}) {
         IdDetalleCatalogo: selectFiscal.IdDetalleCatalogo,
         value: selectFiscal.Valor1,
         Nombre: selectFiscal.Valor2,
+        dataAll: fiscal,
       });
     }
     setModal(false);

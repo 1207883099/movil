@@ -177,7 +177,7 @@ function EmpleadosAsignados({
             <AddActividad
               id_parte_diario={id_parte_diario}
               cuadrilla={cuadrilla}
-              navigation={navigation}
+              setReloadEmplAsig={setReloadEmplAsig}
             />
           </View>
         )}
@@ -265,6 +265,7 @@ function EmpleadosAsignados({
         <CambioActividad
           ActivChange={ActivChange}
           setIsModalChangeAct={setIsModalChangeAct}
+          setReloadEmplAsig={setReloadEmplAsig}
           setIsReload={setIsReload}
         />
       </ModalScreen>
