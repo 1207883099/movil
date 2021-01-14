@@ -39,6 +39,10 @@ const ParteDiarioScreen = ({navigation}) => {
     _id: undefined,
     section: undefined,
   });
+  const [fiscal, setFiscal] = useState({
+    valuie: undefined,
+    Nombre: undefined,
+  });
   const [Cuadrillas, setCuadrillas] = useState([]);
   const [DisponiblesParteDiario, setDisponiblesParteDiario] = useState([]);
   const [CPD, setCPD] = useState({
@@ -63,6 +67,7 @@ const ParteDiarioScreen = ({navigation}) => {
           const thisPeriodo = dataConfig.find(
             (item) => item.section === 'Periodo',
           );
+          setFiscal(dataConfig.find((item) => item.section === 'Fiscal'));
           setSector(dataConfig.find((item) => item.section === 'Sector'));
           setPeriodo(thisPeriodo);
 
@@ -150,19 +155,37 @@ const ParteDiarioScreen = ({navigation}) => {
   }, [isReload, IndexDb, dbMaestra]);
 
   const delete_parte_diario = (_id) => {
-    dbParteDiario.remove({_id}, {multi: true}, function (err, numRemoved) {
-      err && Alert.alert(err.message);
+    Alert.alert(
+      'Eliminar parte diario',
+      '¿Estas seguro que quieres eliminar este parte diario?',
+      [
+        {
+          text: 'Cancel',
+          onPress: () => console.log('Cancel delete parte diario'),
+          style: 'cancel',
+        },
+        {
+          text: 'OK',
+          onPress: () => {
+            dbParteDiario.remove({_id}, {multi: true}, function (err) {
+              err && Alert.alert(err.message);
 
-      Alert.alert(
-        `Se elimino el registro con el _id ${_id + ' cantidad:' + numRemoved}.`,
-      );
-      navigation.navigate('SignInScreen');
-    });
+              Alert.alert(
+                `Se elimino parte diario: ${getDia(
+                  new Date(fechaCtx),
+                )} de semana ${periodo.Nombre} del ${fiscal.Nombre}`,
+              );
+              navigation.navigate('SignInScreen');
+            });
+          },
+        },
+      ],
+      {cancelable: false},
+    );
   };
 
   const create_templeate = () => {
     const ParteDiario = {
-      tipo: 'undefined',
       sector: sector.IdSector,
       Nombre: sector.Nombre,
     };
@@ -185,7 +208,11 @@ const ParteDiarioScreen = ({navigation}) => {
       <View style={styles.container}>
         <Text style={styles.titePD}>
           Parte diario:
-          {' ' + getDia(new Date(fechaCtx))}
+          {' ' +
+            getDia(new Date(fechaCtx)) +
+            periodo.Nombre +
+            ' del ' +
+            fiscal.Nombre}
         </Text>
 
         <Animatable.View animation="fadeInUpBig" style={styles.footer}>
@@ -209,12 +236,6 @@ const ParteDiarioScreen = ({navigation}) => {
                         <Text>
                           <Text style={styles.label}>Sector: </Text>
                           {parte_diario.Nombre}
-                        </Text>
-                      </View>
-                      <View style={[styles.box, {width: 80}]}>
-                        <Text>
-                          <Text style={styles.label}>Tipo: </Text>
-                          {parte_diario.tipo}
                         </Text>
                       </View>
                     </View>

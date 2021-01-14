@@ -47,7 +47,7 @@ export function AddActividad({id_parte_diario, cuadrilla, setReloadEmplAsig}) {
       <Text
         style={[styles.label, styles.box_add_actividad]}
         onPress={() => setIsModal(true)}>
-        Añadir otro
+        Agregar empleado
       </Text>
 
       <ModalScreen isModal={isModal} setIsModal={setIsModal}>
@@ -124,8 +124,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   box_add_actividad: {
-    width: 90,
-    height: 29,
+    width: 150,
+    height: 33,
     textAlign: 'center',
     borderWidth: 1,
     borderStyle: 'solid',

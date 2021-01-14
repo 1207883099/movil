@@ -8,8 +8,8 @@ export function SelectDia({setSelectDay, setFechaCtx}) {
 
   useEffect(() => {
     const dataFechas = [];
-    for (let i = 0; i < 7; i++) {
-      const label = suma_resta_fecha(new Date(primerDiaSemana()), +i);
+    for (let i = 1; i <= 7; i++) {
+      const label = suma_resta_fecha(primerDiaSemana(), +i);
       dataFechas.push({label: getDia(label), value: label.toDateString()});
     }
     setFechas(dataFechas);

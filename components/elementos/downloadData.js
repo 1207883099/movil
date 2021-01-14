@@ -18,7 +18,7 @@ export function DownloadData({UserCtx, setIsLoading, setIsReload}) {
       const maestra = await obtenerMaestra(UserCtx.token);
       if (maestra.data.My_Cuadrilla !== undefined) {
         InsertarMaestra([maestra.data]);
-        Alert.alert('Se Obtuvo datos Maestra :)');
+        Alert.alert('Datos maestros estan actualizados');
 
         const cargos = await obtenerCargos(UserCtx.token);
         cargos.data.length && InsertarCargos(cargos.data);
@@ -29,7 +29,7 @@ export function DownloadData({UserCtx, setIsLoading, setIsReload}) {
         setIsLoading(false);
         setIsReload(true);
       } else {
-        Alert.alert('Datos vacios de la maestra :(');
+        Alert.alert('No hay datos para bajar en maestra');
       }
     } catch (error) {
       Alert.alert(error.message);

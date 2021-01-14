@@ -13,7 +13,6 @@ import {dbEntryHistory} from '../db-local/db-history-entry';
 import {dbConfiguracion} from '../db-local/db-configuracion';
 /* COMPONENTS */
 import LinearGradient from 'react-native-linear-gradient';
-import {MisDatos} from '../components/elementos/mis-datos';
 import {FechaTrabajo} from '../components/elementos/semana-del-ano';
 import {FechaContext} from '../components/context/fecha';
 import {LoaderSpinner} from '../components/loader/spiner-loader';
@@ -72,7 +71,6 @@ const SignInScreen = ({navigation}) => {
     <>
       <View style={styles.container}>
         <ScrollView>
-          <MisDatos UserCtx={UserCtx} />
           <FechaTrabajo
             fechaCtx={fechaCtx}
             setFechaCtx={setFechaCtx}
@@ -158,7 +156,7 @@ const SignInScreen = ({navigation}) => {
                     {borderColor: '#009387', borderWidth: 1, marginTop: 15},
                   ]}>
                   <Text style={[styles.textSign, {color: '#009387'}]}>
-                    Volver ah iniciar session
+                    Iniciar sesion
                   </Text>
                 </TouchableOpacity>
               )

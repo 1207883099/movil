@@ -38,7 +38,9 @@ const SplashScreen = ({navigation, route}) => {
 
   useEffect(() => {
     !netInfo.isConnected &&
-      Alert.alert('Necesitas conneccion a internet para bajar o subir datos.');
+      Alert.alert(
+        'Se necesita coneccion a la red emplesarial para bajar o subir los datos.',
+      );
 
     if (route.params === undefined) {
       dbMaestra.find({}, async function (err, dataMaestra) {
@@ -112,7 +114,7 @@ const SplashScreen = ({navigation, route}) => {
               color: colors.text,
             },
           ]}>
-          Cooperativa de produccion y comercializacion "La clementina"
+          Industria Bananera
         </Text>
         <Text style={styles.text}>Procede a iniciar session</Text>
         <View style={styles.button}>

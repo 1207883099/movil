@@ -148,30 +148,6 @@ function EmpleadosAsignados({
       )}
 
       <View style={styles.header}>
-        <Text
-          style={[
-            styles.label,
-            styles.box_actividad,
-            {borderColor: '#b08b05', color: '#b08b05'},
-          ]}>
-          Actividades
-        </Text>
-        <Text
-          style={[
-            styles.label,
-            styles.box_actividad,
-            {borderColor: 'royalblue', color: 'royalblue'},
-          ]}>
-          Hectareas / $
-        </Text>
-        <Text
-          style={[
-            styles.label,
-            styles.box_actividad,
-            {borderColor: '#009387', color: '#009387'},
-          ]}>
-          Calificar
-        </Text>
         {ActivEmple.length !== 0 && (
           <View>
             <AddActividad
@@ -184,7 +160,7 @@ function EmpleadosAsignados({
       </View>
       <View style={{padding: 10}} key={0}>
         <Text style={{textAlign: 'center', fontWeight: 'bold', padding: 10}}>
-          Empleados Asignados {cuadrilla && ': ' + cuadrilla}
+          {cuadrilla && cuadrilla}
         </Text>
         {ActivEmple.length === 0
           ? Empleados.map((obrero, index) => (

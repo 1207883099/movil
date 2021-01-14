@@ -70,5 +70,6 @@ export function suma_resta_fecha(fecha, dias) {
 export function primerDiaSemana() {
   const curr = new Date();
   const first = curr.getDate() - curr.getDay();
-  return new Date(curr.setDate(first)).toUTCString();
+  return new Date(curr.setDate(first));
+  // toUTCString()
 }
