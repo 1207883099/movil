@@ -16,6 +16,7 @@ import {Haciendas} from '../components/configuracion/hacienda';
 import {EjercicioFiscal} from '../components/configuracion/fiscal';
 import {SectorConfig} from '../components/configuracion/sector';
 import {PeriodoConfig} from '../components/configuracion/periodo';
+import {Divicion} from '../components/configuracion/divicion';
 /* BD LOCAL */
 import {dbConfiguracion} from '../db-local/db-configuracion';
 /* API */
@@ -106,18 +107,11 @@ const Configuracion = ({navigation}) => {
                 setIsReload={setIsReload}
               />
 
-              <TouchableOpacity
-                style={styles.item}
-                onPress={() => console.log('efe')}>
-                <LinearGradient
-                  colors={['#0993B5', '#C7C7C7']}
-                  style={styles.signIn}>
-                  <Text style={[styles.text, {color: '#fff'}]}>
-                    Division: (
-                    {confiAll.divicion ? confiAll.divicion : 'Ninguno'})
-                  </Text>
-                </LinearGradient>
-              </TouchableOpacity>
+              <Divicion
+                divicion={confiAll.divicion}
+                setLoading={setLoading}
+                setIsReload={setIsReload}
+              />
 
               <TouchableOpacity
                 style={styles.item}

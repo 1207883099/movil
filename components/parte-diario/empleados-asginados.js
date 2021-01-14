@@ -178,53 +178,59 @@ function EmpleadosAsignados({
                 </Text>
               </View>
             ))
-          : ActivEmple.map((activEmple, index) => (
-              <View style={styles.row_empleado_asig} key={index}>
-                <Text>
-                  {
-                    <>
-                      <Text style={{fontSize: 12}}>
-                        {obtener_empleado(activEmple.idEmpleado)}
-                      </Text>
-                      <Text
-                        style={[styles.label_actividad, {color: '#b08b05'}]}>
-                        &nbsp; / &nbsp;{' '}
-                        <Text
-                          onPress={() => {
-                            setActivChange({
-                              actividad: activEmple.actividad,
-                              idActividadEmple: activEmple._id,
-                            });
-                            setIsModalChangeAct(true);
-                          }}>
-                          {obtenerActividad(activEmple.actividad, 'Nombre')}
+          : ActivEmple.sort((a, b) => a.idEmpleado > b.idEmpleado).map(
+              (activEmple, index) => (
+                <View style={styles.row_empleado_asig} key={index}>
+                  <Text>
+                    {
+                      <>
+                        <Text style={{fontSize: 12}}>
+                          {obtener_empleado(activEmple.idEmpleado)}
                         </Text>
-                      </Text>
-                      <Text
-                        style={[styles.label_actividad, {color: 'royalblue'}]}>
-                        &nbsp; / {activEmple.hectaria ? activEmple.hectaria : 0}
-                        {' / '} ${' '}
-                        {activEmple.valorTotal ? activEmple.valorTotal : 0}
-                      </Text>
-                    </>
-                  }
-                </Text>
-                {actions && (
-                  <Text
-                    style={styles.btn_actividad}
-                    onPress={() => {
-                      setIsModal(true);
-                      SetselectActiEmple(activEmple._id);
-                    }}>
-                    <MaterialIcons
-                      name="navigate-next"
-                      color="#009387"
-                      size={20}
-                    />
+                        <Text
+                          style={[styles.label_actividad, {color: '#b08b05'}]}>
+                          &nbsp; / &nbsp;{' '}
+                          <Text
+                            onPress={() => {
+                              setActivChange({
+                                actividad: activEmple.actividad,
+                                idActividadEmple: activEmple._id,
+                              });
+                              setIsModalChangeAct(true);
+                            }}>
+                            {obtenerActividad(activEmple.actividad, 'Nombre')}
+                          </Text>
+                        </Text>
+                        <Text
+                          style={[
+                            styles.label_actividad,
+                            {color: 'royalblue'},
+                          ]}>
+                          &nbsp; /{' '}
+                          {activEmple.hectaria ? activEmple.hectaria : 0}
+                          {' / '} ${' '}
+                          {activEmple.valorTotal ? activEmple.valorTotal : 0}
+                        </Text>
+                      </>
+                    }
                   </Text>
-                )}
-              </View>
-            ))}
+                  {actions && (
+                    <Text
+                      style={styles.btn_actividad}
+                      onPress={() => {
+                        setIsModal(true);
+                        SetselectActiEmple(activEmple._id);
+                      }}>
+                      <MaterialIcons
+                        name="navigate-next"
+                        color="#009387"
+                        size={20}
+                      />
+                    </Text>
+                  )}
+                </View>
+              ),
+            )}
       </View>
 
       <ModalScreen isModal={isModal} setIsModal={setIsModal}>
