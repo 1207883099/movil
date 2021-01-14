@@ -178,7 +178,7 @@ function EmpleadosAsignados({
                 </Text>
               </View>
             ))
-          : ActivEmple.sort((a, b) => a.idEmpleado > b.idEmpleado).map(
+          : ActivEmple.sort((a, b) => a.actividad > b.actividad).map(
               (activEmple, index) => (
                 <View style={styles.row_empleado_asig} key={index}>
                   <Text>

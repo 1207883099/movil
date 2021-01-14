@@ -50,7 +50,7 @@ const SplashScreen = ({navigation, route}) => {
 
       dbConfiguracion.find({}, async function (err, dataConfig) {
         err && Alert.alert(err.message);
-        setCompleteConfig(dataConfig.length >= 5 ? true : false);
+        setCompleteConfig(dataConfig.length >= 6 ? true : false);
       });
     }
   }, [netInfo, route, navigation]);

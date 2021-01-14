@@ -20,6 +20,7 @@ import {DeleteData} from '../components/elementos/DeleteData';
 import {UploadData} from '../components/elementos/uploadData';
 import {DownloadData} from '../components/elementos/downloadData';
 import {MyUserContext} from '../components/context/MyUser';
+import {LoginBtn} from '../components/elementos/login-btn';
 /* HOOKS */
 import {get_Semana_Del_Ano} from '../hooks/fechas';
 
@@ -53,9 +54,11 @@ const SignInScreen = ({navigation}) => {
 
       dbConfiguracion.find({}, async function (err, dataConfig) {
         err && Alert.alert(err.message);
-        if (dataConfig.length) {
+        if (dataConfig.length >= 6) {
           setFiscal(dataConfig.find((item) => item.section === 'Fiscal'));
           setPeriodo(dataConfig.find((item) => item.section === 'Periodo'));
+        } else {
+          navigation.navigate('Configuracion');
         }
       });
 
@@ -65,7 +68,7 @@ const SignInScreen = ({navigation}) => {
     } catch (error) {
       Alert.alert(error.message);
     }
-  }, [isReload]);
+  }, [isReload, navigation]);
 
   return (
     <>
@@ -146,20 +149,7 @@ const SignInScreen = ({navigation}) => {
                 {isLoading && <LoaderSpinner />}
               </>
             ) : (
-              dataLocal.length > 0 && (
-                <TouchableOpacity
-                  onPress={() =>
-                    navigation.navigate('SplashScreen', {login: true})
-                  }
-                  style={[
-                    styles.signIn,
-                    {borderColor: '#009387', borderWidth: 1, marginTop: 15},
-                  ]}>
-                  <Text style={[styles.textSign, {color: '#009387'}]}>
-                    Iniciar sesion
-                  </Text>
-                </TouchableOpacity>
-              )
+              dataLocal.length > 0 && <LoginBtn navigation={navigation} />
             )}
 
             <TouchableOpacity

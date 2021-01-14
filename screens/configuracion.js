@@ -17,13 +17,16 @@ import {EjercicioFiscal} from '../components/configuracion/fiscal';
 import {SectorConfig} from '../components/configuracion/sector';
 import {PeriodoConfig} from '../components/configuracion/periodo';
 import {Divicion} from '../components/configuracion/divicion';
+import {LoginBtn} from '../components/elementos/login-btn';
 /* BD LOCAL */
 import {dbConfiguracion} from '../db-local/db-configuracion';
+import {dbMaestra} from '../db-local/db-maestra';
 /* API */
 
 const Configuracion = ({navigation}) => {
   const [loading, setLoading] = useState(false);
   const [isReload, setIsReload] = useState(false);
+  const [isMaestra, setIsMaestra] = useState(false);
   const [confiAll, setConfiAll] = useState({
     rol: undefined,
     hacienda: undefined,
@@ -63,10 +66,22 @@ const Configuracion = ({navigation}) => {
       setConfiAll(dataFind);
     });
 
+    dbMaestra.find({}, async function (err, dataMaestra) {
+      err && Alert.alert(err.message);
+      setIsMaestra(dataMaestra.length ? true : false);
+    });
+
     if (isReload) {
       setIsReload(false);
     }
   }, [isReload]);
+
+  const renderBtnLogin = () => {
+    const {rol, hacienda, fiscal, sector, periodo} = confiAll;
+    if ((!rol || !hacienda || !fiscal || !sector || !periodo) && isMaestra) {
+      return <LoginBtn navigation={navigation} />;
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -112,6 +127,8 @@ const Configuracion = ({navigation}) => {
                 setLoading={setLoading}
                 setIsReload={setIsReload}
               />
+
+              {renderBtnLogin()}
 
               <TouchableOpacity
                 style={styles.item}
