@@ -43,9 +43,9 @@ export function CalificarActividad({
     ) {
       err && Alert.alert(err.message);
       setActvEmpld(dataActEmpl);
+      setIsLote(dataActEmpl.isLote);
       setSelectLote(dataActEmpl.lote && dataActEmpl.lote);
       setHectarea(dataActEmpl.hectaria ? Number(dataActEmpl.hectaria) : 0);
-      setIsLote(dataActEmpl.isLote);
 
       dbTarifas.findOne({IdActividad: dataActEmpl.actividad}, async function (
         err,

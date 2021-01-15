@@ -5,8 +5,8 @@ import React, {useState, useEffect, useContext} from 'react';
 import {Alert, StyleSheet, Text, Button, ScrollView, View} from 'react-native';
 /* DB LOCAL */
 import {dbMaestra} from '../db-local/db-maestra';
-import {dbParteDiario} from '../db-local/db-parte-diario';
-import {InsertarParteDiario} from '../db-local/db-parte-diario';
+import {InsertarParteDiario, dbParteDiario} from '../db-local/db-parte-diario';
+import {dbActEmpl} from '../db-local/db-actividades-empleado';
 import {dbCuadrillaPD} from '../db-local/db-cuadrilla-parte-diario';
 import {dbConfiguracion} from '../db-local/db-configuracion';
 /* COMPONENTS */
@@ -175,7 +175,13 @@ const ParteDiarioScreen = ({navigation}) => {
                   new Date(fechaCtx),
                 )} de semana ${periodo.Nombre} del ${fiscal.Nombre}`,
               );
-              navigation.navigate('SignInScreen');
+
+              dbActEmpl.remove({idParteDiario: _id}, {multi: true}, function (
+                err,
+              ) {
+                err && Alert.alert(err.message);
+                navigation.navigate('SignInScreen');
+              });
             });
           },
         },
@@ -252,7 +258,6 @@ const ParteDiarioScreen = ({navigation}) => {
                         actions={true}
                         idSector={parte_diario.sector}
                         setIsReload={setIsReload}
-                        navigation={navigation}
                       />
                     ) : (
                       CPD.cuadrilla === undefined && (

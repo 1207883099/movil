@@ -24,7 +24,6 @@ function EmpleadosAsignados({
   cuadrilla,
   setIsReload,
   idSector,
-  navigation,
 }) {
   const [Cargos, setCargos] = useState([]);
   const [Tarifas, setTarifas] = useState([]);
@@ -192,11 +191,17 @@ function EmpleadosAsignados({
                           &nbsp; / &nbsp;{' '}
                           <Text
                             onPress={() => {
-                              setActivChange({
-                                actividad: activEmple.actividad,
-                                idActividadEmple: activEmple._id,
-                              });
-                              setIsModalChangeAct(true);
+                              if (activEmple.hectaria === undefined) {
+                                setActivChange({
+                                  actividad: activEmple.actividad,
+                                  idActividadEmple: activEmple._id,
+                                });
+                                setIsModalChangeAct(true);
+                              } else {
+                                Alert.alert(
+                                  'Asegurese de cambiar la actividad antes de calificarlo.',
+                                );
+                              }
                             }}>
                             {obtenerActividad(activEmple.actividad, 'Nombre')}
                           </Text>

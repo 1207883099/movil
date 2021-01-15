@@ -5,12 +5,14 @@ import {Picker} from '@react-native-picker/picker';
 /* DB LOCAL */
 import {InsertarActividadEmpleado} from '../../db-local/db-actividades-empleado';
 import {dbMaestra} from '../../db-local/db-maestra';
+import {dbTarifas} from '../../db-local/db-tarifas';
 
 export function AddActividad({id_parte_diario, cuadrilla, setReloadEmplAsig}) {
   const [isModal, setIsModal] = useState(false);
   const [empleado, setEmpleado] = useState();
   const [actividad, setActividad] = useState();
   ///////////////////
+  const [Tarifas, setTarifas] = useState([]);
   const [empleados, setEmpleados] = useState([]);
   const [actividades, setActividades] = useState([]);
 
@@ -24,15 +26,31 @@ export function AddActividad({id_parte_diario, cuadrilla, setReloadEmplAsig}) {
           .Empleados,
       );
     });
+
+    dbTarifas.find({}, async function (err, dataTarifas) {
+      err && Alert.alert(err.message);
+      setTarifas(dataTarifas);
+    });
   }, [cuadrilla]);
+
+  const obtenerTarifa = (IdActividad) => {
+    if (Tarifas.length) {
+      const Tarifa = Tarifas.find(
+        (tarifa) => tarifa.IdActividad === IdActividad,
+      );
+      return Tarifa;
+    }
+  };
 
   const anadirActividad = () => {
     if (empleado && actividad) {
       console.group(empleado, actividad);
+      const Tarifa = obtenerTarifa(actividad);
       InsertarActividadEmpleado({
         idEmpleado: empleado,
         idParteDiario: id_parte_diario,
         actividad: actividad,
+        isLote: Tarifa.ValidaHectareas,
       });
 
       setIsModal(false);

@@ -2,6 +2,7 @@ import React, {useState, useEffect} from 'react';
 import {Text, View, Alert, StyleSheet, Button} from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 import {dbMaestra} from '../../db-local/db-maestra';
+import {dbTarifas} from '../../db-local/db-tarifas';
 import {dbActEmpl} from '../../db-local/db-actividades-empleado';
 
 export function CambioActividad({
@@ -12,12 +13,18 @@ export function CambioActividad({
 }) {
   const [actividad, setActividad] = useState('');
   const [actividades, setActividades] = useState([]);
+  const [Tarifas, setTarifas] = useState([]);
 
   useEffect(() => {
     dbMaestra.find({}, async function (err, dataMaestra) {
       err && Alert.alert(err.message);
 
       setActividades(dataMaestra[0].Actividades);
+    });
+
+    dbTarifas.find({}, async function (err, dataTarifas) {
+      err && Alert.alert(err.message);
+      setTarifas(dataTarifas);
     });
   }, []);
 
@@ -30,10 +37,21 @@ export function CambioActividad({
     }
   };
 
+  const obtenerTarifa = (IdActividad) => {
+    if (Tarifas.length) {
+      const Tarifa = Tarifas.find(
+        (tarifa) => tarifa.IdActividad === IdActividad,
+      );
+      return Tarifa;
+    }
+  };
+
   const cambioActividad = () => {
+    const Tarifa = obtenerTarifa(actividad);
+
     dbActEmpl.update(
       {_id: ActivChange.idActividadEmple},
-      {$set: {actividad: actividad}},
+      {$set: {actividad: actividad, isLote: Tarifa.ValidaHectareas}},
     );
 
     setIsModalChangeAct(false);
