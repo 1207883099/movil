@@ -21,6 +21,7 @@ import {LoaderSpinner} from '../components/loader/spiner-loader';
 import {MyUserContext} from '../components/context/MyUser';
 /* DB LOCAL */
 import {dbMaestra} from '../db-local/db-maestra';
+import {dbMe} from '../db-local/db-me';
 import {InsertarEntry} from '../db-local/db-history-entry';
 import {dbConfiguracion} from '../db-local/db-configuracion';
 /* FETCH API */
@@ -68,6 +69,7 @@ const SplashScreen = ({navigation, route}) => {
               } else {
                 InsertarEntry({semana: get_Semana_Del_Ano()});
                 setUserCtx(auth.data.MyUser);
+                dbMe.update({}, {$set: {MyData: auth.data.MyUser}});
                 completeConfig
                   ? navigation.navigate('SignInScreen')
                   : navigation.navigate('Configuracion');

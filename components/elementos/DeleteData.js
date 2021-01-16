@@ -9,6 +9,7 @@ import {dbActEmpl} from '../../db-local/db-actividades-empleado';
 import {dbParteDiario} from '../../db-local/db-parte-diario';
 import {dbCargos} from '../../db-local/db-cargos';
 import {dbConfiguracion} from '../../db-local/db-configuracion';
+import {dbMe} from '../../db-local/db-me';
 
 export function DeleteData({navigation, setIsReload}) {
   const eliminar_datos = () => {
@@ -49,6 +50,10 @@ export function DeleteData({navigation, setIsReload}) {
             });
 
             dbEntryHistory.remove({}, {multi: true}, function (err) {
+              err && Alert.alert(err.message);
+            });
+
+            dbMe.remove({}, {multi: true}, function (err) {
               err && Alert.alert(err.message);
             });
 

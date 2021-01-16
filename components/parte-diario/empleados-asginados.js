@@ -6,6 +6,7 @@ import {
   InsertarActividadEmpleado,
   dbActEmpl,
 } from '../../db-local/db-actividades-empleado';
+import {dbMe} from '../../db-local/db-me';
 import {dbTarifas} from '../../db-local/db-tarifas';
 import {dbMaestra} from '../../db-local/db-maestra';
 import {dbParteDiario} from '../../db-local/db-parte-diario';
@@ -34,6 +35,10 @@ function EmpleadosAsignados({
     actividad: undefined,
     idActividadEmple: undefined,
   });
+  const [me, setMe] = useState({
+    Nombre: undefined,
+    Apellido: undefined,
+  });
   const [isModalChangeAct, setIsModalChangeAct] = useState(false);
   const [ReloadEmplAsig, setReloadEmplAsig] = useState(false);
   const [selectIdActiEmple, SetselectActiEmple] = useState('');
@@ -57,6 +62,11 @@ function EmpleadosAsignados({
       setActividades(dataMaestra[0].Actividades);
     });
 
+    dbMe.findOne({}, async function (err, dataMe) {
+      err && Alert.alert(err.message);
+      setMe(dataMe);
+    });
+
     dbTarifas.find({}, async function (err, dataTarifas) {
       err && Alert.alert(err.message);
       setTarifas(dataTarifas);
@@ -70,7 +80,11 @@ function EmpleadosAsignados({
   const obtenerCargo = (codigoCargo, propiedad) => {
     if (Cargos.length) {
       const Cargo = Cargos.find((cargo) => cargo.Codigo === codigoCargo);
-      return obtenerActividad(Cargo.ActividadId, propiedad);
+      if (Cargo) {
+        return obtenerActividad(Cargo.ActividadId, propiedad);
+      } else {
+        return 'Cargando...';
+      }
     }
   };
 
@@ -138,6 +152,16 @@ function EmpleadosAsignados({
 
   return (
     <>
+      <Text style={{marginTop: 8}}>
+        <Text style={{fontWeight: 'bold', fontSize: 16}}>Jefe:</Text>
+        {me.Nombre && me.Nombre + ' ' + me.Apellido}
+      </Text>
+
+      <Text style={{marginTop: 8}}>
+        <Text style={{fontWeight: 'bold', fontSize: 16}}>Cuadrilla:</Text>{' '}
+        {cuadrilla && cuadrilla}
+      </Text>
+
       {!actions && (
         <Button
           title="Finalizar plantilla"
@@ -158,9 +182,6 @@ function EmpleadosAsignados({
         )}
       </View>
       <View style={{padding: 10}} key={0}>
-        <Text style={{textAlign: 'center', fontWeight: 'bold', padding: 10}}>
-          {cuadrilla && cuadrilla}
-        </Text>
         {ActivEmple.length === 0
           ? Empleados.map((obrero, index) => (
               <View style={styles.row_empleado_asig} key={index}>

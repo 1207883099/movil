@@ -157,7 +157,9 @@ const ParteDiarioScreen = ({navigation}) => {
   const delete_parte_diario = (_id) => {
     Alert.alert(
       'Eliminar parte diario',
-      '¿Estas seguro que quieres eliminar este parte diario?',
+      `Esta seguro en eliminar parte diario: ${getDia(
+        new Date(fechaCtx),
+      )} de semana ${periodo.Nombre} del ${fiscal.Nombre}`,
       [
         {
           text: 'Cancel',
@@ -216,6 +218,7 @@ const ParteDiarioScreen = ({navigation}) => {
           Parte diario:
           {' ' +
             getDia(new Date(fechaCtx)) +
+            ', Sem ' +
             periodo.Nombre +
             ' del ' +
             fiscal.Nombre}
@@ -237,14 +240,11 @@ const ParteDiarioScreen = ({navigation}) => {
                       onPress={() => delete_parte_diario(MisPartesDiarios._id)}>
                       Eliminar parte diario
                     </Text>
-                    <View style={styles.header}>
-                      <View style={[styles.box, {width: '75%'}]}>
-                        <Text>
-                          <Text style={styles.label}>Sector: </Text>
-                          {parte_diario.Nombre}
-                        </Text>
-                      </View>
-                    </View>
+
+                    <Text>
+                      <Text style={styles.label}>Sector: </Text>
+                      {parte_diario.Nombre}
+                    </Text>
 
                     {CPD.cuadrilla ? (
                       <EmpleadosAsignados
