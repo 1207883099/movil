@@ -136,7 +136,7 @@ const SignInScreen = ({navigation}) => {
               </>
             )}
 
-            {dataLocal.length > 0 && UserCtx.movil_ip !== undefined ? (
+            {dataLocal.length > 0 && UserCtx.movil_ip === undefined ? (
               <>
                 {isLoading ? (
                   <LoaderSpinner />

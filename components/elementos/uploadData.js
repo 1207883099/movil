@@ -5,6 +5,7 @@ import {SubirParteTrabajo} from '../../api/parteTrabajo';
 /* DB LOCAL */
 import {dbParteDiario} from '../../db-local/db-parte-diario';
 import {dbConfiguracion} from '../../db-local/db-configuracion';
+import {dbActEmpl} from '../../db-local/db-actividades-empleado';
 import {dbMe} from '../../db-local/db-me';
 
 export function UploadData({setIsLoading, fechaCtx, semana, year}) {
@@ -54,6 +55,13 @@ export function UploadData({setIsLoading, fechaCtx, semana, year}) {
     });
   }, []);
 
+  const obtener_actividad_empleado = (idParteDiario) => {
+    dbActEmpl.find({idParteDiario}, async function (err, dataActividad) {
+      err && Alert.alert(err.message);
+      console.log(dataActividad);
+    });
+  };
+
   const subir_datos = async () => {
     setIsLoading(true);
     try {
@@ -66,7 +74,10 @@ export function UploadData({setIsLoading, fechaCtx, semana, year}) {
           let Upload = [];
           for (let i = 0; i < dataPD.length; i++) {
             const parteTrabajo = SchemaParteTrabajo(dataPD[i]);
-            Upload.push(parteTrabajo);
+            const activiEmpleado = obtener_actividad_empleado(dataPD[i]._id);
+            console.log(activiEmpleado);
+            break;
+            //Upload.push(parteTrabajo);
           }
 
           const isUpload = await SubirParteTrabajo(Upload);
