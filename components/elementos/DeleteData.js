@@ -3,6 +3,7 @@ import {Alert, TouchableOpacity, Text, StyleSheet} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 /* DATABASE LOCAL */
 import {dbEntryHistory} from '../../db-local/db-history-entry';
+import {dbConfiguracion} from '../../db-local/db-configuracion';
 import {dbCuadrillaPD} from '../../db-local/db-cuadrilla-parte-diario';
 import {dbActEmpl} from '../../db-local/db-actividades-empleado';
 import {dbParteDiario} from '../../db-local/db-parte-diario';
@@ -22,35 +23,61 @@ export function DeleteData({navigation, setIsReload}) {
         {
           text: 'OK',
           onPress: () => {
-            dbParteDiario.remove({}, {multi: true}, function (err) {
-              err && Alert.alert(err.message);
-            });
-
-            dbActEmpl.remove({}, {multi: true}, function (err) {
-              err && Alert.alert(err.message);
-            });
-
-            dbCuadrillaPD.remove({}, {multi: true}, function (err) {
-              err && Alert.alert(err.message);
-            });
-
-            dbEntryHistory.remove({}, {multi: true}, function (err) {
-              err && Alert.alert(err.message);
-            });
-
-            dbMe.remove({}, {multi: true}, function (err) {
-              err && Alert.alert(err.message);
-            });
-
-            Alert.alert('Se limpiaron todo los datos de la aplicacion.');
-            setIsReload(true);
-
-            navigation.navigate('SplashScreen');
+            Alert.alert(
+              'Antes de eliminar...',
+              '¿Quieres eliminar los datos de configuracion?',
+              [
+                {
+                  text: 'No',
+                  onPress: () => eliminar_part_dia_and_recurrente(),
+                  style: 'cancel',
+                },
+                {
+                  text: 'Si',
+                  onPress: () => {
+                    dbConfiguracion.remove({}, {multi: true}, function (err) {
+                      err && Alert.alert(err.message);
+                    });
+                    eliminar_part_dia_and_recurrente();
+                  },
+                },
+              ],
+              {cancelable: false},
+            );
           },
         },
       ],
       {cancelable: false},
     );
+  };
+
+  const eliminar_part_dia_and_recurrente = () => {
+    dbParteDiario.remove({}, {multi: true}, function (err) {
+      err && Alert.alert(err.message);
+    });
+
+    dbActEmpl.remove({}, {multi: true}, function (err) {
+      err && Alert.alert(err.message);
+    });
+
+    dbCuadrillaPD.remove({}, {multi: true}, function (err) {
+      err && Alert.alert(err.message);
+    });
+
+    dbEntryHistory.remove({}, {multi: true}, function (err) {
+      err && Alert.alert(err.message);
+    });
+
+    dbMe.remove({}, {multi: true}, function (err) {
+      err && Alert.alert(err.message);
+    });
+
+    Alert.alert(
+      'Se limpiaron todo los datos de Parte Diarios y datos recurrentes.',
+    );
+    setIsReload(true);
+
+    navigation.navigate('SplashScreen');
   };
 
   return (

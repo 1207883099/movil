@@ -122,7 +122,6 @@ export function SectorConfig({Sector, setLoading, setIsReload}) {
         InsertarConfiguracion({
           section: 'Sector',
           IdSector: selectSector.IdSector,
-          value: selectSector.IdSector,
           Nombre: selectSector.Nombre + ' - ' + selectSector.Nombre_Hacienda,
           dataAll: sectoresAll,
         });

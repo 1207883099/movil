@@ -28,6 +28,7 @@ const SignInScreen = ({navigation}) => {
   const [dataLocal, setDataLocal] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isReload, setIsReload] = useState(false);
+  const [isConfig, setIsConfig] = useState(false);
   const [fiscal, setFiscal] = useState({
     valuie: undefined,
     Nombre: undefined,
@@ -45,7 +46,8 @@ const SignInScreen = ({navigation}) => {
 
       dbConfiguracion.find({}, async function (err, dataConfig) {
         err && Alert.alert(err.message);
-        if (dataConfig.length >= 6) {
+        setIsConfig(dataConfig.length === 6 ? false : true);
+        if (dataConfig.length === 6) {
           setFiscal(dataConfig.find((item) => item.section === 'Fiscal'));
           setPeriodo(dataConfig.find((item) => item.section === 'Periodo'));
         } else {
@@ -92,7 +94,11 @@ const SignInScreen = ({navigation}) => {
 
                 <TouchableOpacity
                   style={styles.delete}
-                  onPress={() => navigation.navigate('ParteDiario')}>
+                  onPress={() =>
+                    isConfig
+                      ? navigation.navigate('Configuracion')
+                      : navigation.navigate('ParteDiario')
+                  }>
                   <LinearGradient
                     colors={['#69ABC9', '#69D6C9']}
                     style={styles.signIn}>
