@@ -193,6 +193,7 @@ const ParteDiarioScreen = ({navigation}) => {
       const ParteDiario = {
         sector: sector.IdSector,
         Nombre: sector.Nombre,
+        nube: false,
       };
 
       const Mis_Parte_Diario = [];
@@ -235,6 +236,11 @@ const ParteDiarioScreen = ({navigation}) => {
                       style={styles.eliminar_parte_diario}
                       onPress={() => delete_parte_diario(MisPartesDiarios._id)}>
                       Eliminar parte diario
+                    </Text>
+
+                    <Text>
+                      <Text style={styles.label}>En la nube: </Text>
+                      {parte_diario.nube ? 'Si' : 'No'}
                     </Text>
 
                     <Text>

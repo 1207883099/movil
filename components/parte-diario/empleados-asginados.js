@@ -11,7 +11,10 @@ import {dbMe} from '../../db-local/db-me';
 import {dbTarifas} from '../../db-local/db-tarifas';
 import {dbMaestra} from '../../db-local/db-maestra';
 import {dbParteDiario} from '../../db-local/db-parte-diario';
-import {InsertarCuadrillaPD} from '../../db-local/db-cuadrilla-parte-diario';
+import {
+  dbCuadrillaPD,
+  InsertarCuadrillaPD,
+} from '../../db-local/db-cuadrilla-parte-diario';
 /* COMPONENTS */
 import {ModalScreen} from '../modal/modal';
 import {CalificarActividad} from './calificar-actividad';
@@ -131,42 +134,51 @@ function EmpleadosAsignados({
   };
 
   const finish_template = () => {
-    InsertarCuadrillaPD({
-      idParteDiario: id_parte_diario,
-      cuadrilla,
+    dbCuadrillaPD.find({cuadrilla}, async function (err, dataCuadrillaPD) {
+      err && Alert.alert(err.message);
+      if (dataCuadrillaPD.length === 0) {
+        InsertarCuadrillaPD({
+          idParteDiario: id_parte_diario,
+          cuadrilla,
+        });
+
+        dbParteDiario.update(
+          {_id: id_parte_diario, cuadrilla: 'undefined'},
+          {$set: {cuadrilla: cuadrilla}},
+        );
+
+        Empleados.map((empleado) => {
+          const ActividadId = obtenerCargo(empleado.Cargo, 'ActividadId');
+          const Tarifa = obtenerTarifa(ActividadId);
+
+          InsertarActividadEmpleado({
+            idEmpleado: empleado.IdEmpleado,
+            CodigoEmpleado: empleado.Codigo,
+            idParteDiario: id_parte_diario,
+            actividad: ActividadId,
+            isLote: Tarifa.ValidaHectareas,
+            ValorTarifa: Tarifa.ValorTarifa,
+            valorTotal: 0,
+            hectaria: 0,
+          });
+        });
+        setIsReload(true);
+      } else {
+        Alert.alert(
+          'Anteriormente ya se ha creado un parte diario con esta cuadrilla',
+        );
+      }
     });
-
-    dbParteDiario.update(
-      {_id: id_parte_diario, cuadrilla: 'undefined'},
-      {$set: {cuadrilla: cuadrilla}},
-    );
-
-    Empleados.map((empleado) => {
-      const ActividadId = obtenerCargo(empleado.Cargo, 'ActividadId');
-      const Tarifa = obtenerTarifa(ActividadId);
-
-      InsertarActividadEmpleado({
-        idEmpleado: empleado.IdEmpleado,
-        CodigoEmpleado: empleado.Codigo,
-        idParteDiario: id_parte_diario,
-        actividad: ActividadId,
-        isLote: Tarifa.ValidaHectareas,
-        ValorTarifa: Tarifa.ValorTarifa,
-        valorTotal: 0,
-        hectaria: 0,
-      });
-    });
-    setIsReload(true);
   };
 
   return (
     <>
-      <Text style={{marginTop: 8}}>
+      <Text style={{marginTop: 1}}>
         <Text style={{fontWeight: 'bold', fontSize: 16}}>Jefe:</Text>
         {me.Nombre && me.Nombre + ' ' + me.Apellido}
       </Text>
 
-      <Text style={{marginTop: 8}}>
+      <Text style={{marginTop: 1}}>
         <Text style={{fontWeight: 'bold', fontSize: 16}}>Cuadrilla:</Text>{' '}
         {cuadrilla && cuadrilla}
       </Text>
