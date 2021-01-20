@@ -17,7 +17,7 @@ import {GenerarTareaEmpleado} from '../components/parte-diario/generar-tarea-emp
 import * as Animatable from 'react-native-animatable';
 import {FechaContext} from '../components/context/fecha';
 /* HOOKS */
-import {getDia} from '../hooks/fechas';
+import {fecha_actual} from '../hooks/fechas';
 
 const ParteDiarioScreen = ({navigation}) => {
   const {fechaCtx} = useContext(FechaContext);
@@ -72,7 +72,7 @@ const ParteDiarioScreen = ({navigation}) => {
           setPeriodo(thisPeriodo);
 
           dbParteDiario.find(
-            {fecha: fechaCtx, semana: thisPeriodo.Nombre},
+            {dia: fechaCtx, semana: thisPeriodo.Nombre},
             async function (err, docs) {
               err && Alert.alert(err.message);
 
@@ -157,9 +157,7 @@ const ParteDiarioScreen = ({navigation}) => {
   const delete_parte_diario = (_id) => {
     Alert.alert(
       'Eliminar parte diario',
-      `Esta seguro en eliminar parte diario: ${getDia(
-        new Date(fechaCtx),
-      )} de semana ${periodo.Nombre} del ${fiscal.Nombre}`,
+      `Esta seguro en eliminar parte diario: ${fechaCtx} de semana ${periodo.Nombre} del ${fiscal.Nombre}`,
       [
         {
           text: 'Cancel',
@@ -173,9 +171,7 @@ const ParteDiarioScreen = ({navigation}) => {
               err && Alert.alert(err.message);
 
               Alert.alert(
-                `Se elimino parte diario: ${getDia(
-                  new Date(fechaCtx),
-                )} de semana ${periodo.Nombre} del ${fiscal.Nombre}`,
+                `Se elimino parte diario: ${fechaCtx} de semana ${periodo.Nombre} del ${fiscal.Nombre}`,
               );
 
               dbActEmpl.remove({idParteDiario: _id}, {multi: true}, function (
@@ -193,22 +189,27 @@ const ParteDiarioScreen = ({navigation}) => {
   };
 
   const create_templeate = () => {
-    const ParteDiario = {
-      sector: sector.IdSector,
-      Nombre: sector.Nombre,
-    };
+    if (DisponiblesParteDiario.length < Cuadrillas.length) {
+      const ParteDiario = {
+        sector: sector.IdSector,
+        Nombre: sector.Nombre,
+      };
 
-    const Mis_Parte_Diario = [];
-    Mis_Parte_Diario.push(ParteDiario);
+      const Mis_Parte_Diario = [];
+      Mis_Parte_Diario.push(ParteDiario);
 
-    InsertarParteDiario({
-      Mis_Parte_Diario,
-      fecha: fechaCtx,
-      semana: periodo.Nombre,
-      cuadrilla: 'undefined',
-    });
+      InsertarParteDiario({
+        Mis_Parte_Diario,
+        dia: fechaCtx,
+        semana: periodo.Nombre,
+        fecha: fecha_actual(),
+        cuadrilla: 'undefined',
+      });
 
-    setIsReload(true);
+      setIsReload(true);
+    } else {
+      Alert.alert(`Limite de parte diarios: ${Cuadrillas.length}`);
+    }
   };
 
   return (
@@ -216,12 +217,7 @@ const ParteDiarioScreen = ({navigation}) => {
       <View style={styles.container}>
         <Text style={styles.titePD}>
           Parte diario:
-          {' ' +
-            getDia(new Date(fechaCtx)) +
-            ', Sem ' +
-            periodo.Nombre +
-            ' del ' +
-            fiscal.Nombre}
+          {' ' + fechaCtx + ', Sem ' + periodo.Nombre + ' del ' + fiscal.Nombre}
         </Text>
 
         <Animatable.View animation="fadeInUpBig" style={styles.footer}>
@@ -286,7 +282,7 @@ const ParteDiarioScreen = ({navigation}) => {
         />
         <Button
           title="Crear Plantilla"
-          disabled={false}
+          disabled={CPD.cuadrilla === undefined}
           onPress={create_templeate}
         />
       </View>

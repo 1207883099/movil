@@ -3,10 +3,12 @@ import {getDomain} from './config';
 
 ///  PETICIONES GET
 
-export async function SubirParteDiario(data) {
+export async function SubirParteTrabajo(data) {
   return await axios({
     method: 'POST',
-    url: `${getDomain()}/api/parteDiario`,
-    data,
+    url: `${getDomain()}/api/parteTrabajo`,
+    data: {
+      dataPD: data,
+    },
   });
 }

@@ -62,9 +62,9 @@ function EmpleadosAsignados({
       setActividades(dataMaestra[0].Actividades);
     });
 
-    dbMe.findOne({}, async function (err, dataMe) {
+    dbMe.findOne({section: 'me'}, async function (err, dataMe) {
       err && Alert.alert(err.message);
-      setMe(dataMe);
+      setMe(dataMe.MyData);
     });
 
     dbTarifas.find({}, async function (err, dataTarifas) {
@@ -108,7 +108,11 @@ function EmpleadosAsignados({
       const Tarifa = Tarifas.find(
         (tarifa) => tarifa.IdActividad === IdActividad,
       );
-      return Tarifa;
+      if (Tarifa === undefined) {
+        return Tarifa;
+      } else {
+        return 'Cargando...';
+      }
     }
   };
 

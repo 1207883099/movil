@@ -2,13 +2,10 @@ import React from 'react';
 import {Alert, TouchableOpacity, Text, StyleSheet} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 /* DATABASE LOCAL */
-import {dbMaestra} from '../../db-local/db-maestra';
 import {dbEntryHistory} from '../../db-local/db-history-entry';
 import {dbCuadrillaPD} from '../../db-local/db-cuadrilla-parte-diario';
 import {dbActEmpl} from '../../db-local/db-actividades-empleado';
 import {dbParteDiario} from '../../db-local/db-parte-diario';
-import {dbCargos} from '../../db-local/db-cargos';
-import {dbConfiguracion} from '../../db-local/db-configuracion';
 import {dbMe} from '../../db-local/db-me';
 
 export function DeleteData({navigation, setIsReload}) {
@@ -25,19 +22,7 @@ export function DeleteData({navigation, setIsReload}) {
         {
           text: 'OK',
           onPress: () => {
-            dbMaestra.remove({}, {multi: true}, function (err) {
-              err && Alert.alert(err.message);
-            });
-
             dbParteDiario.remove({}, {multi: true}, function (err) {
-              err && Alert.alert(err.message);
-            });
-
-            dbConfiguracion.remove({}, {multi: true}, function (err) {
-              err && Alert.alert(err.message);
-            });
-
-            dbCargos.remove({}, {multi: true}, function (err) {
               err && Alert.alert(err.message);
             });
 

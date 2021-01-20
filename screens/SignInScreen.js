@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import React, {useEffect, useContext, useState} from 'react';
 import {
   View,
@@ -9,7 +10,6 @@ import {
 } from 'react-native';
 /* EMPIEZA DB LOCAL */
 import {dbMaestra} from '../db-local/db-maestra';
-import {dbEntryHistory} from '../db-local/db-history-entry';
 import {dbConfiguracion} from '../db-local/db-configuracion';
 /* COMPONENTS */
 import LinearGradient from 'react-native-linear-gradient';
@@ -21,8 +21,6 @@ import {UploadData} from '../components/elementos/uploadData';
 import {DownloadData} from '../components/elementos/downloadData';
 import {MyUserContext} from '../components/context/MyUser';
 import {LoginBtn} from '../components/elementos/login-btn';
-/* HOOKS */
-import {get_Semana_Del_Ano} from '../hooks/fechas';
 
 const SignInScreen = ({navigation}) => {
   const {fechaCtx, setFechaCtx} = useContext(FechaContext);
@@ -30,7 +28,6 @@ const SignInScreen = ({navigation}) => {
   const [dataLocal, setDataLocal] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isReload, setIsReload] = useState(false);
-  const [lastHistory, setLastHistory] = useState();
   const [fiscal, setFiscal] = useState({
     valuie: undefined,
     Nombre: undefined,
@@ -44,12 +41,6 @@ const SignInScreen = ({navigation}) => {
       dbMaestra.find({}, async function (err, dataMaestra) {
         err && Alert.alert(err.message);
         setDataLocal(dataMaestra);
-      });
-
-      dbEntryHistory.find({}, async function (err, dataHistory) {
-        err && Alert.alert(err.message);
-        const ultimoHistory = dataHistory[dataHistory.length - 1];
-        setLastHistory(ultimoHistory.semana);
       });
 
       dbConfiguracion.find({}, async function (err, dataConfig) {
@@ -101,14 +92,7 @@ const SignInScreen = ({navigation}) => {
 
                 <TouchableOpacity
                   style={styles.delete}
-                  onPress={() => {
-                    if (lastHistory !== get_Semana_Del_Ano()) {
-                      Alert.alert(
-                        'Asegurate de limpiar los datos regularmente.',
-                      );
-                    }
-                    navigation.navigate('ParteDiario');
-                  }}>
+                  onPress={() => navigation.navigate('ParteDiario')}>
                   <LinearGradient
                     colors={['#69ABC9', '#69D6C9']}
                     style={styles.signIn}>
@@ -134,19 +118,30 @@ const SignInScreen = ({navigation}) => {
               </>
             ) : (
               <>
-                <DownloadData
-                  UserCtx={UserCtx}
-                  setIsLoading={setIsLoading}
-                  setIsReload={setIsReload}
-                />
-                {isLoading && <LoaderSpinner />}
+                {isLoading ? (
+                  <LoaderSpinner />
+                ) : (
+                  <DownloadData
+                    UserCtx={UserCtx}
+                    setIsLoading={setIsLoading}
+                    setIsReload={setIsReload}
+                  />
+                )}
               </>
             )}
 
             {dataLocal.length > 0 && UserCtx.movil_ip !== undefined ? (
               <>
-                <UploadData setIsLoading={setIsLoading} />
-                {isLoading && <LoaderSpinner />}
+                {isLoading ? (
+                  <LoaderSpinner />
+                ) : (
+                  <UploadData
+                    setIsLoading={setIsLoading}
+                    fechaCtx={fechaCtx}
+                    semana={periodo.Nombre}
+                    year={fiscal.Nombre}
+                  />
+                )}
               </>
             ) : (
               dataLocal.length > 0 && <LoginBtn navigation={navigation} />
