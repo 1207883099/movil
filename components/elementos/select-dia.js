@@ -10,7 +10,7 @@ export function SelectDia({setSelectDay, setFechaCtx}) {
     const dataFechas = [];
     for (let i = 1; i <= 7; i++) {
       const label = suma_resta_fecha(primerDiaSemana(), +i);
-      dataFechas.push({label: getDia(label), value: label.toDateString()});
+      dataFechas.push({label: getDia(label), value: getDia(label)});
     }
     setFechas(dataFechas);
   }, []);

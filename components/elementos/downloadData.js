@@ -3,7 +3,6 @@ import {Text, TouchableOpacity, Alert, StyleSheet} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 /* FETCH API */
 import {obtenerMaestra} from '../../api/maestra';
-// import {SubirParteDiario} from '../api/parte-diario';
 import {obtenerCargos} from '../../api/cargo';
 import {obtenerTarifas} from '../../api/tarifa';
 /* DB LOCAL */

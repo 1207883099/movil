@@ -21,20 +21,22 @@ import {LoaderSpinner} from '../components/loader/spiner-loader';
 import {MyUserContext} from '../components/context/MyUser';
 /* DB LOCAL */
 import {dbMaestra} from '../db-local/db-maestra';
-import {dbMe} from '../db-local/db-me';
-import {InsertarEntry} from '../db-local/db-history-entry';
+import {dbMe, InsertarMe} from '../db-local/db-me';
+import {InsertarEntry, dbEntryHistory} from '../db-local/db-history-entry';
 import {dbConfiguracion} from '../db-local/db-configuracion';
 /* FETCH API */
 import {Auth} from '../api/usuario';
 import {getDomain, setDomain} from '../api/config';
 /* FECHAS */
-import {get_Semana_Del_Ano} from '../hooks/fechas';
+import {fecha_actual} from '../hooks/fechas';
 
 const SplashScreen = ({navigation, route}) => {
   const {setUserCtx} = useContext(MyUserContext);
   const {colors} = useTheme();
   const netInfo = useNetInfo();
   const [isLogind, setIsLogind] = useState(false);
+  const [isEntrey, setIsEntrey] = useState(false);
+  const [isMe, setIsMe] = useState(false);
   const [completeConfig, setCompleteConfig] = useState(false);
 
   useEffect(() => {
@@ -42,6 +44,21 @@ const SplashScreen = ({navigation, route}) => {
       Alert.alert(
         'Se necesita coneccion a la red emplesarial para bajar o subir los datos.',
       );
+
+    dbEntryHistory.find({}, async function (err, dataEntry) {
+      err && Alert.alert(err.message);
+      if (dataEntry.length === 20) {
+        setIsEntrey(true);
+        dbEntryHistory.remove({}, {multi: true}, function (err) {
+          err && Alert.alert(err.message);
+        });
+      }
+    });
+
+    dbMe.find({section: 'me'}, async function (err, dataMe) {
+      err && Alert.alert(err.message);
+      dataMe.length && setIsMe(true);
+    });
 
     if (route.params === undefined) {
       dbMaestra.find({}, async function (err, dataMaestra) {
@@ -67,9 +84,18 @@ const SplashScreen = ({navigation, route}) => {
               if (auth.data.feedback) {
                 Alert.alert(auth.data.feedback);
               } else {
-                InsertarEntry({semana: get_Semana_Del_Ano()});
+                InsertarEntry({fecha: fecha_actual()});
+                isEntrey &&
+                  Alert.alert('Asegurate de limpiar los datos regularmente.');
                 setUserCtx(auth.data.MyUser);
-                dbMe.update({}, {$set: {MyData: auth.data.MyUser}});
+                if (isMe) {
+                  dbMe.update(
+                    {section: 'me'},
+                    {$set: {MyData: auth.data.MyUser}},
+                  );
+                } else {
+                  InsertarMe({MyData: auth.data.MyUser, section: 'me'});
+                }
                 completeConfig
                   ? navigation.navigate('SignInScreen')
                   : navigation.navigate('Configuracion');

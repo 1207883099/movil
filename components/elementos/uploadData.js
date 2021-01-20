@@ -1,45 +1,124 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {TouchableOpacity, Text, StyleSheet, Alert} from 'react-native';
+/* API */
+import {SubirParteTrabajo} from '../../api/parteTrabajo';
+/* DB LOCAL */
+import {dbParteDiario} from '../../db-local/db-parte-diario';
+import {dbConfiguracion} from '../../db-local/db-configuracion';
+import {dbActEmpl} from '../../db-local/db-actividades-empleado';
+import {dbMe} from '../../db-local/db-me';
 
-export function UploadData() {
-  const subir_datos = async ({setIsLoading}) => {
+export function UploadData({setIsLoading, fechaCtx, semana, year}) {
+  const [me, setMe] = useState();
+  const [config, setConfig] = useState({
+    rol: undefined,
+    hacienda: undefined,
+    fiscal: undefined,
+    sector: undefined,
+    periodo: undefined,
+    divicion: undefined,
+  });
+
+  useEffect(() => {
+    dbConfiguracion.find({}, async function (err, dataConfig) {
+      err && Alert.alert(err.message);
+      let dataFind = {
+        rol: undefined,
+        hacienda: undefined,
+        fiscal: undefined,
+        sector: undefined,
+        periodo: undefined,
+        divicion: undefined,
+      };
+
+      const obtenerSection = (section) => {
+        if (dataConfig.length) {
+          const sectionFind = dataConfig.find(
+            (item) => item.section === section,
+          );
+          return sectionFind ? sectionFind.value : '';
+        }
+      };
+
+      dataFind.rol = obtenerSection('Rol');
+      dataFind.hacienda = obtenerSection('Hacienda');
+      dataFind.fiscal = obtenerSection('Fiscal');
+      dataFind.sector = obtenerSection('Sector');
+      dataFind.periodo = obtenerSection('Periodo');
+      dataFind.divicion = obtenerSection('Divicion');
+      setConfig(dataFind);
+    });
+
+    dbMe.findOne({section: 'me'}, async function (err, dataMe) {
+      err && Alert.alert(err.message);
+      setMe(dataMe.MyData);
+    });
+  }, []);
+
+  const obtener_actividad_empleado = (idParteDiario) => {
+    dbActEmpl.find({idParteDiario}, async function (err, dataActividad) {
+      err && Alert.alert(err.message);
+      console.log(dataActividad);
+    });
+  };
+
+  const subir_datos = async () => {
     setIsLoading(true);
-    /*try {
-          dbMaestra.find({}, async function (err, docs) {
-            if (err) {
-              Alert.alert(err.message);
-            }
+    try {
+      dbParteDiario.find({$not: {cuadrilla: 'undefined'}}, async function (
+        err,
+        dataPD,
+      ) {
+        err && Alert.alert(err.message);
+        if (dataPD.length) {
+          let Upload = [];
+          for (let i = 0; i < dataPD.length; i++) {
+            const parteTrabajo = SchemaParteTrabajo(dataPD[i]);
+            const activiEmpleado = obtener_actividad_empleado(dataPD[i]._id);
+            console.log(activiEmpleado);
+            break;
+            //Upload.push(parteTrabajo);
+          }
 
-            if (docs.some((data, index) => docs[index].Mis_Parte_Diario)) {
-              const partes_diario = docs.filter(
-                (data, index) => docs[index].Mis_Parte_Diario,
-              );
-              const resParteDiario = await SubirParteDiario(partes_diario);
+          const isUpload = await SubirParteTrabajo(Upload);
 
-              if (resParteDiario.data.upload) {
-                Alert.alert(
-                  `EXITO, se acabo de subir: ${partes_diario.length} partes diarios`,
-                );
-                eliminar_datos();
-              } else {
-                Alert.alert(
-                  'ERROR, algo acabo de fallar al momento de subir los parte diarios.',
-                );
-              }
-            } else {
-              Alert.alert(
-                'No tienes datos que subir, crea y gestionar parte diarios y luego vuelve.',
-              );
-            }
-          });
+          if (isUpload.data.upload) {
+            Alert.alert(
+              `Datos subidos: Parte Trabajo ${fechaCtx}, sem ${semana} del ${year}`,
+            );
+            setIsLoading(false);
+          }
 
-          setIsLoading(false);
-        } catch (error) {
-          Alert.alert(error.message);
-        }*/
+          if (isUpload.data.feedback) {
+            Alert.alert(
+              `Ocurrio un error al subir los datos, ${isUpload.data.feedback}.`,
+            );
+            setIsLoading(false);
+          }
+        } else {
+          Alert.alert('No existen partes diarios');
+        }
+      });
+    } catch (error) {
+      console.log(error.message);
+      Alert.alert(error.message);
+      setIsLoading(false);
+    }
+  };
 
-    setIsLoading(false);
-    Alert.alert('Esta accion aun no esta programada.');
+  const SchemaParteTrabajo = (dataPd) => {
+    const ParteTrabajo = {
+      codigo: '00000001',
+      Division: config.divicion,
+      EjercicioFiscal: config.fiscal,
+      Fecha: dataPd.fecha,
+      IdMayordomo: me.id_Empleado,
+      IdPeriodo: config.periodo,
+      IdTipoRol: config.rol,
+      IdHacienda: config.hacienda,
+      IdSector: config.sector,
+    };
+    return ParteTrabajo;
   };
 
   return (
