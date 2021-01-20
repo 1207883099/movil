@@ -45,7 +45,7 @@ export function CalificarActividad({
       setActvEmpld(dataActEmpl);
       setIsLote(dataActEmpl.isLote);
       setSelectLote(dataActEmpl.lote && dataActEmpl.lote);
-      setHectarea(dataActEmpl.hectaria ? Number(dataActEmpl.hectaria) : 0);
+      setHectarea(dataActEmpl.hectaria ? dataActEmpl.hectaria : 0);
 
       dbTarifas.findOne({IdActividad: dataActEmpl.actividad}, async function (
         err,
@@ -182,22 +182,6 @@ export function CalificarActividad({
           $ {(Tarifas.ValorTarifa * hectarea).toFixed(2)}
         </Text>
       </View>
-
-      {actvEmpld.hectaria && (
-        <>
-          <View style={[styles.head, {marginBottom: 20}]}>
-            <Text>
-              <Text style={styles.tarea_text}>Actual: </Text>
-              {obtenerLote(actvEmpld.lote)}
-            </Text>
-            <Text
-              style={styles.update_bottom}
-              onPress={() => setUpdateSelect(!updateSelect)}>
-              Cambiar
-            </Text>
-          </View>
-        </>
-      )}
 
       <View style={styles.head}>
         <Text>Minimo: {Tarifas.Minimo}</Text>

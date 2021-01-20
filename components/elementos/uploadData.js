@@ -1,3 +1,5 @@
+/* eslint-disable react-native/no-inline-styles */
+/* eslint-disable no-shadow */
 import React, {useEffect, useState} from 'react';
 import {TouchableOpacity, Text, StyleSheet, Alert} from 'react-native';
 /* API */
@@ -55,13 +57,6 @@ export function UploadData({setIsLoading, fechaCtx, semana, year}) {
     });
   }, []);
 
-  const obtener_actividad_empleado = (idParteDiario) => {
-    dbActEmpl.find({idParteDiario}, async function (err, dataActividad) {
-      err && Alert.alert(err.message);
-      console.log(dataActividad);
-    });
-  };
-
   const subir_datos = async () => {
     setIsLoading(true);
     try {
@@ -74,10 +69,25 @@ export function UploadData({setIsLoading, fechaCtx, semana, year}) {
           let Upload = [];
           for (let i = 0; i < dataPD.length; i++) {
             const parteTrabajo = SchemaParteTrabajo(dataPD[i]);
-            const activiEmpleado = obtener_actividad_empleado(dataPD[i]._id);
-            console.log(activiEmpleado);
-            break;
-            //Upload.push(parteTrabajo);
+
+            dbActEmpl.find({idParteDiario: dataPD[i]._id}, async function (
+              err,
+              dataActividad,
+            ) {
+              err && Alert.alert(err.message);
+              for (let j = 0; j < dataActividad.length; j++) {
+                parteTrabajo.ParteTrabajoDetalle.push({
+                  IdActividad: dataActividad[j].actividad,
+                  IdEmpleado: dataActividad[j].idEmpleado,
+                  CodigoEmpleado: dataActividad[j].CodigoEmpleado,
+                  Total: dataActividad[j].valorTotal,
+                  Valor: dataActividad[j].hectaria,
+                  Tarifa: dataActividad[j].ValorTarifa,
+                  isLote: dataActividad[j].isLote,
+                });
+              }
+            });
+            Upload.push(parteTrabajo);
           }
 
           const isUpload = await SubirParteTrabajo(Upload);
@@ -97,10 +107,10 @@ export function UploadData({setIsLoading, fechaCtx, semana, year}) {
           }
         } else {
           Alert.alert('No existen partes diarios');
+          setIsLoading(false);
         }
       });
     } catch (error) {
-      console.log(error.message);
       Alert.alert(error.message);
       setIsLoading(false);
     }
@@ -117,6 +127,7 @@ export function UploadData({setIsLoading, fechaCtx, semana, year}) {
       IdTipoRol: config.rol,
       IdHacienda: config.hacienda,
       IdSector: config.sector,
+      ParteTrabajoDetalle: [],
     };
     return ParteTrabajo;
   };

@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import React, {useEffect, useState, memo} from 'react';
 import {Text, View, Alert, StyleSheet, Button} from 'react-native';
 /* DB LOCAL */
@@ -109,9 +110,9 @@ function EmpleadosAsignados({
         (tarifa) => tarifa.IdActividad === IdActividad,
       );
       if (Tarifa === undefined) {
-        return Tarifa;
-      } else {
         return 'Cargando...';
+      } else {
+        return Tarifa;
       }
     }
   };
@@ -146,9 +147,13 @@ function EmpleadosAsignados({
 
       InsertarActividadEmpleado({
         idEmpleado: empleado.IdEmpleado,
+        CodigoEmpleado: empleado.Codigo,
         idParteDiario: id_parte_diario,
         actividad: ActividadId,
         isLote: Tarifa.ValidaHectareas,
+        ValorTarifa: Tarifa.ValorTarifa,
+        valorTotal: 0,
+        hectaria: 0,
       });
     });
     setIsReload(true);
