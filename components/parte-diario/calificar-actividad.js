@@ -31,10 +31,10 @@ export function CalificarActividad({
     Maximo: undefined,
     ValorTarifa: undefined,
   });
-  const [selectLote, setSelectLote] = useState();
+  //const [selectLote, setSelectLote] = useState();
   const [hectarea, setHectarea] = useState(0);
   const [isLote, setIsLote] = useState(false);
-  const [updateSelect, setUpdateSelect] = useState(false);
+  //const [updateSelect, setUpdateSelect] = useState(false);
 
   useEffect(() => {
     dbActEmpl.findOne({_id: selectIdActiEmple}, async function (
@@ -44,8 +44,8 @@ export function CalificarActividad({
       err && Alert.alert(err.message);
       setActvEmpld(dataActEmpl);
       setIsLote(dataActEmpl.isLote);
-      setSelectLote(dataActEmpl.lote && dataActEmpl.lote);
       setHectarea(dataActEmpl.hectaria ? dataActEmpl.hectaria : 0);
+      setLotes(dataActEmpl.lotes);
 
       dbTarifas.findOne({IdActividad: dataActEmpl.actividad}, async function (
         err,
@@ -58,20 +58,23 @@ export function CalificarActividad({
 
     dbMaestra.find({}, async function (err, dataMaestra) {
       err && Alert.alert(err.message);
-      const result = dataMaestra[0].Lotes.filter(
-        (item) => item.IdSector === idSector,
-      );
-      setLotes(result);
       setActividades(dataMaestra[0].Actividades);
     });
   }, [idSector, selectIdActiEmple]);
+
+  useEffect(() => {
+    if (lotes.length) {
+      let suma = lotes.reduce((total, b) => total + Number(b.value), 0);
+      setHectarea(suma);
+    }
+  }, [lotes]);
 
   const obtenerLote = (IdLote) => {
     const result = lotes.find((item) => item.IdLote === IdLote);
     if (result === undefined) {
       return 'cargando....';
     } else {
-      return result.Nombre;
+      return result;
     }
   };
 
@@ -102,19 +105,20 @@ export function CalificarActividad({
           }}
         />
         <Text style={styles.tarea_text}>Lotes:</Text>
-        {lotes.map((lote) => (
-          <View style={[styles.head, {marginBottom: 10}]}>
+        {lotes.map((lote, index) => (
+          <View style={[styles.head, {marginBottom: 10}]} key={index}>
             <View>
               <Text>{lote.Nombre}</Text>
             </View>
             <View>
               <TextInput
-                defaultValue={actvEmpld.hectaria && actvEmpld.hectaria}
-                onChangeText={(value) =>
-                  setHectarea(
-                    hectarea ? hectarea + Number(value) : 0 + Number(value),
-                  )
-                }
+                defaultValue={lote.value && String(lote.value)}
+                onChangeText={(value) => {
+                  const thisLote = obtenerLote(lote.IdLote);
+                  thisLote.value = Number(value);
+                  setLotes(lotes.splice(0, lotes.length, thisLote));
+                  value = 0;
+                }}
                 style={styles.text_input}
                 placeholder="Insertar valor"
               />
@@ -133,7 +137,7 @@ export function CalificarActividad({
           {
             $set: {
               hectaria: hectarea,
-              lote: selectLote + 7,
+              lotes: lotes,
               valorTotal: (Tarifas.ValorTarifa * hectarea).toFixed(2),
             },
           },

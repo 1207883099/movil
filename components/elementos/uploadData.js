@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react-native/no-inline-styles */
 /* eslint-disable no-shadow */
 import React, {useEffect, useState} from 'react';
@@ -84,17 +85,35 @@ export function UploadData({setIsLoading, fechaCtx, semana, year}) {
                   Valor: dataActividad[j].hectaria,
                   Tarifa: dataActividad[j].ValorTarifa,
                   isLote: dataActividad[j].isLote,
+                  lotes: [],
                 });
+
+                let item;
+                for (let k = 0; k < dataActividad[j].lotes.length; k++) {
+                  item = dataActividad[j].lotes;
+
+                  parteTrabajo.ParteTrabajoDetalle[j].lotes.push({
+                    Lote: item[k].Nombre,
+                    IdLote: item[k].IdLote,
+                    Valor: item[k].value,
+                  });
+                }
               }
             });
             Upload.push(parteTrabajo);
           }
+
+          //console.log(await Upload[0].ParteTrabajoDetalle[0]);
 
           const isUpload = await SubirParteTrabajo(Upload);
 
           if (isUpload.data.upload) {
             Alert.alert(
               `Datos subidos: Parte Trabajo ${fechaCtx}, sem ${semana} del ${year}`,
+            );
+            dbParteDiario.update(
+              {dia: fechaCtx, semana},
+              {$set: {'Mis_Parte_Diario[0].nube': true}},
             );
             setIsLoading(false);
           }

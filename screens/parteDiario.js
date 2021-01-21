@@ -174,6 +174,14 @@ const ParteDiarioScreen = ({navigation}) => {
                 `Se elimino parte diario: ${fechaCtx} de semana ${periodo.Nombre} del ${fiscal.Nombre}`,
               );
 
+              dbCuadrillaPD.remove(
+                {idParteDiario: _id},
+                {multi: true},
+                function (err) {
+                  err && Alert.alert(err.message);
+                },
+              );
+
               dbActEmpl.remove({idParteDiario: _id}, {multi: true}, function (
                 err,
               ) {
@@ -208,6 +216,7 @@ const ParteDiarioScreen = ({navigation}) => {
       });
 
       setIsReload(true);
+      DisponiblesParteDiario.length > 0 && navigation.navigate('SignInScreen');
     } else {
       Alert.alert(`Limite de parte diarios: ${Cuadrillas.length}`);
     }
@@ -266,6 +275,7 @@ const ParteDiarioScreen = ({navigation}) => {
                         <GenerarTareaEmpleado
                           Cuadrillas={Cuadrillas}
                           id_parte_diario={MisPartesDiarios._id}
+                          idSector={parte_diario.sector}
                           setIsReload={setIsReload}
                         />
                       )

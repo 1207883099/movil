@@ -6,6 +6,7 @@ import {Picker} from '@react-native-picker/picker';
 export function GenerarTareaEmpleado({
   Cuadrillas,
   id_parte_diario,
+  idSector,
   setIsReload,
 }) {
   const [IsCuadrilla, setIsCuadrilla] = useState('');
@@ -60,6 +61,7 @@ export function GenerarTareaEmpleado({
           actions={false}
           id_parte_diario={id_parte_diario}
           cuadrilla={IsCuadrilla}
+          idSector={idSector}
           setIsReload={setIsReload}
         />
       )}
