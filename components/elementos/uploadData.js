@@ -61,74 +61,74 @@ export function UploadData({setIsLoading, fechaCtx, semana, year}) {
   const subir_datos = async () => {
     setIsLoading(true);
     try {
-      dbParteDiario.find({$not: {cuadrilla: 'undefined'}}, async function (
-        err,
-        dataPD,
-      ) {
-        err && Alert.alert(err.message);
-        if (dataPD.length) {
-          let Upload = [];
-          for (let i = 0; i < dataPD.length; i++) {
-            const parteTrabajo = SchemaParteTrabajo(dataPD[i]);
+      dbParteDiario.find(
+        {$not: {cuadrilla: 'undefined'}, dia: fechaCtx, semana},
+        async function (err, dataPD) {
+          err && Alert.alert(err.message);
+          if (dataPD.length) {
+            let Upload = [];
+            for (let i = 0; i < dataPD.length; i++) {
+              const parteTrabajo = SchemaParteTrabajo(dataPD[i]);
 
-            dbActEmpl.find({idParteDiario: dataPD[i]._id}, async function (
-              err,
-              dataActividad,
-            ) {
-              err && Alert.alert(err.message);
-              for (let j = 0; j < dataActividad.length; j++) {
-                parteTrabajo.ParteTrabajoDetalle.push({
-                  IdActividad: dataActividad[j].actividad,
-                  IdEmpleado: dataActividad[j].idEmpleado,
-                  CodigoEmpleado: dataActividad[j].CodigoEmpleado,
-                  Total: dataActividad[j].valorTotal,
-                  Valor: dataActividad[j].hectaria,
-                  Tarifa: dataActividad[j].ValorTarifa,
-                  isLote: dataActividad[j].isLote,
-                  lotes: [],
-                });
-
-                let item;
-                for (let k = 0; k < dataActividad[j].lotes.length; k++) {
-                  item = dataActividad[j].lotes;
-
-                  parteTrabajo.ParteTrabajoDetalle[j].lotes.push({
-                    Lote: item[k].Nombre,
-                    IdLote: item[k].IdLote,
-                    Valor: item[k].value,
+              dbActEmpl.find({idParteDiario: dataPD[i]._id}, async function (
+                err,
+                dataActividad,
+              ) {
+                err && Alert.alert(err.message);
+                for (let j = 0; j < dataActividad.length; j++) {
+                  parteTrabajo.ParteTrabajoDetalle.push({
+                    IdActividad: dataActividad[j].actividad,
+                    IdEmpleado: dataActividad[j].idEmpleado,
+                    CodigoEmpleado: dataActividad[j].CodigoEmpleado,
+                    Total: dataActividad[j].valorTotal,
+                    Valor: dataActividad[j].hectaria,
+                    Tarifa: dataActividad[j].ValorTarifa,
+                    isLote: dataActividad[j].isLote,
+                    lotes: [],
                   });
+
+                  let item;
+                  for (let k = 0; k < dataActividad[j].lotes.length; k++) {
+                    item = dataActividad[j].lotes;
+
+                    parteTrabajo.ParteTrabajoDetalle[j].lotes.push({
+                      Lote: item[k].Nombre,
+                      IdLote: item[k].IdLote,
+                      Valor: item[k].value,
+                    });
+                  }
                 }
-              }
-            });
-            Upload.push(parteTrabajo);
-          }
+              });
+              Upload.push(parteTrabajo);
+            }
 
-          //console.log(await Upload[0].ParteTrabajoDetalle[0]);
+            //console.log(await Upload[0].ParteTrabajoDetalle[0]);
 
-          const isUpload = await SubirParteTrabajo(Upload);
+            const isUpload = await SubirParteTrabajo(Upload);
 
-          if (isUpload.data.upload) {
-            Alert.alert(
-              `Datos subidos: Parte Trabajo ${fechaCtx}, sem ${semana} del ${year}`,
-            );
-            dbParteDiario.update(
-              {dia: fechaCtx, semana},
-              {$set: {'Mis_Parte_Diario[0].nube': true}},
-            );
+            if (isUpload.data.upload) {
+              Alert.alert(
+                `Datos subidos: Parte Trabajo ${fechaCtx}, sem ${semana} del ${year}`,
+              );
+              dbParteDiario.update(
+                {dia: fechaCtx, semana},
+                {$set: {'Mis_Parte_Diario[0].nube': true}},
+              );
+              setIsLoading(false);
+            }
+
+            if (isUpload.data.feedback) {
+              Alert.alert(
+                `Ocurrio un error al subir los datos, ${isUpload.data.feedback}.`,
+              );
+              setIsLoading(false);
+            }
+          } else {
+            Alert.alert('No existen partes diarios');
             setIsLoading(false);
           }
-
-          if (isUpload.data.feedback) {
-            Alert.alert(
-              `Ocurrio un error al subir los datos, ${isUpload.data.feedback}.`,
-            );
-            setIsLoading(false);
-          }
-        } else {
-          Alert.alert('No existen partes diarios');
-          setIsLoading(false);
-        }
-      });
+        },
+      );
     } catch (error) {
       Alert.alert(error.message);
       setIsLoading(false);

@@ -192,7 +192,7 @@ export function CalificarActividad({
         <Text>Maximo: {Tarifas.Maximo}</Text>
       </View>
 
-      {!actvEmpld.hectaria && isLote ? (
+      {isLote ? (
         renderLotes()
       ) : (
         <View style={{marginBottom: 10}}>
