@@ -1,3 +1,4 @@
+/* eslint-disable handle-callback-err */
 /* eslint-disable react-native/no-inline-styles */
 import React, {useEffect, useContext, useState} from 'react';
 import {

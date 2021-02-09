@@ -4,12 +4,14 @@ import {Picker} from '@react-native-picker/picker';
 import {dbMaestra} from '../../db-local/db-maestra';
 import {dbTarifas} from '../../db-local/db-tarifas';
 import {dbActEmpl} from '../../db-local/db-actividades-empleado';
+import {generarLotes} from '../../hooks/lotes';
 
 export function CambioActividad({
   ActivChange,
   setIsModalChangeAct,
   setReloadEmplAsig,
   setIsReload,
+  idSector,
 }) {
   const [actividad, setActividad] = useState('');
   const [actividades, setActividades] = useState([]);
@@ -46,12 +48,20 @@ export function CambioActividad({
     }
   };
 
-  const cambioActividad = () => {
+  const cambioActividad = async () => {
     const Tarifa = obtenerTarifa(actividad);
+    const lotesGenerados = await generarLotes(dbMaestra, idSector);
 
     dbActEmpl.update(
       {_id: ActivChange.idActividadEmple},
-      {$set: {actividad: actividad, isLote: Tarifa.ValidaHectareas}},
+      {
+        $set: {
+          actividad: actividad,
+          isLote: Tarifa.ValidaHectareas,
+          lotes: Tarifa.ValidaHectareas ? lotesGenerados : [],
+          ValorTarifa: Tarifa.ValorTarifa,
+        },
+      },
     );
 
     setIsModalChangeAct(false);

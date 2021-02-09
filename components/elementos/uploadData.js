@@ -70,35 +70,37 @@ export function UploadData({setIsLoading, fechaCtx, semana, year}) {
             for (let i = 0; i < dataPD.length; i++) {
               const parteTrabajo = SchemaParteTrabajo(dataPD[i]);
 
-              dbActEmpl.find({idParteDiario: dataPD[i]._id}, async function (
-                err,
-                dataActividad,
-              ) {
-                err && Alert.alert(err.message);
-                for (let j = 0; j < dataActividad.length; j++) {
-                  parteTrabajo.ParteTrabajoDetalle.push({
-                    IdActividad: dataActividad[j].actividad,
-                    IdEmpleado: dataActividad[j].idEmpleado,
-                    CodigoEmpleado: dataActividad[j].CodigoEmpleado,
-                    Total: dataActividad[j].valorTotal,
-                    Valor: dataActividad[j].hectaria,
-                    Tarifa: dataActividad[j].ValorTarifa,
-                    isLote: dataActividad[j].isLote,
-                    lotes: [],
-                  });
+              dbActEmpl.find(
+                {idParteDiario: dataPD[i]._id},
+                async function (err, dataActividad) {
+                  err && Alert.alert(err.message);
+                  for (let j = 0; j < dataActividad.length; j++) {
+                    if (dataActividad[j].hectaria) {
+                      parteTrabajo.ParteTrabajoDetalle.push({
+                        IdActividad: dataActividad[j].actividad,
+                        IdEmpleado: dataActividad[j].idEmpleado,
+                        CodigoEmpleado: dataActividad[j].CodigoEmpleado,
+                        Total: dataActividad[j].valorTotal,
+                        Valor: dataActividad[j].hectaria,
+                        Tarifa: dataActividad[j].ValorTarifa,
+                        isLote: dataActividad[j].isLote,
+                        lotes: [],
+                      });
 
-                  let item;
-                  for (let k = 0; k < dataActividad[j].lotes.length; k++) {
-                    item = dataActividad[j].lotes;
+                      let item;
+                      for (let k = 0; k < dataActividad[j].lotes.length; k++) {
+                        item = dataActividad[j].lotes;
 
-                    parteTrabajo.ParteTrabajoDetalle[j].lotes.push({
-                      Lote: item[k].Nombre,
-                      IdLote: item[k].IdLote,
-                      Valor: item[k].value,
-                    });
+                        parteTrabajo.ParteTrabajoDetalle[j].lotes.push({
+                          Lote: item[k].Nombre,
+                          IdLote: item[k].IdLote,
+                          Valor: item[k].value,
+                        });
+                      }
+                    }
                   }
-                }
-              });
+                },
+              );
               Upload.push(parteTrabajo);
             }
 

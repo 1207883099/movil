@@ -2,14 +2,24 @@ import React, {useState, useEffect} from 'react';
 import {Text, View, StyleSheet, Button, Alert} from 'react-native';
 import {ModalScreen} from '../modal/modal';
 import {Picker} from '@react-native-picker/picker';
+import {generarLotes} from '../../hooks/lotes';
 /* DB LOCAL */
 import {InsertarActividadEmpleado} from '../../db-local/db-actividades-empleado';
 import {dbMaestra} from '../../db-local/db-maestra';
 import {dbTarifas} from '../../db-local/db-tarifas';
 
-export function AddActividad({id_parte_diario, cuadrilla, setReloadEmplAsig}) {
+export function AddActividad({
+  id_parte_diario,
+  cuadrilla,
+  setReloadEmplAsig,
+  idSector,
+}) {
   const [isModal, setIsModal] = useState(false);
-  const [empleado, setEmpleado] = useState();
+  const [empleado, setEmpleado] = useState({
+    IdEmpleado: '',
+    CodigoEmpleado: '',
+    Apellidos: '',
+  });
   const [actividad, setActividad] = useState();
   ///////////////////
   const [Tarifas, setTarifas] = useState([]);
@@ -42,15 +52,23 @@ export function AddActividad({id_parte_diario, cuadrilla, setReloadEmplAsig}) {
     }
   };
 
-  const anadirActividad = () => {
-    if (empleado && actividad) {
+  const anadirActividad = async () => {
+    if (empleado.IdEmpleado && actividad) {
       console.group(empleado, actividad);
+
       const Tarifa = obtenerTarifa(actividad);
+      const lotesGenerados = await generarLotes(dbMaestra, idSector);
+
       InsertarActividadEmpleado({
-        idEmpleado: empleado,
+        idEmpleado: empleado.IdEmpleado,
         idParteDiario: id_parte_diario,
+        CodigoEmpleado: empleado.CodigoEmpleado,
         actividad: actividad,
         isLote: Tarifa.ValidaHectareas,
+        lotes: Tarifa.ValidaHectareas ? lotesGenerados : [],
+        ValorTarifa: Tarifa.ValorTarifa,
+        valorTotal: 0,
+        hectaria: 0,
       });
 
       setIsModal(false);
@@ -73,7 +91,22 @@ export function AddActividad({id_parte_diario, cuadrilla, setReloadEmplAsig}) {
         <View style={styles.select}>
           <Picker
             selectedValue={empleados}
-            onValueChange={(itemValue) => itemValue && setEmpleado(itemValue)}>
+            onValueChange={(itemValue) => {
+              if (itemValue) {
+                const findEmpleado = empleados.find(
+                  (empleado) => empleado.IdEmpleado === itemValue,
+                );
+                if (findEmpleado) {
+                  setEmpleado({
+                    IdEmpleado: findEmpleado.IdEmpleado,
+                    CodigoEmpleado: findEmpleado.Codigo,
+                    Apellidos: findEmpleado.Apellido,
+                  });
+                } else {
+                  Alert.alert('Ocurrio un error al seleccionar el empleado.');
+                }
+              }
+            }}>
             <Picker.Item label="** SELECCIONA **" value={''} />
             {empleados
               .sort((a, b) => a.Apellido > b.Apellido)
@@ -110,9 +143,9 @@ export function AddActividad({id_parte_diario, cuadrilla, setReloadEmplAsig}) {
         </>
 
         <Button
-          title={`Guardar nueva actividad: ${empleado && empleado} - ${
-            actividad && actividad
-          }`}
+          title={`Guardar nueva actividad: ${
+            empleado.Apellidos && empleado.Apellidos
+          } - ${actividad && actividad}`}
           color="#009387"
           onPress={anadirActividad}
         />

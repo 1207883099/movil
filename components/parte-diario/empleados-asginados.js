@@ -19,6 +19,7 @@ import {CalificarActividad} from './calificar-actividad';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {AddActividad} from './add-actividad';
 import {CambioActividad} from './cambio-actividad';
+import {generarLotes} from '../../hooks/lotes';
 
 function EmpleadosAsignados({
   Empleados,
@@ -31,7 +32,7 @@ function EmpleadosAsignados({
   const [Cargos, setCargos] = useState([]);
   const [Tarifas, setTarifas] = useState([]);
   const [Actividades, setActividades] = useState([]);
-  const [Lotes, setLotes] = useState([]);
+  const [ReloadActEmpl, setReloadActEmpl] = useState(false);
   const [isModal, setIsModal] = useState(false);
   const [ActivEmple, setActivEmple] = useState([]);
   const [ActivChange, setActivChange] = useState({
@@ -52,13 +53,7 @@ function EmpleadosAsignados({
       setCargos(dataCargos);
     });
 
-    dbActEmpl.find({idParteDiario: id_parte_diario}, async function (
-      err,
-      dataActEmpl,
-    ) {
-      err && Alert.alert(err.message);
-      setActivEmple(dataActEmpl);
-    });
+    getActividadEmpleado();
 
     dbMaestra.find({}, async function (err, dataMaestra) {
       err && Alert.alert(err.message);
@@ -80,6 +75,13 @@ function EmpleadosAsignados({
     }
   }, [id_parte_diario, ReloadEmplAsig]);
 
+  useEffect(() => {
+    if (ReloadActEmpl) {
+      getActividadEmpleado();
+      setReloadActEmpl(false);
+    }
+  }, [ReloadActEmpl]);
+
   const obtenerCargo = (codigoCargo, propiedad) => {
     if (Cargos.length) {
       const Cargo = Cargos.find((cargo) => cargo.Codigo === codigoCargo);
@@ -89,6 +91,16 @@ function EmpleadosAsignados({
         return 'Cargando...';
       }
     }
+  };
+
+  const getActividadEmpleado = () => {
+    dbActEmpl.find(
+      {idParteDiario: id_parte_diario},
+      async function (err, dataActEmpl) {
+        err && Alert.alert(err.message);
+        setActivEmple(dataActEmpl);
+      },
+    );
   };
 
   const obtenerActividad = (idActividad, propiedad) => {
@@ -132,28 +144,6 @@ function EmpleadosAsignados({
     }
   };
 
-  const generarLotes = () => {
-    let collectionLote = [];
-
-    dbMaestra.find({}, async function (err, dataMaestra) {
-      err && Alert.alert(err.message);
-      const result = dataMaestra[0].Lotes.filter(
-        (item) => item.IdSector === idSector,
-      );
-
-      let item;
-      for (let i = 0; i < result.length; i++) {
-        item = result[i];
-        collectionLote.push({
-          IdLote: item.IdLote,
-          Nombre: item.Nombre,
-          value: 0,
-        });
-      }
-    });
-    return collectionLote;
-  };
-
   const finish_template = async () => {
     InsertarCuadrillaPD({
       idParteDiario: id_parte_diario,
@@ -165,7 +155,7 @@ function EmpleadosAsignados({
       {$set: {cuadrilla: cuadrilla}},
     );
 
-    const lotesGenerados = await generarLotes();
+    const lotesGenerados = await generarLotes(dbMaestra, idSector);
 
     Empleados.map(async (empleado) => {
       const ActividadId = obtenerCargo(empleado.Cargo, 'ActividadId');
@@ -184,6 +174,33 @@ function EmpleadosAsignados({
       });
     });
     setIsReload(true);
+  };
+
+  const deleteEmpleado = (idEmpleado) => {
+    Alert.alert(
+      obtener_empleado(idEmpleado),
+      '¿Seguro que quieres eliminar este registro?',
+      [
+        {
+          text: 'No',
+          onPress: () => console.log('no'),
+          style: 'cancel',
+        },
+        {
+          text: 'Si',
+          onPress: () => {
+            dbActEmpl.remove(
+              {idEmpleado, idParteDiario: id_parte_diario},
+              function (err) {
+                err && Alert.alert(err.message);
+              },
+            );
+            setReloadActEmpl(true);
+          },
+        },
+      ],
+      {cancelable: false},
+    );
   };
 
   return (
@@ -213,6 +230,7 @@ function EmpleadosAsignados({
               id_parte_diario={id_parte_diario}
               cuadrilla={cuadrilla}
               setReloadEmplAsig={setReloadEmplAsig}
+              idSector={idSector}
             />
           </View>
         )}
@@ -240,7 +258,9 @@ function EmpleadosAsignados({
                   <Text>
                     {
                       <>
-                        <Text style={{fontSize: 12}}>
+                        <Text
+                          style={{fontSize: 12}}
+                          onPress={() => deleteEmpleado(activEmple.idEmpleado)}>
                           {obtener_empleado(activEmple.idEmpleado)}
                         </Text>
                         <Text
@@ -248,7 +268,7 @@ function EmpleadosAsignados({
                           &nbsp; / &nbsp;{' '}
                           <Text
                             onPress={() => {
-                              if (activEmple.hectaria === undefined) {
+                              if (activEmple.hectaria === 0) {
                                 setActivChange({
                                   actividad: activEmple.actividad,
                                   idActividadEmple: activEmple._id,
@@ -310,6 +330,7 @@ function EmpleadosAsignados({
           ActivChange={ActivChange}
           setIsModalChangeAct={setIsModalChangeAct}
           setReloadEmplAsig={setReloadEmplAsig}
+          idSector={idSector}
           setIsReload={setIsReload}
         />
       </ModalScreen>

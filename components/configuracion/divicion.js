@@ -28,34 +28,37 @@ export function Divicion({divicion, setLoading, setIsReload}) {
   });
 
   useEffect(() => {
-    dbConfiguracion.findOne({section: 'Divicion'}, async function (
-      err,
-      dataConfig,
-    ) {
-      err && Alert.alert(err.message);
-      dataConfig && setIsUpdate(true);
-    });
+    dbConfiguracion.findOne(
+      {section: 'Divicion'},
+      async function (err, dataConfig) {
+        err && Alert.alert(err.message);
+        dataConfig && setIsUpdate(true);
+      },
+    );
   }, []);
 
   const getDivicion = () => {
     setLoading(true);
 
     if (isUpdate) {
-      dbConfiguracion.findOne({section: 'Divicion'}, async function (
-        err,
-        dataConfig,
-      ) {
-        err && Alert.alert(err.message);
+      dbConfiguracion.findOne(
+        {section: 'Divicion'},
+        async function (err, dataConfig) {
+          err && Alert.alert(err.message);
 
-        setDivi(dataConfig.dataAll);
-        setModal(true);
-      });
+          setDivi(dataConfig.dataAll);
+          setModal(true);
+        },
+      );
     } else {
       obtenerConfiguracion('token-static', 'Divicion')
         .then((fiscal) => {
           if (fiscal.data.length) {
             setModal(true);
             setDivi(fiscal.data);
+            setSelectDivicion(
+              fiscal.data.find((item) => item.Valor2 === 'Banano'),
+            );
           } else {
             Alert.alert('No hay datos de divicion');
           }
