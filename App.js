@@ -25,6 +25,7 @@ import ParteDiario from './screens/parteDiario';
 import Configuracion from './screens/configuracion';
 import FechaContextProvider from './components/context/fecha';
 import MyUserContextProvider from './components/context/MyUser';
+import ReporteSemanal from './screens/reporteSemanal';
 
 const RootStack = createStackNavigator();
 
@@ -65,6 +66,10 @@ const App = () => {
               <RootStack.Screen name="SignInScreen" component={SignInScreen} />
               <RootStack.Screen name="SignUpScreen" component={SignUpScreen} />
               <RootStack.Screen name="ParteDiario" component={ParteDiario} />
+              <RootStack.Screen
+                name="ReporteSemanal"
+                component={ReporteSemanal}
+              />
               <RootStack.Screen
                 name="Configuracion"
                 component={Configuracion}

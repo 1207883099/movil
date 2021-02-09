@@ -24,7 +24,7 @@ const ParteDiarioScreen = ({navigation}) => {
   const [isParteDiario, setIsParteDiario] = useState(true);
   const [isReload, setIsReload] = useState(false);
   const [IndexDb, setIndexDb] = useState(0);
-  const [next_prev, setNext_Prev] = useState({next: false, prev: false});
+  const [next_prev] = useState({next: false, prev: false});
   const [MisPartesDiarios, setMisPartesDiarios] = useState({
     _id: '',
     data: [],
@@ -182,12 +182,14 @@ const ParteDiarioScreen = ({navigation}) => {
                 },
               );
 
-              dbActEmpl.remove({idParteDiario: _id}, {multi: true}, function (
-                err,
-              ) {
-                err && Alert.alert(err.message);
-                navigation.navigate('SignInScreen');
-              });
+              dbActEmpl.remove(
+                {idParteDiario: _id},
+                {multi: true},
+                function (err) {
+                  err && Alert.alert(err.message);
+                  navigation.navigate('SignInScreen');
+                },
+              );
             });
           },
         },

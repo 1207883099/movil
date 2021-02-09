@@ -85,7 +85,7 @@ const SignInScreen = ({navigation}) => {
                     navigation.navigate('SignUpScreen', {test: 'probando'})
                   }>
                   <LinearGradient
-                    colors={['#5982EB', '#A69649']}
+                    colors={['#009387', '#009387']}
                     style={styles.signIn}>
                     <Text style={[styles.textSign, styles.colorWhite]}>
                       Ver Mis Cuadrillas
@@ -101,10 +101,22 @@ const SignInScreen = ({navigation}) => {
                       : navigation.navigate('ParteDiario')
                   }>
                   <LinearGradient
-                    colors={['#69ABC9', '#69D6C9']}
+                    colors={['#009387', '#009387']}
                     style={styles.signIn}>
                     <Text style={[styles.textSign, styles.colorWhite]}>
                       Gestionar Parte Diario
+                    </Text>
+                  </LinearGradient>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.delete}
+                  onPress={() => navigation.navigate('ReporteSemanal')}>
+                  <LinearGradient
+                    colors={['#009387', '#009387']}
+                    style={styles.signIn}>
+                    <Text style={[styles.textSign, styles.colorWhite]}>
+                      Reporte Semanal
                     </Text>
                   </LinearGradient>
                 </TouchableOpacity>
