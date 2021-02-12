@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {View, Text, ScrollView, StyleSheet} from 'react-native';
 import * as Animatable from 'react-native-animatable';
+import {MessageAlert} from '../components/elementos/message';
 /* DB LOCAL */
 import {dbConfiguracion} from '../db-local/db-configuracion';
 import {dbParteDiario} from '../db-local/db-parte-diario';
@@ -43,6 +44,7 @@ const ReporteSemanal = () => {
         {$not: {cuadrilla: 'undefined'}, semana: thisPeriodo.Nombre},
         function (err, dataPD) {
           err && Alert.alert(err.message);
+          const report_foy_day = [];
 
           for (let j = 0; j < dias.length; j++) {
             const filterDay = dataPD.filter((item) => item.dia === dias[j]);
@@ -53,7 +55,6 @@ const ReporteSemanal = () => {
                 function (err, dataActiEmpl) {
                   err && Alert.alert(err.message);
                   const data_for_day = [];
-                  const report_foy_day = [];
 
                   for (let k = 0; k < dataActiEmpl.length; k++) {
                     let item = dataActiEmpl[k];
@@ -68,7 +69,8 @@ const ReporteSemanal = () => {
                     dia: dias[j],
                     data: data_for_day,
                   });
-                  setReportes(report_foy_day);
+
+                  setTimeout(() => setReportes(report_foy_day), 2000);
                 },
               );
             }
@@ -162,6 +164,13 @@ const ReporteSemanal = () => {
                 ))}
             </>
           ))}
+
+          {reportes.length === 0 && (
+            <MessageAlert
+              background="#cce5ff"
+              content="Por el momento no existe ningun registro del parte diario semanal."
+            />
+          )}
         </ScrollView>
       </Animatable.View>
     </View>
