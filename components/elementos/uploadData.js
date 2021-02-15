@@ -3,12 +3,11 @@
 /* eslint-disable no-shadow */
 import React, {useEffect, useState} from 'react';
 import {TouchableOpacity, Text, StyleSheet, Alert} from 'react-native';
-/* API */
-import {SubirParteTrabajo} from '../../api/parteTrabajo';
+import {ModalScreen} from '../modal/modal';
+import {SelectUpload} from '../parte-diario/select-Upload';
 /* DB LOCAL */
 import {dbParteDiario} from '../../db-local/db-parte-diario';
 import {dbConfiguracion} from '../../db-local/db-configuracion';
-import {dbActEmpl} from '../../db-local/db-actividades-empleado';
 import {dbMe} from '../../db-local/db-me';
 
 export function UploadData({setIsLoading, fechaCtx, semana, year}) {
@@ -21,6 +20,8 @@ export function UploadData({setIsLoading, fechaCtx, semana, year}) {
     periodo: undefined,
     divicion: undefined,
   });
+  const [isModal, setIsModal] = useState(false);
+  const [UploadCuadrillas, setUploadCuadrillas] = useState();
 
   useEffect(() => {
     dbConfiguracion.find({}, async function (err, dataConfig) {
@@ -59,114 +60,48 @@ export function UploadData({setIsLoading, fechaCtx, semana, year}) {
   }, []);
 
   const subir_datos = () => {
-    setIsLoading(true);
-    try {
-      dbParteDiario.find(
-        {$not: {cuadrilla: 'undefined'}, dia: fechaCtx, semana},
-        async function (err, dataPD) {
-          err && Alert.alert(err.message);
-          if (dataPD.length) {
-            let Upload = [];
-            for (let i = 0; i < dataPD.length; i++) {
-              let parteTrabajo;
+    dbParteDiario.find(
+      {$not: {cuadrilla: 'undefined'}, dia: fechaCtx, semana},
+      function (err, dataPD) {
+        err && Alert.alert(err.message);
+        const cuadrillas = [];
+        for (let h = 0; h < dataPD.length; h++) {
+          cuadrillas.push({select: false, cuadrilla: dataPD[h].cuadrilla});
+        }
 
-              dbActEmpl.find(
-                {idParteDiario: dataPD[i]._id},
-                async function (err, dataActividad) {
-                  err && Alert.alert(err.message);
-                  parteTrabajo = SchemaParteTrabajo(dataPD[i]);
-
-                  for (let j = 0; j < dataActividad.length; j++) {
-                    if (dataActividad[j].hectaria) {
-                      parteTrabajo.ParteTrabajoDetalle.push({
-                        IdActividad: dataActividad[j].actividad,
-                        IdEmpleado: dataActividad[j].idEmpleado,
-                        CodigoEmpleado: dataActividad[j].CodigoEmpleado,
-                        Total: dataActividad[j].valorTotal,
-                        Valor: dataActividad[j].hectaria,
-                        Tarifa: dataActividad[j].ValorTarifa,
-                        isLote: dataActividad[j].isLote,
-                        lotes: [],
-                      });
-
-                      for (let k = 0; k < dataActividad[j].lotes.length; k++) {
-                        let item = dataActividad[j].lotes;
-
-                        parteTrabajo.ParteTrabajoDetalle[j].lotes.push({
-                          Lote: item[k].Nombre,
-                          IdLote: item[k].IdLote,
-                          Valor: item[k].value,
-                        });
-                      }
-                    } else {
-                      parteTrabajo.ParteTrabajoDetalle.push(null);
-                    }
-                  }
-
-                  Upload.push(parteTrabajo);
-
-                  if (i === dataPD.length - 1) {
-                    try {
-                      const isUpload = await SubirParteTrabajo(Upload);
-
-                      if (isUpload.data.upload) {
-                        Alert.alert(
-                          `Datos subidos: Parte Trabajo ${fechaCtx}, sem ${semana} del ${year}`,
-                        );
-                        setIsLoading(false);
-                      }
-
-                      if (isUpload.data.feedback) {
-                        Alert.alert(
-                          `Ocurrio un error al subir los datos, ${isUpload.data.feedback}.`,
-                        );
-                        setIsLoading(false);
-                      }
-                    } catch (error) {
-                      Alert.alert(error.message);
-                      setIsLoading(false);
-                    }
-                  }
-                },
-              );
-            }
-          } else {
-            Alert.alert('No existen partes diarios');
-            setIsLoading(false);
-          }
-        },
-      );
-    } catch (error) {
-      Alert.alert(error.message);
-      setIsLoading(false);
-    }
-  };
-
-  const SchemaParteTrabajo = (dataPd) => {
-    const ParteTrabajo = {
-      codigo: '00000001',
-      Division: config.divicion,
-      EjercicioFiscal: config.fiscal,
-      Fecha: dataPd.fecha,
-      IdMayordomo: me.id_Empleado,
-      IdPeriodo: config.periodo,
-      IdTipoRol: config.rol,
-      IdHacienda: config.hacienda,
-      IdSector: config.sector,
-      ParteTrabajoDetalle: [],
-    };
-    return ParteTrabajo;
+        setUploadCuadrillas(cuadrillas);
+        console.log(cuadrillas);
+        cuadrillas.length
+          ? setIsModal(true)
+          : Alert.alert(`No existen partes diarios en: ${fechaCtx}`);
+      },
+    );
   };
 
   return (
-    <TouchableOpacity
-      onPress={subir_datos}
-      style={[
-        styles.signIn,
-        {borderColor: '#009387', borderWidth: 1, marginTop: 15},
-      ]}>
-      <Text style={[styles.textSign, {color: '#009387'}]}>Subir datos</Text>
-    </TouchableOpacity>
+    <>
+      <TouchableOpacity
+        onPress={subir_datos}
+        style={[
+          styles.signIn,
+          {borderColor: '#009387', borderWidth: 1, marginTop: 15},
+        ]}>
+        <Text style={[styles.textSign, {color: '#009387'}]}>Subir datos</Text>
+      </TouchableOpacity>
+
+      <ModalScreen isModal={isModal} setIsModal={setIsModal}>
+        <SelectUpload
+          cuadrillas={UploadCuadrillas}
+          setCuadrillas={setUploadCuadrillas}
+          setIsLoading={setIsLoading}
+          fechaCtx={fechaCtx}
+          semana={semana}
+          config={config}
+          year={year}
+          me={me}
+        />
+      </ModalScreen>
+    </>
   );
 }
 
