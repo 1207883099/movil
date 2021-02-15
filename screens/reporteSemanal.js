@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {View, Text, ScrollView, StyleSheet} from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import {MessageAlert} from '../components/elementos/message';
+import {LoaderSpinner} from '../components/loader/spiner-loader';
 /* DB LOCAL */
 import {dbConfiguracion} from '../db-local/db-configuracion';
 import {dbParteDiario} from '../db-local/db-parte-diario';
@@ -9,6 +10,7 @@ import {dbActEmpl} from '../db-local/db-actividades-empleado';
 import {dbMaestra} from '../db-local/db-maestra';
 
 const ReporteSemanal = () => {
+  const [loading, setLoading] = useState(false);
   const [periodo, setPeriodo] = useState({
     Nombre: undefined,
     _id: undefined,
@@ -23,6 +25,8 @@ const ReporteSemanal = () => {
   const [Actividades, setActividades] = useState([]);
 
   useEffect(() => {
+    setLoading(true);
+
     dbConfiguracion.find({}, async function (err, dataConfig) {
       err && Alert.alert(err.message);
 
@@ -51,7 +55,7 @@ const ReporteSemanal = () => {
 
             for (let i = 0; i < filterDay.length; i++) {
               dbActEmpl.find(
-                {idParteDiario: dataPD[i]._id},
+                {idParteDiario: filterDay[i]._id},
                 function (err, dataActiEmpl) {
                   err && Alert.alert(err.message);
                   const data_for_day = [];
@@ -70,7 +74,10 @@ const ReporteSemanal = () => {
                     data: data_for_day,
                   });
 
-                  setTimeout(() => setReportes(report_foy_day), 2000);
+                  setTimeout(() => {
+                    setReportes(report_foy_day);
+                    setLoading(false);
+                  }, 2000);
                 },
               );
             }
@@ -144,28 +151,21 @@ const ReporteSemanal = () => {
               {reporte.data
                 .sort((a, b) => a.actividad > b.actividad)
                 .map((value) => (
-                  <View
-                    style={{
-                      padding: 10,
-                      borderBottom: 2,
-                      borderBottomStyle: 'solid',
-                      borderBottomColor: '#cddcdcd',
-                      borderBottomWidth: 2,
-                    }}
-                    key={value.idEmpleado}>
-                    <Text style={{color: '#000'}}>
-                      Empleado: {obtener_empleado(value.idEmpleado)}
+                  <View key={value.idEmpleado}>
+                    <Text style={{color: '#000', padding: 7}}>
+                      {obtener_empleado(value.idEmpleado)}{' '}
+                      <Text style={{color: 'blue'}}>/</Text>{' '}
+                      {obtenerActividad(value.actividad)}{' '}
+                      <Text style={{color: 'red'}}>/</Text> {value.hectaria}
                     </Text>
-                    <Text style={{color: '#000'}}>
-                      Actividad: {obtenerActividad(value.actividad)}
-                    </Text>
-                    <Text style={{color: '#000'}}>valor: {value.hectaria}</Text>
                   </View>
                 ))}
             </>
           ))}
 
-          {reportes.length === 0 && (
+          {loading && <LoaderSpinner />}
+
+          {reportes.length === 0 && !loading && (
             <MessageAlert
               background="#cce5ff"
               content="Por el momento no existe ningun registro del parte diario semanal."

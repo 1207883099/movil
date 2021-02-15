@@ -113,10 +113,6 @@ export function UploadData({setIsLoading, fechaCtx, semana, year}) {
                         Alert.alert(
                           `Datos subidos: Parte Trabajo ${fechaCtx}, sem ${semana} del ${year}`,
                         );
-                        dbParteDiario.update(
-                          {dia: fechaCtx, semana},
-                          {$set: {'Mis_Parte_Diario[0].nube': true}},
-                        );
                         setIsLoading(false);
                       }
 

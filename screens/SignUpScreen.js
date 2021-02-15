@@ -66,26 +66,10 @@ const SignInScreen = ({navigation}) => {
               </View>
               {cuadrilla.Empleados.sort((a, b) => a.Apellido > b.Apellido).map(
                 (empleado, index) => (
-                  <View
-                    style={{
-                      padding: 10,
-                      borderBottom: 2,
-                      borderBottomStyle: 'solid',
-                      borderBottomColor: '#cddcdcd',
-                      borderBottomWidth: 2,
-                    }}
-                    key={index}>
-                    <Text style={{color: '#000'}}>
-                      Apellido: {empleado.Apellido}
-                    </Text>
-                    <Text style={{color: '#000'}}>
-                      Nombre: {empleado.Nombre}
-                    </Text>
-                    <Text style={{color: '#000'}}>
-                      Cedula: {empleado.Cedula}
-                    </Text>
-                    <Text style={{color: '#000'}}>
-                      Codigo: {empleado.Codigo}
+                  <View key={index}>
+                    <Text style={{color: '#000', padding: 7}}>
+                      {empleado.Apellido + ' ' + empleado.Nombre}{' '}
+                      <Text style={{color: 'blue'}}>/</Text> {empleado.Cedula}
                     </Text>
                   </View>
                 ),

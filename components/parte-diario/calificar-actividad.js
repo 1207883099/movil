@@ -37,24 +37,24 @@ export function CalificarActividad({
   //const [updateSelect, setUpdateSelect] = useState(false);
 
   useEffect(() => {
-    dbActEmpl.findOne({_id: selectIdActiEmple}, async function (
-      err,
-      dataActEmpl,
-    ) {
-      err && Alert.alert(err.message);
-      setActvEmpld(dataActEmpl);
-      setIsLote(dataActEmpl.isLote);
-      setHectarea(dataActEmpl.hectaria ? dataActEmpl.hectaria : 0);
-      setLotes(dataActEmpl.lotes);
-
-      dbTarifas.findOne({IdActividad: dataActEmpl.actividad}, async function (
-        err,
-        dataTarifas,
-      ) {
+    dbActEmpl.findOne(
+      {_id: selectIdActiEmple},
+      async function (err, dataActEmpl) {
         err && Alert.alert(err.message);
-        setTarifas(dataTarifas);
-      });
-    });
+        setActvEmpld(dataActEmpl);
+        setIsLote(dataActEmpl.isLote);
+        setHectarea(dataActEmpl.hectaria ? dataActEmpl.hectaria : 0);
+        setLotes(dataActEmpl.lotes);
+
+        dbTarifas.findOne(
+          {IdActividad: dataActEmpl.actividad},
+          async function (err, dataTarifas) {
+            err && Alert.alert(err.message);
+            setTarifas(dataTarifas);
+          },
+        );
+      },
+    );
 
     dbMaestra.find({}, async function (err, dataMaestra) {
       err && Alert.alert(err.message);
@@ -130,27 +130,23 @@ export function CalificarActividad({
   };
 
   const saveDataActividad = () => {
-    if (hectarea) {
-      if (hectarea >= Tarifas.Minimo && hectarea <= Tarifas.Maximo) {
-        dbActEmpl.update(
-          {_id: selectIdActiEmple},
-          {
-            $set: {
-              hectaria: hectarea,
-              lotes: lotes,
-              valorTotal: (Tarifas.ValorTarifa * hectarea).toFixed(2),
-            },
+    if (hectarea >= Tarifas.Minimo && hectarea <= Tarifas.Maximo) {
+      dbActEmpl.update(
+        {_id: selectIdActiEmple},
+        {
+          $set: {
+            hectaria: hectarea,
+            lotes: lotes,
+            valorTotal: (Tarifas.ValorTarifa * hectarea).toFixed(2),
           },
-        );
+        },
+      );
 
-        setIsModal(false);
-        setIsReload(true);
-        setReloadEmplAsig(true);
-      } else {
-        Alert.alert('Los valores no estan dentro del rango permitido');
-      }
+      setIsModal(false);
+      setIsReload(true);
+      setReloadEmplAsig(true);
     } else {
-      Alert.alert('Campos vacios, vuelva a intentarlo');
+      Alert.alert('Los valores no estan dentro del rango permitido');
     }
   };
 
