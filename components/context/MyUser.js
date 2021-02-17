@@ -6,7 +6,7 @@ const MyUserProvider = ({children}) => {
   const [UserCtx, setUserCtx] = useState({
     token: undefined,
     id_Empleado: undefined,
-    id_login_movil: undefined,
+    codeAccess: undefined,
     fecha_ingreso: undefined,
     movil_ip: undefined,
     Nombre: undefined,

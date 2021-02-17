@@ -134,7 +134,11 @@ export function AddActividad({
                 .map((actividad, index) => (
                   <Picker.Item
                     key={index}
-                    label={actividad.Nombre}
+                    label={
+                      actividad.CodigoActividad
+                        ? `${actividad.CodigoActividad} - ${actividad.Nombre}`
+                        : 'No code' + ' - ' + actividad.Nombre
+                    }
                     value={actividad.IdActividad}
                   />
                 ))}
