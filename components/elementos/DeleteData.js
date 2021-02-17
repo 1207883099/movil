@@ -4,6 +4,7 @@ import LinearGradient from 'react-native-linear-gradient';
 /* DATABASE LOCAL */
 import {dbEntryHistory} from '../../db-local/db-history-entry';
 import {dbConfiguracion} from '../../db-local/db-configuracion';
+import {dbMaestra} from '../../db-local/db-maestra';
 import {dbCuadrillaPD} from '../../db-local/db-cuadrilla-parte-diario';
 import {dbActEmpl} from '../../db-local/db-actividades-empleado';
 import {dbParteDiario} from '../../db-local/db-parte-diario';
@@ -22,28 +23,54 @@ export function DeleteData({navigation, setIsReload}) {
         },
         {
           text: 'OK',
+          onPress: () => DeleteMaestra(),
+        },
+      ],
+      {cancelable: false},
+    );
+  };
+
+  const deleteConfig = () => {
+    Alert.alert(
+      'Por ultimo',
+      '¿Quieres eliminar los datos de configuracion?',
+      [
+        {
+          text: 'No',
+          onPress: () => eliminar_part_dia_and_recurrente(),
+          style: 'cancel',
+        },
+        {
+          text: 'Si',
           onPress: () => {
-            Alert.alert(
-              'Antes de eliminar...',
-              '¿Quieres eliminar los datos de configuracion?',
-              [
-                {
-                  text: 'No',
-                  onPress: () => eliminar_part_dia_and_recurrente(),
-                  style: 'cancel',
-                },
-                {
-                  text: 'Si',
-                  onPress: () => {
-                    dbConfiguracion.remove({}, {multi: true}, function (err) {
-                      err && Alert.alert(err.message);
-                    });
-                    eliminar_part_dia_and_recurrente();
-                  },
-                },
-              ],
-              {cancelable: false},
-            );
+            dbConfiguracion.remove({}, {multi: true}, function (err) {
+              err && Alert.alert(err.message);
+            });
+            eliminar_part_dia_and_recurrente();
+          },
+        },
+      ],
+      {cancelable: false},
+    );
+  };
+
+  const DeleteMaestra = () => {
+    Alert.alert(
+      'Antes de eliminar...',
+      '¿Quieres eliminar los datos de la maestra?',
+      [
+        {
+          text: 'No',
+          onPress: () => deleteConfig(),
+          style: 'cancel',
+        },
+        {
+          text: 'Si',
+          onPress: () => {
+            dbMaestra.remove({}, {multi: true}, function (err) {
+              err && Alert.alert(err.message);
+            });
+            deleteConfig();
           },
         },
       ],

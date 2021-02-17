@@ -22,15 +22,11 @@ const SignInScreen = ({navigation}) => {
   useEffect(() => {
     setIsLoading(true);
     try {
-      const fetchTest = () => {
-        dbMaestra.find({}, async function (err, dataMaestra) {
-          err && Alert.alert(err.message);
-          setMisCuadrillas(dataMaestra[0].My_Cuadrilla);
-          setIsLoading(false);
-        });
-      };
-
-      fetchTest();
+      dbMaestra.find({}, async function (err, dataMaestra) {
+        err && Alert.alert(err.message);
+        setMisCuadrillas(dataMaestra[0].My_Cuadrilla);
+        setIsLoading(false);
+      });
     } catch (error) {
       Alert.alert(error.message);
     }

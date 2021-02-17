@@ -35,6 +35,7 @@ const SplashScreen = ({navigation, route}) => {
   const {colors} = useTheme();
   const netInfo = useNetInfo();
   const [isLogind, setIsLogind] = useState(false);
+  const [codeAccess, setCodeAccess] = useState('');
   const [isEntrey, setIsEntrey] = useState(false);
   const [isMe, setIsMe] = useState(false);
   const [completeConfig, setCompleteConfig] = useState(false);
@@ -75,33 +76,27 @@ const SplashScreen = ({navigation, route}) => {
 
   const btn_empezar = async () => {
     setIsLogind(true);
-    if (getDomain()) {
+    if (getDomain() && codeAccess) {
       if (getDomain().indexOf('https') !== -1) {
         try {
-          NetworkInfo.getIPAddress()
-            .then(async (ip) => {
-              const auth = await Auth(ip);
-              if (auth.data.feedback) {
-                Alert.alert(auth.data.feedback);
-              } else {
-                InsertarEntry({fecha: fecha_actual()});
-                isEntrey &&
-                  Alert.alert('Asegurate de limpiar los datos regularmente.');
-                setUserCtx(auth.data.MyUser);
-                if (isMe) {
-                  dbMe.update(
-                    {section: 'me'},
-                    {$set: {MyData: auth.data.MyUser}},
-                  );
-                } else {
-                  InsertarMe({MyData: auth.data.MyUser, section: 'me'});
-                }
-                completeConfig
-                  ? navigation.navigate('SignInScreen')
-                  : navigation.navigate('Configuracion');
-              }
-            })
-            .catch((err) => Alert.alert(err.message), setIsLogind(false));
+          const auth = await Auth(codeAccess);
+          if (auth.data.feedback) {
+            Alert.alert(auth.data.feedback);
+          } else {
+            InsertarEntry({fecha: fecha_actual()});
+            isEntrey &&
+              Alert.alert('Asegurate de limpiar los datos regularmente.');
+            setUserCtx(auth.data.MyUser);
+            if (isMe) {
+              dbMe.update({section: 'me'}, {$set: {MyData: auth.data.MyUser}});
+            } else {
+              InsertarMe({MyData: auth.data.MyUser, section: 'me'});
+            }
+            completeConfig
+              ? navigation.navigate('SignInScreen')
+              : navigation.navigate('Configuracion');
+          }
+          setIsLogind(false);
         } catch (error) {
           setIsLogind(false);
           Alert.alert(error.message);
@@ -110,7 +105,7 @@ const SplashScreen = ({navigation, route}) => {
         Alert.alert('Inserta una URL valida.');
       }
     } else {
-      Alert.alert('Inserta la URL de autorizacion.');
+      Alert.alert('Inserta la URL y el codigo de autorizacion.');
     }
   };
 
@@ -118,12 +113,20 @@ const SplashScreen = ({navigation, route}) => {
     <View style={styles.container}>
       <StatusBar backgroundColor="#009387" barStyle="light-content" />
       <View style={styles.header}>
-        <Text style={styles.titleInput}>Inserta la direccion autorizada</Text>
+        <Text style={styles.titleInput}>
+          Inserta la direccion y codigo autorizados
+        </Text>
         <TextInput
           onChangeText={(value) => setDomain(value)}
           style={styles.input}
           type="url"
           placeholder="Inserta la URL autorizada"
+        />
+        <TextInput
+          onChangeText={(value) => setCodeAccess(value)}
+          style={styles.input}
+          type="url"
+          placeholder="Inserta el codigo autorizado"
         />
       </View>
       {isLogind && <LoaderSpinner color="white" />}

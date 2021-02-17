@@ -49,6 +49,7 @@ const ReporteSemanal = () => {
         function (err, dataPD) {
           err && Alert.alert(err.message);
           const report_foy_day = [];
+          dataPD.length === 0 && setLoading(false);
 
           for (let j = 0; j < dias.length; j++) {
             const filterDay = dataPD.filter((item) => item.dia === dias[j]);

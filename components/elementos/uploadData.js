@@ -55,7 +55,7 @@ export function UploadData({setIsLoading, fechaCtx, semana, year}) {
 
     dbMe.findOne({section: 'me'}, async function (err, dataMe) {
       err && Alert.alert(err.message);
-      setMe(dataMe.MyData);
+      dataMe && setMe(dataMe.MyData);
     });
   }, []);
 

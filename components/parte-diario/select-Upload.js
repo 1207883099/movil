@@ -1,9 +1,11 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {View, Text, CheckBox, StyleSheet, Button, Alert} from 'react-native';
 /* API */
 import {SubirParteTrabajo} from '../../api/parteTrabajo';
+/* DB LOCAL */
 import {dbParteDiario} from '../../db-local/db-parte-diario';
 import {dbActEmpl} from '../../db-local/db-actividades-empleado';
+import {dbMaestra} from '../../db-local/db-maestra';
 
 export const SelectUpload = ({
   cuadrillas,
@@ -15,6 +17,24 @@ export const SelectUpload = ({
   me,
   year,
 }) => {
+  const [MisCuadrillas, setMisCuadrillas] = useState();
+
+  useEffect(() => {
+    dbMaestra.find({}, async function (err, dataMaestra) {
+      err && Alert.alert(err.message);
+      setMisCuadrillas(dataMaestra[0].My_Cuadrilla);
+    });
+  }, []);
+
+  const obtenerIdCuadrilla = (NameCuadrilla) => {
+    if (MisCuadrillas.length) {
+      const findCuadrilla = MisCuadrillas.find(
+        (item) => item.Nombre === NameCuadrilla,
+      );
+      return findCuadrilla.IdCuadrilla;
+    }
+  };
+
   const UploadData = async () => {
     const isSelected = cuadrillas.filter((item) => item.select === false);
 
@@ -48,6 +68,9 @@ export const SelectUpload = ({
 
                     for (let j = 0; j < dataActividad.length; j++) {
                       if (dataActividad[j].hectaria) {
+                        parteTrabajo.IdCuadrilla = obtenerIdCuadrilla(
+                          dataPD[i].cuadrilla,
+                        );
                         parteTrabajo.ParteTrabajoDetalle.push({
                           IdActividad: dataActividad[j].actividad,
                           IdEmpleado: dataActividad[j].idEmpleado,
@@ -78,7 +101,9 @@ export const SelectUpload = ({
                     }
 
                     Upload.push(parteTrabajo);
+                    console.log(Upload);
 
+                    return false;
                     if (i === dataPD.length - 1) {
                       try {
                         const isUpload = await SubirParteTrabajo(Upload);
@@ -128,6 +153,7 @@ export const SelectUpload = ({
       IdTipoRol: config.rol,
       IdHacienda: config.hacienda,
       IdSector: config.sector,
+      IdCuadrilla: '',
       ParteTrabajoDetalle: [],
     };
     return ParteTrabajo;
