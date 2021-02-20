@@ -65,7 +65,7 @@ const SignInScreen = ({navigation}) => {
                   <View key={index}>
                     <Text style={{color: '#000', padding: 7}}>
                       {empleado.Apellido + ' ' + empleado.Nombre}{' '}
-                      <Text style={{color: 'blue'}}>/</Text> {empleado.Cedula}
+                      <Text style={{color: 'blue'}}>/ {empleado.Cedula} </Text>
                     </Text>
                   </View>
                 ),

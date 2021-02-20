@@ -155,9 +155,10 @@ const ReporteSemanal = () => {
                   <View key={value.idEmpleado}>
                     <Text style={{color: '#000', padding: 7}}>
                       {obtener_empleado(value.idEmpleado)}{' '}
-                      <Text style={{color: 'blue'}}>/</Text>{' '}
-                      {obtenerActividad(value.actividad)}{' '}
-                      <Text style={{color: 'red'}}>/</Text> {value.hectaria}
+                      <Text style={{color: '#b08b05'}}>
+                        /{obtenerActividad(value.actividad)}{' '}
+                      </Text>{' '}
+                      <Text style={{color: 'blue'}}>/ {value.hectaria} </Text>
                     </Text>
                   </View>
                 ))}

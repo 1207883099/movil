@@ -102,6 +102,7 @@ export const SelectUpload = ({
 
                     Upload.push(parteTrabajo);
 
+                    return false;
                     if (i === dataPD.length - 1) {
                       try {
                         const isUpload = await SubirParteTrabajo(Upload);
@@ -154,13 +155,22 @@ export const SelectUpload = ({
       IdCuadrilla: '',
       ParteTrabajoDetalle: [],
     };
+
     return ParteTrabajo;
   };
 
   const handleChange = (value, cuadrilla) => {
     const changeValue = {select: value, cuadrilla};
-    console.log(cuadrillas.splice(0, cuadrillas.length, changeValue));
-    setCuadrillas(cuadrillas.splice(0, cuadrillas.length, changeValue));
+    const changeCuadrillas = [];
+    for (let i = 0; i < cuadrillas.length; i++) {
+      if (cuadrilla === cuadrillas[i].cuadrilla) {
+        changeCuadrillas.push(changeValue);
+      } else {
+        changeCuadrillas.push(cuadrillas[i]);
+      }
+    }
+
+    setCuadrillas(changeCuadrillas);
   };
 
   return (

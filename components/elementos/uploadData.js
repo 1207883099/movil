@@ -70,7 +70,6 @@ export function UploadData({setIsLoading, fechaCtx, semana, year}) {
         }
 
         setUploadCuadrillas(cuadrillas);
-        console.log(cuadrillas);
         cuadrillas.length
           ? setIsModal(true)
           : Alert.alert(`No existen partes diarios en: ${fechaCtx}`);

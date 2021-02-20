@@ -149,7 +149,7 @@ const SignInScreen = ({navigation}) => {
               </>
             )}
 
-            {dataLocal.length > 0 && UserCtx.codeAccess !== undefined ? (
+            {dataLocal.length > 0 && UserCtx.codeAccess === undefined ? (
               <>
                 {isLoading ? (
                   <LoaderSpinner />
