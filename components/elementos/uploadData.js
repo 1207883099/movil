@@ -7,6 +7,7 @@ import {ModalScreen} from '../modal/modal';
 import {SelectUpload} from '../parte-diario/select-Upload';
 /* DB LOCAL */
 import {dbParteDiario} from '../../db-local/db-parte-diario';
+import {dbActEmpl} from '../../db-local/db-actividades-empleado';
 import {dbConfiguracion} from '../../db-local/db-configuracion';
 import {dbMe} from '../../db-local/db-me';
 
@@ -62,11 +63,25 @@ export function UploadData({setIsLoading, fechaCtx, semana, year}) {
   const subir_datos = () => {
     dbParteDiario.find(
       {$not: {cuadrilla: 'undefined'}, dia: fechaCtx, semana},
-      function (err, dataPD) {
+      async function (err, dataPD) {
         err && Alert.alert(err.message);
         const cuadrillas = [];
         for (let h = 0; h < dataPD.length; h++) {
-          cuadrillas.push({select: false, cuadrilla: dataPD[h].cuadrilla});
+          await dbActEmpl.find(
+            {idParteDiario: dataPD[h]._id},
+            function (err, dataActividad) {
+              err && Alert.alert(err.message);
+              for (let j = 0; j < dataActividad.length; j++) {
+                if (dataActividad[j].hectaria) {
+                  cuadrillas.push({
+                    select: false,
+                    cuadrilla: dataPD[h].cuadrilla,
+                  });
+                  break;
+                }
+              }
+            },
+          );
         }
 
         setUploadCuadrillas(cuadrillas);

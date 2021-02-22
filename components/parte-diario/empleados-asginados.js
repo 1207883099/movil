@@ -113,7 +113,7 @@ function EmpleadosAsignados({
           ? Actividad.IdActividad
           : Actividad.Nombre;
       } else {
-        return 'Cargando...';
+        return '( Sin Cargo )';
       }
     }
   };
@@ -296,20 +296,22 @@ function EmpleadosAsignados({
                       </>
                     }
                   </Text>
-                  {actions && (
-                    <Text
-                      style={styles.btn_actividad}
-                      onPress={() => {
-                        setIsModal(true);
-                        SetselectActiEmple(activEmple._id);
-                      }}>
-                      <MaterialIcons
-                        name="navigate-next"
-                        color="#009387"
-                        size={20}
-                      />
-                    </Text>
-                  )}
+                  {actions &&
+                    obtenerActividad(activEmple.actividad, 'Nombre') !==
+                      '( Sin Cargo )' && (
+                      <Text
+                        style={styles.btn_actividad}
+                        onPress={() => {
+                          setIsModal(true);
+                          SetselectActiEmple(activEmple._id);
+                        }}>
+                        <MaterialIcons
+                          name="navigate-next"
+                          color="#009387"
+                          size={20}
+                        />
+                      </Text>
+                    )}
                 </View>
               ),
             )}

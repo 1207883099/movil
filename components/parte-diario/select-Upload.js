@@ -102,7 +102,6 @@ export const SelectUpload = ({
 
                     Upload.push(parteTrabajo);
 
-                    return false;
                     if (i === dataPD.length - 1) {
                       try {
                         const isUpload = await SubirParteTrabajo(Upload);

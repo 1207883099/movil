@@ -35,7 +35,7 @@ export function CambioActividad({
       const Actividad = actividades.find(
         (activi) => activi.IdActividad === idActividad,
       );
-      return Actividad ? Actividad.Nombre : 'Cargando...';
+      return Actividad ? Actividad.Nombre : '( Sin Cargo )';
     }
   };
 
@@ -72,7 +72,7 @@ export function CambioActividad({
   return (
     <>
       <Text>
-        Actividad Actual:{' '}
+        Cargo o Actividad Actual:{' '}
         <Text style={{color: '#b08b05'}}>
           {' '}
           {obtenerActividad(ActivChange.actividad)}
