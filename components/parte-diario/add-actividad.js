@@ -162,7 +162,6 @@ const styles = StyleSheet.create({
   label: {
     fontWeight: 'bold',
     textAlign: 'left',
-    paddingBottom: 15,
   },
   tarea_text: {
     fontSize: 15,

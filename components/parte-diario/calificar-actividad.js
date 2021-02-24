@@ -9,6 +9,7 @@ import {
   Alert,
   ScrollView,
 } from 'react-native';
+import NumericInput from 'react-native-numeric-input';
 /* DB LOCAL */
 import {dbActEmpl} from '../../db-local/db-actividades-empleado';
 import {dbTarifas} from '../../db-local/db-tarifas';
@@ -72,7 +73,7 @@ export function CalificarActividad({
   const obtenerLote = (IdLote) => {
     const result = lotes.find((item) => item.IdLote === IdLote);
     if (result === undefined) {
-      return 'cargando....';
+      return 'Sin Lote';
     } else {
       return result;
     }
@@ -96,31 +97,37 @@ export function CalificarActividad({
   const renderLotes = () => {
     return (
       <>
-        <View
-          style={{
-            borderBottom: 2,
-            borderBottomColor: '#cdcdcd',
-            borderBottomWidth: 2,
-            padding: 10,
-          }}
-        />
-        <Text style={styles.tarea_text}>Lotes:</Text>
         {lotes.map((lote, index) => (
-          <View style={[styles.head, {marginBottom: 10}]} key={index}>
+          <View
+            style={[
+              styles.head,
+              {marginBottom: 10, justifyContent: 'space-around'},
+            ]}
+            key={index}>
             <View>
               <Text>{lote.Nombre}</Text>
             </View>
             <View>
-              <TextInput
-                defaultValue={lote.value && String(lote.value)}
-                onChangeText={(value) => {
+              <NumericInput
+                value={lote.value && lote.value}
+                onChange={(value) => {
                   const thisLote = obtenerLote(lote.IdLote);
                   thisLote.value = Number(value);
                   setLotes(lotes.splice(0, lotes.length, thisLote));
                   value = 0;
                 }}
-                style={styles.text_input}
-                placeholder="Insertar valor"
+                onLimitReached={(isMax) =>
+                  isMax && Alert.alert('Limite maximo alcanzado')
+                }
+                totalWidth={100}
+                totalHeight={30}
+                iconSize={20}
+                step={1}
+                valueType="real"
+                textColor="#009387"
+                iconStyle={{color: 'white'}}
+                rightButtonBackgroundColor="#009387"
+                leftButtonBackgroundColor="#009387"
               />
             </View>
           </View>
@@ -152,40 +159,28 @@ export function CalificarActividad({
 
   return (
     <ScrollView>
-      <View style={styles.head}>
+      <View style={[styles.head, {justifyContent: 'space-between'}]}>
         <Text style={styles.tarea_text}>Actividad ------{'>'}</Text>
-        <Text
-          style={[
-            styles.box_actividad,
-            {borderColor: '#b08b05', color: '#b08b05'},
-          ]}>
+        <Text style={{borderColor: '#b08b05', color: '#b08b05'}}>
           {obtenerActividad(actvEmpld.actividad, 'Nombre')}
         </Text>
       </View>
-      <View style={styles.head}>
+
+      <View style={[styles.head, {justifyContent: 'space-between'}]}>
         <Text style={styles.tarea_text}>Hectaria ------{'>'}</Text>
-        <Text
-          style={[
-            styles.box_actividad,
-            {borderColor: 'royalblue', color: 'royalblue'},
-          ]}>
+        <Text style={{borderColor: 'royalblue', color: 'royalblue'}}>
           # {hectarea.toFixed(2)}
         </Text>
       </View>
-      <View style={styles.head}>
-        <Text style={styles.tarea_text}>Valor total ------{'>'}</Text>
-        <Text
-          style={[
-            styles.box_actividad,
-            {borderColor: '#009387', color: '#009387'},
-          ]}>
-          $ {(Tarifas.ValorTarifa * hectarea).toFixed(2)}
-        </Text>
-      </View>
 
-      <View style={styles.head}>
+      <View
+        style={[styles.head, {marginTop: 10, justifyContent: 'space-around'}]}>
         <Text>Minimo: {Tarifas.Minimo}</Text>
         <Text>Maximo: {Tarifas.Maximo}</Text>
+      </View>
+
+      <View style={{margin: 15}}>
+        <Button title="Guardar" color="#009387" onPress={saveDataActividad} />
       </View>
 
       {isLote ? (
@@ -202,27 +197,14 @@ export function CalificarActividad({
           </View>
         </View>
       )}
-
-      <Button title="Guardar" color="#009387" onPress={saveDataActividad} />
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  box_tareas: {
-    padding: 2,
-    marginBottom: 15,
-    marginTop: 5,
-  },
-  row_tareas: {
-    padding: 10,
-  },
   tarea_text: {
     fontSize: 14,
     fontWeight: 'bold',
-    padding: 10,
-    textAlign: 'center',
-    marginBottom: 20,
   },
   text_input: {
     borderWidth: 2,
@@ -246,19 +228,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderStyle: 'solid',
     fontSize: 12,
-    marginTop: 10,
   },
   head: {
     flex: 1,
     flexDirection: 'row',
-    justifyContent: 'space-around',
-  },
-  update_bottom: {
-    paddingLeft: 10,
-    paddingRight: 10,
-    borderWidth: 2,
-    borderColor: '#b08b05',
-    color: '#b08b05',
-    borderStyle: 'solid',
   },
 });

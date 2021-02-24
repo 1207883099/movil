@@ -223,19 +223,15 @@ function EmpleadosAsignados({
         />
       )}
 
-      <View style={styles.header}>
-        {ActivEmple.length !== 0 && (
-          <View>
-            <AddActividad
-              id_parte_diario={id_parte_diario}
-              cuadrilla={cuadrilla}
-              setReloadEmplAsig={setReloadEmplAsig}
-              idSector={idSector}
-            />
-          </View>
-        )}
-      </View>
-      <View style={{padding: 10}} key={0}>
+      {ActivEmple.length !== 0 && (
+        <AddActividad
+          id_parte_diario={id_parte_diario}
+          cuadrilla={cuadrilla}
+          setReloadEmplAsig={setReloadEmplAsig}
+          idSector={idSector}
+        />
+      )}
+      <View>
         {ActivEmple.length === 0
           ? Empleados.map((obrero, index) => (
               <View style={styles.row_empleado_asig} key={index}>
