@@ -23,6 +23,7 @@ import {generarLotes} from '../../hooks/lotes';
 
 function EmpleadosAsignados({
   Empleados,
+  secuencia,
   actions,
   id_parte_diario,
   cuadrilla,
@@ -152,7 +153,7 @@ function EmpleadosAsignados({
 
     dbParteDiario.update(
       {_id: id_parte_diario, cuadrilla: 'undefined'},
-      {$set: {cuadrilla: cuadrilla}},
+      {$set: {cuadrilla: cuadrilla, iteracion: secuencia}},
     );
 
     const lotesGenerados = await generarLotes(dbMaestra, idSector);
@@ -173,13 +174,14 @@ function EmpleadosAsignados({
         hectaria: 0,
       });
     });
+
     setIsReload(true);
   };
 
   const deleteEmpleado = (idEmpleado) => {
     Alert.alert(
       obtener_empleado(idEmpleado),
-      '¿Seguro que quieres eliminar este registro?',
+      '¿Seguro que deseas eliminar este registro?',
       [
         {
           text: 'No',

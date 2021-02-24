@@ -11,6 +11,7 @@ export function GenerarTareaEmpleado({
 }) {
   const [IsCuadrilla, setIsCuadrilla] = useState('');
   const [Empleados, setEmpleados] = useState([]);
+  const [secuencia, setSecuencia] = useState('00001');
 
   useEffect(() => {
     if (Cuadrillas) {
@@ -20,9 +21,29 @@ export function GenerarTareaEmpleado({
       } else {
         setIsCuadrilla(Cuadrillas[0].Nombre);
         setEmpleados(Cuadrillas[0].Empleados);
+        const IdCuadrilla = addCero(`${Cuadrillas[0].IdCuadrilla}`);
+
+        if (Cuadrillas[0].secuenciapartediario) {
+          setSecuencia(
+            `8${IdCuadrilla}${Cuadrillas[0].secuenciapartediario + 1}`,
+          );
+        } else {
+          setSecuencia(`8${IdCuadrilla}00001`);
+        }
       }
     }
   }, [Cuadrillas]);
+
+  const addCero = (IdCuadrilla) => {
+    switch (IdCuadrilla.length) {
+      case 1:
+        return `00${IdCuadrilla}`;
+      case 2:
+        return `0${IdCuadrilla}`;
+      default:
+        return IdCuadrilla;
+    }
+  };
 
   return (
     <>
@@ -42,6 +63,17 @@ export function GenerarTareaEmpleado({
                     (cuadrilla) => cuadrilla.Nombre === itemValue,
                   );
                   setEmpleados(ResultEmpleados.Empleados);
+                  const IdCuadrilla = addCero(`${ResultEmpleados.IdCuadrilla}`);
+
+                  if (ResultEmpleados.secuenciapartediario) {
+                    setSecuencia(
+                      `8${IdCuadrilla}${
+                        ResultEmpleados.secuenciapartediario + 1
+                      }`,
+                    );
+                  } else {
+                    setSecuencia(`8${IdCuadrilla}00001`);
+                  }
                 }
               }}>
               <Picker.Item label="** Seleccione la cuadrilla **" value="none" />
@@ -58,6 +90,7 @@ export function GenerarTareaEmpleado({
       ) : (
         <EmpleadosAsignados
           Empleados={Empleados}
+          secuencia={secuencia}
           actions={false}
           id_parte_diario={id_parte_diario}
           cuadrilla={IsCuadrilla}

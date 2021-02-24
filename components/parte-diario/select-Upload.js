@@ -142,7 +142,7 @@ export const SelectUpload = ({
 
   const SchemaParteTrabajo = (dataPd) => {
     const ParteTrabajo = {
-      codigo: '00000001',
+      codigo: dataPd.iteracion,
       Division: config.divicion,
       EjercicioFiscal: config.fiscal,
       Fecha: dataPd.fecha,

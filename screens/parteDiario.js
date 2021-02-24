@@ -215,6 +215,7 @@ const ParteDiarioScreen = ({navigation}) => {
         semana: periodo.Nombre,
         fecha: getDiaSemana(new Date(periodo.FechaInicial), fechaCtx),
         cuadrilla: 'undefined',
+        iteracion: 'undefined',
       });
 
       setIsReload(true);
