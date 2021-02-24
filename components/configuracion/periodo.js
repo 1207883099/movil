@@ -25,47 +25,67 @@ export function PeriodoConfig({Periodo, setLoading, setIsReload}) {
     IdPeriodoNomina: undefined,
     EjercicioFiscal: undefined,
     Numero: undefined,
+    FechaInicial: undefined,
   });
 
   useEffect(() => {
-    dbConfiguracion.findOne({section: 'Periodo'}, async function (
-      err,
-      dataConfig,
-    ) {
-      err && Alert.alert(err.message);
-      dataConfig && setIsUpdate(true);
-    });
+    dbConfiguracion.findOne(
+      {section: 'Periodo'},
+      async function (err, dataConfig) {
+        err && Alert.alert(err.message);
+        dataConfig && setIsUpdate(true);
+      },
+    );
   }, []);
 
   const getPeriodos = () => {
     setLoading(true);
 
-    dbConfiguracion.find({}, async function (err, dataConfig) {
-      err && Alert.alert(err.message);
+    if (isUpdate) {
+      dbConfiguracion.find({}, async function (err, dataConfig) {
+        err && Alert.alert(err.message);
 
-      const fiscal = dataConfig.find((item) => item.section === 'Fiscal');
-      const Rol = dataConfig.find((item) => item.section === 'Rol');
+        if (dataConfig.length) {
+          const PeriodosAll = dataConfig.find(
+            (item) => item.section === 'Periodo',
+          );
 
-      if (fiscal && Rol) {
-        obtenerConfiguracion(
-          'token-static',
-          'PeriodoNomina',
-          fiscal.value,
-          Rol.value,
-        )
-          .then((periodos) => {
-            if (periodos.data.length) {
-              setModal(true);
-              setPeriodos(periodos.data);
-            } else {
-              Alert.alert('No hay datos de periodos');
-            }
-          })
-          .catch((error) => Alert.alert(error.message));
-      } else {
-        Alert.alert('Se necesita configurar Rol y fiscal antes que periodo.');
-      }
-    });
+          console.log(PeriodosAll.FechaInicial);
+
+          setPeriodos(PeriodosAll.dataAll);
+          setModal(true);
+        } else {
+          Alert.alert('Se necesita configurar hacienda antes que sector.');
+        }
+      });
+    } else {
+      dbConfiguracion.find({}, async function (err, dataConfig) {
+        err && Alert.alert(err.message);
+
+        const fiscal = dataConfig.find((item) => item.section === 'Fiscal');
+        const Rol = dataConfig.find((item) => item.section === 'Rol');
+
+        if (fiscal && Rol) {
+          obtenerConfiguracion(
+            'token-static',
+            'PeriodoNomina',
+            fiscal.value,
+            Rol.value,
+          )
+            .then((periodos) => {
+              if (periodos.data.length) {
+                setModal(true);
+                setPeriodos(periodos.data);
+              } else {
+                Alert.alert('No hay datos de periodos');
+              }
+            })
+            .catch((error) => Alert.alert(error.message));
+        } else {
+          Alert.alert('Se necesita configurar Rol y fiscal antes que periodo.');
+        }
+      });
+    }
 
     setLoading(false);
   };
@@ -84,6 +104,7 @@ export function PeriodoConfig({Periodo, setLoading, setIsReload}) {
           $set: {
             value: selectPeriodo.IdPeriodoNomina,
             Nombre: selectPeriodo.Numero,
+            FechaInicial: selectPeriodo.FechaInicial,
           },
         },
       );
@@ -92,8 +113,11 @@ export function PeriodoConfig({Periodo, setLoading, setIsReload}) {
         section: 'Periodo',
         value: selectPeriodo.IdPeriodoNomina,
         Nombre: selectPeriodo.Numero,
+        FechaInicial: selectPeriodo.FechaInicial,
+        dataAll: periodos,
       });
     }
+
     setModal(false);
     setIsReload(true);
   };

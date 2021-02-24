@@ -48,6 +48,7 @@ const SignInScreen = ({navigation}) => {
       dbConfiguracion.find({}, async function (err, dataConfig) {
         err && Alert.alert(err.message);
         setIsConfig(dataConfig.length === 6 ? false : true);
+        console.log(dataConfig.length);
         if (dataConfig.length === 6) {
           setFiscal(dataConfig.find((item) => item.section === 'Fiscal'));
           setPeriodo(dataConfig.find((item) => item.section === 'Periodo'));

@@ -17,7 +17,7 @@ import {GenerarTareaEmpleado} from '../components/parte-diario/generar-tarea-emp
 import * as Animatable from 'react-native-animatable';
 import {FechaContext} from '../components/context/fecha';
 /* HOOKS */
-import {fecha_actual} from '../hooks/fechas';
+import {getDiaSemana} from '../hooks/fechas';
 
 const ParteDiarioScreen = ({navigation}) => {
   const {fechaCtx} = useContext(FechaContext);
@@ -75,6 +75,7 @@ const ParteDiarioScreen = ({navigation}) => {
             {dia: fechaCtx, semana: thisPeriodo.Nombre},
             async function (err, docs) {
               err && Alert.alert(err.message);
+              console.log(docs);
 
               if (IndexDb >= 0) {
                 let disponibles = [];
@@ -212,7 +213,7 @@ const ParteDiarioScreen = ({navigation}) => {
         Mis_Parte_Diario,
         dia: fechaCtx,
         semana: periodo.Nombre,
-        fecha: fecha_actual(),
+        fecha: getDiaSemana(new Date(periodo.FechaInicial), fechaCtx),
         cuadrilla: 'undefined',
       });
 

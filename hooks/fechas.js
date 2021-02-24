@@ -71,5 +71,19 @@ export function primerDiaSemana() {
   const curr = new Date();
   const first = curr.getDate() - curr.getDay();
   return new Date(curr.setDate(first));
-  // toUTCString()
+}
+
+export function getDiaSemana(date, diaActual) {
+  const dias = [
+    'Lunes',
+    'Martes',
+    'Miercoles',
+    'Jueves',
+    'Viernes',
+    'Sabado',
+    'Domingo',
+  ];
+
+  const numerDay = dias.findIndex((item) => item === diaActual);
+  return suma_resta_fecha(date, numerDay);
 }

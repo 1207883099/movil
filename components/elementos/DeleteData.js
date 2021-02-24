@@ -33,7 +33,7 @@ export function DeleteData({navigation, setIsReload}) {
   const deleteConfig = () => {
     Alert.alert(
       'Por ultimo',
-      '¿Quieres eliminar los datos de configuracion?',
+      '¿Deseas eliminar los datos de configuracion?',
       [
         {
           text: 'No',
@@ -57,7 +57,7 @@ export function DeleteData({navigation, setIsReload}) {
   const DeleteMaestra = () => {
     Alert.alert(
       'Antes de eliminar...',
-      '¿Quieres eliminar los datos de la maestra?',
+      '¿Deseas eliminar los datos de la maestra?',
       [
         {
           text: 'No',

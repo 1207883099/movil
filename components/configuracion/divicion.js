@@ -96,6 +96,7 @@ export function Divicion({divicion, setLoading, setIsReload}) {
         dataAll: divi,
       });
     }
+
     setModal(false);
     setIsReload(true);
   };
@@ -112,7 +113,7 @@ export function Divicion({divicion, setLoading, setIsReload}) {
           ]}
           style={styles.signIn}>
           <Text style={[styles.text, {color: '#fff'}]}>
-            Divicion: ({divicion ? divicion : 'Ninguno'})
+            Division: ({divicion ? divicion : 'Ninguno'})
           </Text>
         </LinearGradient>
       </TouchableOpacity>
