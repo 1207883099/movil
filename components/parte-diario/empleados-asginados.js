@@ -286,8 +286,6 @@ function EmpleadosAsignados({
                           ]}>
                           &nbsp; /{' '}
                           {activEmple.hectaria ? activEmple.hectaria : 0}
-                          {' / '} ${' '}
-                          {activEmple.valorTotal ? activEmple.valorTotal : 0}
                         </Text>
                       </>
                     }

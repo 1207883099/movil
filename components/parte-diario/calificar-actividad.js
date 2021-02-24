@@ -24,6 +24,7 @@ export function CalificarActividad({
 }) {
   const [actvEmpld, setActvEmpld] = useState({
     actividad: 'Cargando',
+    hectaria: 0,
   });
   const [lotes, setLotes] = useState([]);
   const [Actividades, setActividades] = useState([]);
@@ -186,15 +187,26 @@ export function CalificarActividad({
       {isLote ? (
         renderLotes()
       ) : (
-        <View style={{marginBottom: 10}}>
-          <View style={{marginTop: 10}}>
-            <TextInput
-              defaultValue={actvEmpld.hectaria && actvEmpld.hectaria}
-              onChangeText={(value) => setHectarea(Number(value))}
-              style={styles.text_input}
-              placeholder="Insertar valor"
+        <View
+          style={[
+            styles.head,
+            {justifyContent: 'space-around', marginBottom: 10},
+          ]}>
+          {actvEmpld.actividad !== 'Cargando' && (
+            <NumericInput
+              value={actvEmpld.hectaria}
+              onChange={(value) => setHectarea(Number(value))}
+              totalWidth={150}
+              totalHeight={50}
+              iconSize={20}
+              step={1}
+              valueType="real"
+              textColor="#009387"
+              iconStyle={{color: 'white'}}
+              rightButtonBackgroundColor="#009387"
+              leftButtonBackgroundColor="#009387"
             />
-          </View>
+          )}
         </View>
       )}
     </ScrollView>
