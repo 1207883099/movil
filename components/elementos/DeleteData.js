@@ -7,6 +7,7 @@ import {dbConfiguracion} from '../../db-local/db-configuracion';
 import {dbMaestra} from '../../db-local/db-maestra';
 import {dbCuadrillaPD} from '../../db-local/db-cuadrilla-parte-diario';
 import {dbActEmpl} from '../../db-local/db-actividades-empleado';
+import {dbIteracionPT} from '../../db-local/db-interacion-pt';
 import {dbParteDiario} from '../../db-local/db-parte-diario';
 import {dbMe} from '../../db-local/db-me';
 
@@ -68,6 +69,10 @@ export function DeleteData({navigation, setIsReload}) {
           text: 'Si',
           onPress: () => {
             dbMaestra.remove({}, {multi: true}, function (err) {
+              err && Alert.alert(err.message);
+            });
+
+            dbIteracionPT.remove({}, {multi: true}, function (err) {
               err && Alert.alert(err.message);
             });
             deleteConfig();

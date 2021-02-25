@@ -4,6 +4,7 @@ import React, {useEffect, useState, memo} from 'react';
 import {Text, View, Alert, StyleSheet, Button} from 'react-native';
 /* DB LOCAL */
 import {dbCargos} from '../../db-local/db-cargos';
+import {InsertarIteracion} from '../../db-local/db-interacion-pt';
 import {
   InsertarActividadEmpleado,
   dbActEmpl,
@@ -23,7 +24,7 @@ import {generarLotes} from '../../hooks/lotes';
 
 function EmpleadosAsignados({
   Empleados,
-  secuencia,
+  dataSecuencia,
   actions,
   id_parte_diario,
   cuadrilla,
@@ -146,6 +147,11 @@ function EmpleadosAsignados({
   };
 
   const finish_template = async () => {
+    InsertarIteracion({
+      IdCuadrilla: dataSecuencia.IdCuadrilla,
+      iteracion: dataSecuencia.iteracion,
+    });
+
     InsertarCuadrillaPD({
       idParteDiario: id_parte_diario,
       cuadrilla,
@@ -153,7 +159,7 @@ function EmpleadosAsignados({
 
     dbParteDiario.update(
       {_id: id_parte_diario, cuadrilla: 'undefined'},
-      {$set: {cuadrilla: cuadrilla, iteracion: secuencia}},
+      {$set: {cuadrilla: cuadrilla, iteracion: dataSecuencia.secuencia}},
     );
 
     const lotesGenerados = await generarLotes(dbMaestra, idSector);

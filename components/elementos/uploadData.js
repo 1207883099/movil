@@ -87,7 +87,9 @@ export function UploadData({setIsLoading, fechaCtx, semana, year}) {
         setUploadCuadrillas(cuadrillas);
         cuadrillas.length
           ? setIsModal(true)
-          : Alert.alert(`No existen partes diarios en: ${fechaCtx}`);
+          : Alert.alert(
+              `No existen o estan vacios los partes diarios en: ${fechaCtx}`,
+            );
       },
     );
   };

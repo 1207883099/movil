@@ -76,6 +76,7 @@ const SplashScreen = ({navigation, route}) => {
 
   const btn_empezar = async () => {
     setIsLogind(true);
+
     if (getDomain() && codeAccess) {
       if (getDomain().indexOf('https') !== -1) {
         try {
@@ -83,19 +84,20 @@ const SplashScreen = ({navigation, route}) => {
           if (auth.data.feedback) {
             Alert.alert(auth.data.feedback);
           } else {
-            InsertarEntry({fecha: fecha_actual()});
-            isEntrey &&
-              Alert.alert('Asegurate de limpiar los datos regularmente.');
+            InsertarMe({MyData: auth.data.MyUser, section: 'me'});
             setUserCtx(auth.data.MyUser);
-            if (isMe) {
-              dbMe.update({section: 'me'}, {$set: {MyData: auth.data.MyUser}});
-            } else {
-              InsertarMe({MyData: auth.data.MyUser, section: 'me'});
+
+            InsertarEntry({fecha: fecha_actual()});
+
+            if (isEntrey) {
+              Alert.alert('Asegurate de limpiar los datos regularmente.');
             }
-            completeConfig
+
+            completeConfig && !isLogind
               ? navigation.navigate('SignInScreen')
               : navigation.navigate('Configuracion');
           }
+
           setIsLogind(false);
         } catch (error) {
           setIsLogind(false);

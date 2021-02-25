@@ -135,7 +135,7 @@ const Configuracion = ({navigation}) => {
                 onPress={() => {
                   const {rol, hacienda, fiscal, sector, periodo} = confiAll;
                   if (rol && hacienda && fiscal && sector && periodo) {
-                    navigation.navigate('SignInScreen');
+                    navigation.navigate('SignInScreen', {config: true});
                   } else {
                     Alert.alert('Completa la configuracion');
                   }

@@ -2,6 +2,8 @@ import React, {useState, useEffect} from 'react';
 import EmpleadosAsignados from './empleados-asginados';
 import {Text, View, StyleSheet} from 'react-native';
 import {Picker} from '@react-native-picker/picker';
+/* DB LOCAL */
+import {dbIteracionPT} from '../../db-local/db-interacion-pt';
 
 export function GenerarTareaEmpleado({
   Cuadrillas,
@@ -11,7 +13,11 @@ export function GenerarTareaEmpleado({
 }) {
   const [IsCuadrilla, setIsCuadrilla] = useState('');
   const [Empleados, setEmpleados] = useState([]);
-  const [secuencia, setSecuencia] = useState('00001');
+  const [dataSecuencia, setDateSecuencia] = useState({
+    IdCuadrilla: undefined,
+    iteracion: undefined,
+    secuencia: undefined,
+  });
 
   useEffect(() => {
     if (Cuadrillas) {
@@ -21,20 +27,44 @@ export function GenerarTareaEmpleado({
       } else {
         setIsCuadrilla(Cuadrillas[0].Nombre);
         setEmpleados(Cuadrillas[0].Empleados);
-        const IdCuadrilla = addCero(`${Cuadrillas[0].IdCuadrilla}`);
+        const IdCuadrillaSrt = addCeroCuadrilla(`${Cuadrillas[0].IdCuadrilla}`);
+        const IdCuadrilla = Cuadrillas[0].IdCuadrilla;
 
-        if (Cuadrillas[0].secuenciapartediario) {
-          setSecuencia(
-            `8${IdCuadrilla}${Cuadrillas[0].secuenciapartediario + 1}`,
-          );
-        } else {
-          setSecuencia(`8${IdCuadrilla}00001`);
-        }
+        validarIteracion(IdCuadrilla, IdCuadrillaSrt);
       }
     }
   }, [Cuadrillas]);
 
-  const addCero = (IdCuadrilla) => {
+  const validarIteracion = (IdCuadrilla, IdCuadrillaSrt) => {
+    dbIteracionPT.find({IdCuadrilla}, async function (err, dataIteracion) {
+      err && Alert.alert(err.message);
+
+      if (dataIteracion.length) {
+        const IntReverce = dataIteracion.reverse();
+        const secuencia = `8${IdCuadrillaSrt}${IntReverce[0].iteracion + 1}`;
+        const iteracion = IntReverce[0].iteracion + 1;
+
+        setDateSecuencia({IdCuadrilla, iteracion, secuencia});
+      } else {
+        if (Cuadrillas[0].secuencialpartediario) {
+          const secuencia = `8${IdCuadrillaSrt}${
+            Cuadrillas[0].secuencialpartediario + 1
+          }`;
+          const iteracion = Cuadrillas[0].secuenciapartediario + 1;
+
+          setDateSecuencia({IdCuadrilla, iteracion, secuencia});
+        } else {
+          setDateSecuencia({
+            IdCuadrilla,
+            iteracion: 1,
+            secuencia: `8${IdCuadrillaSrt}1`,
+          });
+        }
+      }
+    });
+  };
+
+  const addCeroCuadrilla = (IdCuadrilla) => {
     switch (IdCuadrilla.length) {
       case 1:
         return `00${IdCuadrilla}`;
@@ -63,17 +93,12 @@ export function GenerarTareaEmpleado({
                     (cuadrilla) => cuadrilla.Nombre === itemValue,
                   );
                   setEmpleados(ResultEmpleados.Empleados);
-                  const IdCuadrilla = addCero(`${ResultEmpleados.IdCuadrilla}`);
+                  const IdCuadrillaSrt = addCeroCuadrilla(
+                    `${ResultEmpleados.IdCuadrilla}`,
+                  );
+                  const IdCuadrilla = ResultEmpleados.IdCuadrilla;
 
-                  if (ResultEmpleados.secuenciapartediario) {
-                    setSecuencia(
-                      `8${IdCuadrilla}${
-                        ResultEmpleados.secuenciapartediario + 1
-                      }`,
-                    );
-                  } else {
-                    setSecuencia(`8${IdCuadrilla}00001`);
-                  }
+                  validarIteracion(IdCuadrilla, IdCuadrillaSrt);
                 }
               }}>
               <Picker.Item label="** Seleccione la cuadrilla **" value="none" />
@@ -90,7 +115,7 @@ export function GenerarTareaEmpleado({
       ) : (
         <EmpleadosAsignados
           Empleados={Empleados}
-          secuencia={secuencia}
+          dataSecuencia={dataSecuencia}
           actions={false}
           id_parte_diario={id_parte_diario}
           cuadrilla={IsCuadrilla}

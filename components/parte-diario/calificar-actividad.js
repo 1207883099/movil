@@ -138,7 +138,10 @@ export function CalificarActividad({
   };
 
   const saveDataActividad = () => {
-    if (hectarea >= Tarifas.Minimo && hectarea <= Tarifas.Maximo) {
+    if (
+      (hectarea >= Tarifas.Minimo && hectarea <= Tarifas.Maximo) ||
+      hectarea === 0
+    ) {
       dbActEmpl.update(
         {_id: selectIdActiEmple},
         {
