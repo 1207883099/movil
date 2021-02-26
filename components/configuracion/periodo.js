@@ -50,8 +50,6 @@ export function PeriodoConfig({Periodo, setLoading, setIsReload}) {
             (item) => item.section === 'Periodo',
           );
 
-          console.log(PeriodosAll.FechaInicial);
-
           setPeriodos(PeriodosAll.dataAll);
           setModal(true);
         } else {

@@ -72,6 +72,7 @@ const ReporteSemanal = () => {
 
                   report_foy_day.push({
                     dia: dias[j],
+                    iteracion: filterDay[i].iteracion,
                     data: data_for_day,
                   });
 
@@ -145,7 +146,7 @@ const ReporteSemanal = () => {
             <>
               <View key={reporte.dia}>
                 <Text style={{fontSize: 18, fontWeight: 'bold'}}>
-                  {reporte.dia}
+                  {reporte.dia} - {reporte.iteracion}
                 </Text>
               </View>
 

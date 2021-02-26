@@ -37,6 +37,7 @@ function EmpleadosAsignados({
   const [ReloadActEmpl, setReloadActEmpl] = useState(false);
   const [isModal, setIsModal] = useState(false);
   const [ActivEmple, setActivEmple] = useState([]);
+  const [selectEmpleado, SetselectEmpleado] = useState([]);
   const [ActivChange, setActivChange] = useState({
     actividad: undefined,
     idActividadEmple: undefined,
@@ -306,6 +307,9 @@ function EmpleadosAsignados({
                         onPress={() => {
                           setIsModal(true);
                           SetselectActiEmple(activEmple._id);
+                          SetselectEmpleado(
+                            obtener_empleado(activEmple.idEmpleado),
+                          );
                         }}>
                         <MaterialIcons
                           name="navigate-next"
@@ -322,6 +326,7 @@ function EmpleadosAsignados({
       <ModalScreen isModal={isModal} setIsModal={setIsModal}>
         <CalificarActividad
           selectIdActiEmple={selectIdActiEmple}
+          selectEmpleado={selectEmpleado}
           setIsModal={setIsModal}
           setReloadEmplAsig={setReloadEmplAsig}
           setIsReload={setIsReload}

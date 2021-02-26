@@ -10,6 +10,7 @@ import {
   ScrollView,
 } from 'react-native';
 import NumericInput from 'react-native-numeric-input';
+import {trunc} from '../../helpers/truncar';
 /* DB LOCAL */
 import {dbActEmpl} from '../../db-local/db-actividades-empleado';
 import {dbTarifas} from '../../db-local/db-tarifas';
@@ -17,6 +18,7 @@ import {dbMaestra} from '../../db-local/db-maestra';
 
 export function CalificarActividad({
   selectIdActiEmple,
+  selectEmpleado,
   setIsModal,
   setIsReload,
   setReloadEmplAsig,
@@ -146,9 +148,9 @@ export function CalificarActividad({
         {_id: selectIdActiEmple},
         {
           $set: {
-            hectaria: hectarea,
+            hectaria: trunc(hectarea, 2),
             lotes: lotes,
-            valorTotal: (Tarifas.ValorTarifa * hectarea).toFixed(2),
+            valorTotal: trunc(Tarifas.ValorTarifa * hectarea, 2),
           },
         },
       );
@@ -163,6 +165,13 @@ export function CalificarActividad({
 
   return (
     <ScrollView>
+      <View style={[styles.head, {justifyContent: 'space-between'}]}>
+        <Text style={styles.tarea_text}>Empleado ------{'>'}</Text>
+        <Text style={{borderColor: '#000', color: '#000'}}>
+          {selectEmpleado}
+        </Text>
+      </View>
+
       <View style={[styles.head, {justifyContent: 'space-between'}]}>
         <Text style={styles.tarea_text}>Actividad ------{'>'}</Text>
         <Text style={{borderColor: '#b08b05', color: '#b08b05'}}>

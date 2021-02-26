@@ -75,7 +75,6 @@ const ParteDiarioScreen = ({navigation}) => {
             {dia: fechaCtx, semana: thisPeriodo.Nombre},
             async function (err, docs) {
               err && Alert.alert(err.message);
-              console.log(docs);
 
               if (IndexDb >= 0) {
                 let disponibles = [];
