@@ -9,7 +9,6 @@ import {
   Alert,
   ScrollView,
 } from 'react-native';
-import NumericInput from 'react-native-numeric-input';
 import {trunc} from '../../helpers/truncar';
 /* DB LOCAL */
 import {dbActEmpl} from '../../db-local/db-actividades-empleado';
@@ -111,26 +110,17 @@ export function CalificarActividad({
               <Text>{lote.Nombre}</Text>
             </View>
             <View>
-              <NumericInput
-                value={lote.value && lote.value}
-                onChange={(value) => {
+              <TextInput
+                keyboardType="numeric"
+                defaultValue={lote.value && String(lote.value)}
+                onChangeText={(value) => {
                   const thisLote = obtenerLote(lote.IdLote);
                   thisLote.value = Number(value);
                   setLotes(lotes.splice(0, lotes.length, thisLote));
                   value = 0;
                 }}
-                onLimitReached={(isMax) =>
-                  isMax && Alert.alert('Limite maximo alcanzado')
-                }
-                totalWidth={100}
-                totalHeight={30}
-                iconSize={20}
-                step={1}
-                valueType="real"
-                textColor="#009387"
-                iconStyle={{color: 'white'}}
-                rightButtonBackgroundColor="#009387"
-                leftButtonBackgroundColor="#009387"
+                style={styles.text_input}
+                placeholder="Insertar valor"
               />
             </View>
           </View>
@@ -205,18 +195,12 @@ export function CalificarActividad({
             {justifyContent: 'space-around', marginBottom: 10},
           ]}>
           {actvEmpld.actividad !== 'Cargando' && (
-            <NumericInput
-              value={actvEmpld.hectaria}
-              onChange={(value) => setHectarea(Number(value))}
-              totalWidth={150}
-              totalHeight={50}
-              iconSize={20}
-              step={1}
-              valueType="real"
-              textColor="#009387"
-              iconStyle={{color: 'white'}}
-              rightButtonBackgroundColor="#009387"
-              leftButtonBackgroundColor="#009387"
+            <TextInput
+              keyboardType="numeric"
+              defaultValue={actvEmpld.hectaria && actvEmpld.hectaria}
+              onChangeText={(value) => setHectarea(Number(value))}
+              style={styles.text_input}
+              placeholder="Insertar valor"
             />
           )}
         </View>
