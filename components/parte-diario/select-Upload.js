@@ -1,7 +1,11 @@
 import React, {useEffect, useState} from 'react';
 import {View, Text, CheckBox, StyleSheet, Button, Alert} from 'react-native';
 /* API */
-import {SubirParteTrabajo} from '../../api/parteTrabajo';
+import {
+  SubirParteTrabajo,
+  SubirParteTrabajoDetalles,
+  SubirParteTrabajoDetallesValor,
+} from '../../api/parteTrabajo';
 /* DB LOCAL */
 import {dbParteDiario} from '../../db-local/db-parte-diario';
 import {dbActEmpl} from '../../db-local/db-actividades-empleado';
@@ -27,6 +31,7 @@ export const SelectUpload = ({
   }, []);
 
   const obtenerIdCuadrilla = (NameCuadrilla) => {
+    console.log(NameCuadrilla);
     if (MisCuadrillas.length) {
       const findCuadrilla = MisCuadrillas.find(
         (item) => item.Nombre === NameCuadrilla,
@@ -58,70 +63,89 @@ export const SelectUpload = ({
               );
 
               if (PD_select !== undefined && PD_select.select) {
-                let parteTrabajo;
-
                 dbActEmpl.find(
                   {idParteDiario: dataPD[i]._id},
                   async function (err, dataActividad) {
                     err && Alert.alert(err.message);
-                    parteTrabajo = SchemaParteTrabajo(dataPD[i]);
+                    const parteTrabajo = SchemaParteTrabajo(dataPD[i]);
+                    const {IdParteTrabajo, feedback} = await (
+                      await SubirParteTrabajo(parteTrabajo)
+                    ).data;
 
-                    for (let j = 0; j < dataActividad.length; j++) {
-                      if (dataActividad[j].hectaria) {
-                        parteTrabajo.IdCuadrilla = obtenerIdCuadrilla(
-                          dataPD[i].cuadrilla,
-                        );
-                        parteTrabajo.ParteTrabajoDetalle.push({
-                          IdActividad: dataActividad[j].actividad,
-                          IdEmpleado: dataActividad[j].idEmpleado,
-                          CodigoEmpleado: dataActividad[j].CodigoEmpleado,
-                          Total: dataActividad[j].valorTotal,
-                          Valor: dataActividad[j].hectaria,
-                          Tarifa: dataActividad[j].ValorTarifa,
-                          isLote: dataActividad[j].isLote,
-                          lotes: [],
-                        });
-
-                        for (
-                          let k = 0;
-                          k < dataActividad[j].lotes.length;
-                          k++
-                        ) {
-                          let item = dataActividad[j].lotes;
-
-                          parteTrabajo.ParteTrabajoDetalle[j].lotes.push({
-                            Lote: item[k].Nombre,
-                            IdLote: item[k].IdLote,
-                            Valor: item[k].value,
-                          });
-                        }
-                      } else {
-                        parteTrabajo.ParteTrabajoDetalle.push(null);
-                      }
+                    if (feedback) {
+                      Alert.alert(
+                        `Ocurrio un error al subir los datos, ${feedback}.`,
+                      );
+                      setIsLoading(false);
+                      return false;
                     }
 
-                    Upload.push(parteTrabajo);
+                    if (IdParteTrabajo) {
+                      for (let j = 0; j < dataActividad.length; j++) {
+                        if (dataActividad[j].hectaria) {
+                          const ParteTrabajoDetalle = {
+                            IdActividad: dataActividad[j].actividad,
+                            IdEmpleado: dataActividad[j].idEmpleado,
+                            CodigoEmpleado: dataActividad[j].CodigoEmpleado,
+                            Total: dataActividad[j].valorTotal,
+                            Valor: dataActividad[j].hectaria,
+                            Tarifa: dataActividad[j].ValorTarifa,
+                            IdParteTrabajo,
+                            IdCuadrilla: parteTrabajo.IdCuadrilla,
+                            Codigo: parteTrabajo.codigo,
+                          };
 
-                    if (i === dataPD.length - 1) {
-                      try {
-                        const isUpload = await SubirParteTrabajo(Upload);
+                          const {IdParteTrabajoDetalle, feedback} = await (
+                            await SubirParteTrabajoDetalles(ParteTrabajoDetalle)
+                          ).data;
 
-                        if (isUpload.data.upload) {
-                          Alert.alert(
-                            `Datos subidos: Parte Trabajo ${fechaCtx}, sem ${semana} del ${year}`,
-                          );
-                          setIsLoading(false);
+                          if (feedback) {
+                            Alert.alert(
+                              `Ocurrio un error al subir los datos, ${feedback}.`,
+                            );
+                            setIsLoading(false);
+                            return false;
+                          }
+
+                          if (IdParteTrabajoDetalle) {
+                            for (
+                              let k = 0;
+                              k < dataActividad[j].lotes.length;
+                              k++
+                            ) {
+                              let item = dataActividad[j].lotes;
+                              const thisLotes = [];
+
+                              thisLotes.push({
+                                Lote: item[k].Nombre,
+                                IdLote: item[k].IdLote,
+                                Valor: item[k].value,
+                              });
+
+                              const {upload, feedback} = await (
+                                await SubirParteTrabajoDetallesValor(
+                                  thisLotes,
+                                  IdParteTrabajoDetalle,
+                                )
+                              ).data;
+
+                              if (feedback) {
+                                Alert.alert(
+                                  `Ocurrio un error al subir los datos, ${feedback}.`,
+                                );
+                                setIsLoading(false);
+                                return false;
+                              }
+
+                              if (upload) {
+                                Alert.alert(
+                                  `Datos subidos: Parte Trabajo ${fechaCtx}, sem ${semana} del ${year}`,
+                                );
+                                setIsLoading(false);
+                              }
+                            }
+                          }
                         }
-
-                        if (isUpload.data.feedback) {
-                          Alert.alert(
-                            `Ocurrio un error al subir los datos, ${isUpload.data.feedback}.`,
-                          );
-                          setIsLoading(false);
-                        }
-                      } catch (error) {
-                        Alert.alert(error.message);
-                        setIsLoading(false);
                       }
                     }
                   },
@@ -151,8 +175,7 @@ export const SelectUpload = ({
       IdTipoRol: config.rol,
       IdHacienda: config.hacienda,
       IdSector: config.sector,
-      IdCuadrilla: '',
-      ParteTrabajoDetalle: [],
+      IdCuadrilla: obtenerIdCuadrilla(cuadrillas[0].cuadrilla),
     };
 
     return ParteTrabajo;
@@ -160,16 +183,8 @@ export const SelectUpload = ({
 
   const handleChange = (value, cuadrilla) => {
     const changeValue = {select: value, cuadrilla};
-    const changeCuadrillas = [];
-    for (let i = 0; i < cuadrillas.length; i++) {
-      if (cuadrilla === cuadrillas[i].cuadrilla) {
-        changeCuadrillas.push(changeValue);
-      } else {
-        changeCuadrillas.push(cuadrillas[i]);
-      }
-    }
-
-    setCuadrillas(changeCuadrillas);
+    console.log(cuadrillas.splice(0, cuadrillas.length, changeValue));
+    setCuadrillas(cuadrillas.splice(0, cuadrillas.length, changeValue));
   };
 
   return (
