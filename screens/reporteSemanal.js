@@ -3,6 +3,7 @@ import {View, Text, ScrollView, StyleSheet} from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import {MessageAlert} from '../components/elementos/message';
 import {LoaderSpinner} from '../components/loader/spiner-loader';
+import {AddCeraIteracion} from '../hooks/iteracion';
 /* DB LOCAL */
 import {dbConfiguracion} from '../db-local/db-configuracion';
 import {dbParteDiario} from '../db-local/db-parte-diario';
@@ -72,7 +73,7 @@ const ReporteSemanal = () => {
 
                   report_foy_day.push({
                     dia: dias[j],
-                    iteracion: filterDay[i].iteracion,
+                    iteracion: AddCeraIteracion(filterDay[i].iteracion),
                     data: data_for_day,
                   });
 

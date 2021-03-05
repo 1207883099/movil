@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {View, Text, CheckBox, StyleSheet, Button, Alert} from 'react-native';
+import {AddCeraIteracion} from '../../hooks/iteracion';
 /* API */
 import {
   SubirParteTrabajo,
@@ -56,7 +57,6 @@ export const SelectUpload = ({
         async function (err, dataPD) {
           err && Alert.alert(err.message);
           if (dataPD.length) {
-            let Upload = [];
             for (let i = 0; i < dataPD.length; i++) {
               const PD_select = cuadrillas.find(
                 (item) => item.cuadrilla === dataPD[i].cuadrilla,
@@ -92,7 +92,7 @@ export const SelectUpload = ({
                             Tarifa: dataActividad[j].ValorTarifa,
                             IdParteTrabajo,
                             IdCuadrilla: parteTrabajo.IdCuadrilla,
-                            Codigo: parteTrabajo.codigo,
+                            Codigo: parteTrabajo.Codigo,
                           };
 
                           const {IdParteTrabajoDetalle, feedback} = await (
@@ -108,12 +108,10 @@ export const SelectUpload = ({
                           }
 
                           if (IdParteTrabajoDetalle) {
-                            for (
-                              let k = 0;
-                              k < dataActividad[j].lotes.length;
-                              k++
-                            ) {
-                              let item = dataActividad[j].lotes;
+                            const dataLotes = dataActividad[j].lotes;
+
+                            for (let k = 0; k < dataLotes.length; k++) {
+                              let item = dataLotes;
                               const thisLotes = [];
 
                               thisLotes.push({
@@ -137,17 +135,18 @@ export const SelectUpload = ({
                                 return false;
                               }
 
-                              if (upload) {
+                              if (dataLotes.length - 1 === k && upload) {
                                 Alert.alert(
-                                  `Datos subidos: Parte Trabajo ${fechaCtx}, sem ${semana} del ${year}`,
+                                  `Subiendo Datos... Parte Trabajo ${fechaCtx}, sem ${semana} del ${year}`,
                                 );
-                                setIsLoading(false);
                               }
                             }
                           }
                         }
                       }
                     }
+
+                    setIsLoading(false);
                   },
                 );
               }
@@ -166,7 +165,7 @@ export const SelectUpload = ({
 
   const SchemaParteTrabajo = (dataPd) => {
     const ParteTrabajo = {
-      codigo: dataPd.iteracion,
+      Codigo: AddCeraIteracion(dataPd.iteracion),
       Division: config.divicion,
       EjercicioFiscal: config.fiscal,
       Fecha: dataPd.fecha,
