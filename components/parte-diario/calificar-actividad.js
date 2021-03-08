@@ -140,7 +140,7 @@ export function CalificarActividad({
           $set: {
             hectaria: trunc(hectarea, 2),
             lotes: lotes,
-            valorTotal: trunc(Tarifas.ValorTarifa * hectarea, 2),
+            valorTotal: trunc(Tarifas.ValorTarifa * hectarea, 6),
           },
         },
       );

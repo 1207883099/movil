@@ -5,6 +5,7 @@ import {Picker} from '@react-native-picker/picker';
 import {generarLotes} from '../../hooks/lotes';
 /* DB LOCAL */
 import {InsertarActividadEmpleado} from '../../db-local/db-actividades-empleado';
+import {dbAllEmpleados} from '../../db-local/db-emplados-all';
 import {dbMaestra} from '../../db-local/db-maestra';
 import {dbTarifas} from '../../db-local/db-tarifas';
 
@@ -31,10 +32,11 @@ export function AddActividad({
       err && Alert.alert(err.message);
 
       setActividades(dataMaestra[0].Actividades);
-      setEmpleados(
-        dataMaestra[0].My_Cuadrilla.find((item) => item.Nombre === cuadrilla)
-          .Empleados,
-      );
+
+      dbAllEmpleados.find({}, async function (err, dataAllEmpleados) {
+        err && Alert.alert(err.message);
+        setEmpleados(dataAllEmpleados);
+      });
     });
 
     dbTarifas.find({}, async function (err, dataTarifas) {

@@ -49,7 +49,6 @@ export function GenerarTareaEmpleado({
       } else {
         if (Cuadrillas[0].secuencialpartediario) {
           // console.log('iteacion desde sql server')
-          console.log(Cuadrillas[0].secuencialpartediario);
           const secuencia = `8${IdCuadrillaSrt}${
             Cuadrillas[0].secuencialpartediario + 1
           }`;

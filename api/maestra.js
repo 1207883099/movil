@@ -10,3 +10,10 @@ export async function obtenerMaestra(token) {
     headers: {'access-token': token},
   });
 }
+
+export async function obtenerAllEmpleados(tipoRol) {
+  return await axios({
+    method: 'GET',
+    url: `${getDomain()}/api/empleados/${tipoRol}`,
+  });
+}
