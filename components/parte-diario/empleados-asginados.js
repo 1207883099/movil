@@ -14,6 +14,7 @@ import {dbTarifas} from '../../db-local/db-tarifas';
 import {dbMaestra} from '../../db-local/db-maestra';
 import {dbParteDiario} from '../../db-local/db-parte-diario';
 import {InsertarCuadrillaPD} from '../../db-local/db-cuadrilla-parte-diario';
+import {dbAllEmpleados} from '../../db-local/db-emplados-all';
 /* COMPONENTS */
 import {ModalScreen} from '../modal/modal';
 import {CalificarActividad} from './calificar-actividad';
@@ -38,6 +39,7 @@ function EmpleadosAsignados({
   const [isModal, setIsModal] = useState(false);
   const [ActivEmple, setActivEmple] = useState([]);
   const [selectEmpleado, SetselectEmpleado] = useState([]);
+  const [AllEmpleados, SetAllEmpleados] = useState([]);
   const [ActivChange, setActivChange] = useState({
     actividad: undefined,
     idActividadEmple: undefined,
@@ -71,6 +73,11 @@ function EmpleadosAsignados({
     dbTarifas.find({}, async function (err, dataTarifas) {
       err && Alert.alert(err.message);
       setTarifas(dataTarifas);
+    });
+
+    dbAllEmpleados.find({}, async function (err, dataAllEmpleados) {
+      err && Alert.alert(err.message);
+      SetAllEmpleados(dataAllEmpleados);
     });
 
     if (ReloadEmplAsig) {
@@ -140,10 +147,17 @@ function EmpleadosAsignados({
         (empleado) => empleado.IdEmpleado === IdEmpleado,
       );
       if (result === undefined) {
+        const result = AllEmpleados.find(
+          (empleado) => empleado.IdEmpleado === IdEmpleado,
+        );
+
+        if (result) {
+          return result.Apellido;
+        }
+
         return 'Cargando...';
-      } else {
-        return result.Apellido;
       }
+      return result.Apellido;
     }
   };
 

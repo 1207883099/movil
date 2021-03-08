@@ -40,6 +40,7 @@ export function GenerarTareaEmpleado({
       err && Alert.alert(err.message);
 
       if (dataIteracion.length) {
+        // console.log('iteracioon ya existe')
         const IntReverce = dataIteracion.reverse();
         const secuencia = `8${IdCuadrillaSrt}${IntReverce[0].iteracion + 1}`;
         const iteracion = IntReverce[0].iteracion + 1;
@@ -47,13 +48,15 @@ export function GenerarTareaEmpleado({
         setDateSecuencia({IdCuadrilla, iteracion, secuencia});
       } else {
         if (Cuadrillas[0].secuencialpartediario) {
+          // console.log('iteacion desde sql server')
           const secuencia = `8${IdCuadrillaSrt}${
             Cuadrillas[0].secuencialpartediario + 1
           }`;
-          const iteracion = Cuadrillas[0].secuenciapartediario + 1;
+          const iteracion = Cuadrillas[0].secuencialpartediario + 1;
 
           setDateSecuencia({IdCuadrilla, iteracion, secuencia});
         } else {
+          // console.loog('iteacion desde 1');
           setDateSecuencia({
             IdCuadrilla,
             iteracion: 1,

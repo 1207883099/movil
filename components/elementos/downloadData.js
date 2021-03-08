@@ -2,13 +2,15 @@ import React from 'react';
 import {Text, TouchableOpacity, Alert, StyleSheet} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 /* FETCH API */
-import {obtenerMaestra} from '../../api/maestra';
+import {obtenerMaestra, obtenerAllEmpleados} from '../../api/maestra';
 import {obtenerCargos} from '../../api/cargo';
 import {obtenerTarifas} from '../../api/tarifa';
 /* DB LOCAL */
 import {InsertarTarifas} from '../../db-local/db-tarifas';
 import {InsertarMaestra} from '../../db-local/db-maestra';
 import {InsertarCargos} from '../../db-local/db-cargos';
+import {dbConfiguracion} from '../../db-local/db-configuracion';
+import {InsertarAllEmpleados} from '../../db-local/db-emplados-all';
 
 export function DownloadData({UserCtx, setIsLoading, setIsReload}) {
   const bajar_maestra = async () => {
@@ -24,6 +26,16 @@ export function DownloadData({UserCtx, setIsLoading, setIsReload}) {
 
         const tarifas = await obtenerTarifas(UserCtx.token);
         tarifas.data.length && InsertarTarifas(tarifas.data);
+
+        dbConfiguracion.findOne(
+          {section: 'Rol'},
+          async function (err, dataConfi) {
+            err && Alert.alert(err.message);
+
+            const allEmpleados = await obtenerAllEmpleados(dataConfi.value);
+            allEmpleados.data.length && InsertarAllEmpleados(allEmpleados.data);
+          },
+        );
 
         setIsLoading(false);
         setIsReload(true);

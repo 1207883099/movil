@@ -9,13 +9,14 @@ import {dbCuadrillaPD} from '../../db-local/db-cuadrilla-parte-diario';
 import {dbActEmpl} from '../../db-local/db-actividades-empleado';
 import {dbIteracionPT} from '../../db-local/db-interacion-pt';
 import {dbParteDiario} from '../../db-local/db-parte-diario';
+import {dbAllEmpleados} from '../../db-local/db-emplados-all';
 import {dbMe} from '../../db-local/db-me';
 
 export function DeleteData({navigation, setIsReload}) {
   const eliminar_datos = () => {
     Alert.alert(
       'Limpiar datos de aplicacion',
-      'Asegurate haber subido los datos antes de pasar a limpiar la app',
+      'Asegurese de subir los partes diarios antes de eliminar los datos',
       [
         {
           text: 'Cancel',
@@ -33,8 +34,8 @@ export function DeleteData({navigation, setIsReload}) {
 
   const deleteConfig = () => {
     Alert.alert(
-      'Por ultimo',
-      '¿Deseas eliminar los datos de configuracion?',
+      'Configuracion',
+      '¿Desea eliminar los datos de configuracion?',
       [
         {
           text: 'No',
@@ -101,6 +102,10 @@ export function DeleteData({navigation, setIsReload}) {
     });
 
     dbMe.remove({}, {multi: true}, function (err) {
+      err && Alert.alert(err.message);
+    });
+
+    dbAllEmpleados.remove({}, {multi: true}, function (err) {
       err && Alert.alert(err.message);
     });
 
