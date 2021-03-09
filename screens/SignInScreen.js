@@ -183,7 +183,7 @@ const SignInScreen = ({navigation, route}) => {
                 {borderColor: '#009387', borderWidth: 1, marginTop: 15},
               ]}>
               <Text style={[styles.textSign, {color: '#009387'}]}>
-                Configuracion
+                Configuración
               </Text>
             </TouchableOpacity>
           </View>

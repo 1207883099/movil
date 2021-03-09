@@ -228,8 +228,7 @@ const ParteDiarioScreen = ({navigation}) => {
     <>
       <View style={styles.container}>
         <Text style={styles.titePD}>
-          Parte diario:
-          {' ' + fechaCtx + ', Sem ' + periodo.Nombre + ' del ' + fiscal.Nombre}
+          {fechaCtx + ', Sem ' + periodo.Nombre + ' del ' + fiscal.Nombre}
         </Text>
 
         <Animatable.View animation="fadeInUpBig" style={styles.footer}>
@@ -247,11 +246,6 @@ const ParteDiarioScreen = ({navigation}) => {
                       style={styles.eliminar_parte_diario}
                       onPress={() => delete_parte_diario(MisPartesDiarios._id)}>
                       Eliminar parte diario
-                    </Text>
-
-                    <Text>
-                      <Text style={styles.label}>Sector: </Text>
-                      {parte_diario.Nombre}
                     </Text>
 
                     {CPD.cuadrilla ? (
@@ -316,7 +310,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     paddingHorizontal: 20,
-    paddingTop: 30,
+    paddingTop: 10,
     paddingBottom: 70,
   },
   header: {

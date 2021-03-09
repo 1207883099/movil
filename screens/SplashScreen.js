@@ -116,7 +116,7 @@ const SplashScreen = ({navigation, route}) => {
       <StatusBar backgroundColor="#009387" barStyle="light-content" />
       <View style={styles.header}>
         <Text style={styles.titleInput}>
-          Inserta la direccion y codigo autorizados
+          Inserta la dirección y código autorizados
         </Text>
         <TextInput
           onChangeText={(value) => setDomain(value)}
@@ -149,7 +149,6 @@ const SplashScreen = ({navigation, route}) => {
           ]}>
           Industria Bananera
         </Text>
-        <Text style={styles.text}>Procede a iniciar session</Text>
         <View style={styles.button}>
           <TouchableOpacity onPress={btn_empezar}>
             <LinearGradient

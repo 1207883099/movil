@@ -102,7 +102,9 @@ export function UploadData({setIsLoading, fechaCtx, semana, year}) {
           styles.signIn,
           {borderColor: '#009387', borderWidth: 1, marginTop: 15},
         ]}>
-        <Text style={[styles.textSign, {color: '#009387'}]}>Subir datos</Text>
+        <Text style={[styles.textSign, {color: '#009387'}]}>
+          Enviar datos a oficina central
+        </Text>
       </TouchableOpacity>
 
       <ModalScreen isModal={isModal} setIsModal={setIsModal}>

@@ -113,7 +113,7 @@ export function Divicion({divicion, setLoading, setIsReload}) {
           ]}
           style={styles.signIn}>
           <Text style={[styles.text, {color: '#fff'}]}>
-            Division: ({divicion ? divicion : 'Ninguno'})
+            División: ({divicion ? divicion : 'Ninguno'})
           </Text>
         </LinearGradient>
       </TouchableOpacity>

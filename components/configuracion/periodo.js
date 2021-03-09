@@ -132,7 +132,7 @@ export function PeriodoConfig({Periodo, setLoading, setIsReload}) {
           ]}
           style={styles.signIn}>
           <Text style={[styles.text, {color: '#fff'}]}>
-            Periodo: ({Periodo ? Periodo : 'Ninguno'})
+            Período: ({Periodo ? Periodo : 'Ninguno'})
           </Text>
         </LinearGradient>
       </TouchableOpacity>
