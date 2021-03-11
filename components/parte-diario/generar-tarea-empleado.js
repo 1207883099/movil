@@ -36,35 +36,36 @@ export function GenerarTareaEmpleado({
   }, [Cuadrillas]);
 
   const validarIteracion = (IdCuadrilla, IdCuadrillaSrt) => {
-    dbIteracionPT.find({IdCuadrilla}, async function (err, dataIteracion) {
-      err && Alert.alert(err.message);
+    dbIteracionPT
+      .find({IdCuadrilla})
+      .sort({iteracion: -1})
+      .exec(function (err, dataIteracion) {
+        err && Alert.alert(err.message);
 
-      if (dataIteracion.length) {
-        // console.log('iteracioon ya existe')
-        const IntReverce = dataIteracion.reverse();
-        const secuencia = `8${IdCuadrillaSrt}${IntReverce[0].iteracion + 1}`;
-        const iteracion = IntReverce[0].iteracion + 1;
-
-        setDateSecuencia({IdCuadrilla, iteracion, secuencia});
-      } else {
-        if (Cuadrillas[0].secuencialpartediario) {
-          // console.log('iteacion desde sql server')
+        if (dataIteracion.length) {
           const secuencia = `8${IdCuadrillaSrt}${
-            Cuadrillas[0].secuencialpartediario + 1
+            dataIteracion[0].iteracion + 1
           }`;
-          const iteracion = Cuadrillas[0].secuencialpartediario + 1;
+          const iteracion = dataIteracion[0].iteracion + 1;
 
           setDateSecuencia({IdCuadrilla, iteracion, secuencia});
         } else {
-          // console.loog('iteacion desde 1');
-          setDateSecuencia({
-            IdCuadrilla,
-            iteracion: 1,
-            secuencia: `8${IdCuadrillaSrt}1`,
-          });
+          if (Cuadrillas[0].secuencialpartediario) {
+            const secuencia = `8${IdCuadrillaSrt}${
+              Cuadrillas[0].secuencialpartediario + 1
+            }`;
+            const iteracion = Cuadrillas[0].secuencialpartediario + 1;
+
+            setDateSecuencia({IdCuadrilla, iteracion, secuencia});
+          } else {
+            setDateSecuencia({
+              IdCuadrilla,
+              iteracion: 1,
+              secuencia: `8${IdCuadrillaSrt}1`,
+            });
+          }
         }
-      }
-    });
+      });
   };
 
   const addCeroCuadrilla = (IdCuadrilla) => {
