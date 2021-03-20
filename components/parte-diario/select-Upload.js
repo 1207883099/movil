@@ -143,6 +143,12 @@ export const SelectUpload = ({
                             }
                           }
                         }
+
+                        if (dataActividad.length - 1 === j) {
+                          Alert.alert(
+                            `Datos Subidos al servidor: ${fechaCtx}, sem ${semana} del ${year}`,
+                          );
+                        }
                       }
                     }
 
